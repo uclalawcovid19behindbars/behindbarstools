@@ -40,15 +40,15 @@ group_by_coalesce <- function(.data, ...) {
     z_list <- dplyr::group_split(.data, !!!dots)
 
     dplyr::bind_rows(lapply(z_list, function(z){
-        z_sub <- z %>%
-            dplyr::select(-(!!!dots))
-
-        z_cols <- names(z_sub)
-        names(z_cols) <- z_cols
 
         z_group <- z %>%
             dplyr::select(!!!dots) %>%
             unique()
+
+        z_sub <- z[,setdiff(names(z), names(z_group))]
+
+        z_cols <- names(z_sub)
+        names(z_cols) <- z_cols
 
         z_group_string <- paste0(sapply(1:length(z_group), function(i){
             paste0(names(z_group)[i], ": ", z_group[[i]])
