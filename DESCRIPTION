@@ -14,6 +14,7 @@ Depends:
     datasets,
     magrittr,
     dplyr,
-    stringr
+    stringr,
+    readxl
 LazyData: true
 RoxygenNote: 7.1.1
