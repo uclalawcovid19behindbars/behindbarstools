@@ -20,10 +20,8 @@
 clean_fac_col_txt <- function(x, to_upper = FALSE){
     # get rid of excessive white space
     out <- stringr::str_squish(x) %>%
-        # remove trailing stars
-        stringr::str_remove("[\\*]+$") %>%
-        # remove leading stars
-        stringr::str_remove("^[\\*]+") %>%
+        # remove all special characters
+        stringr::str_remove("[^[:alnum:]]") %>%
         # capitalize COVID wherever its found
         stringr::str_replace_all("(?i)covid", "COVID") %>%
         # replace COVID - 19 with  some form of spaces with COVID-19
