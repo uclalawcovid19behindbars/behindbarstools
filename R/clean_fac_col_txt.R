@@ -1,7 +1,7 @@
 #' Cleans character data that has been scraped from websites
 #'
 #' Cleans data usually associated with facilities or column names. Specifically
-#' removes leading and trailing asterisks capitalizes COVID, standardizes
+#' removes special characters (except spaces and dashes), capitalizes COVID, standardizes
 #' COVID-19 references removes new line indicators and excess white space.
 #' Optionally capitalizes output.
 #'
@@ -20,10 +20,8 @@
 clean_fac_col_txt <- function(x, to_upper = FALSE){
     # get rid of excessive white space
     out <- stringr::str_squish(x) %>%
-        # remove trailing stars
-        stringr::str_remove("[\\*]+$") %>%
-        # remove leading stars
-        stringr::str_remove("^[\\*]+") %>%
+        # remove all special characters except spaces and dashes
+        str_remove_all(test, "[^-|^[:space:]|^[:alnum:]]") %>%
         # capitalize COVID wherever its found
         stringr::str_replace_all("(?i)covid", "COVID") %>%
         # replace COVID - 19 with  some form of spaces with COVID-19
