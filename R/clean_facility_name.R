@@ -11,39 +11,33 @@
 #' @export
 
 clean_facility_name <- function(dat){
-    name_xwalk <- "https://raw.githubusercontent.com/uclalawcovid19behindbars" %>%
-        str_c("/facility_data/master/data_sheets/fac_spellings.csv") %>%
-        read_csv(col_types = cols()) %>%
-        select(
-          ID = Count.ID, State, 
-          facility_name_clean,
-          facility_name_raw) %>%
-        mutate(xwalk_name_clean = behindbarstools::clean_fac_col_txt(str_to_upper(facility_name_clean))) %>%
-        mutate(xwalk_name_raw = behindbarstools::clean_fac_col_txt(str_to_upper(facility_name_raw))) %>%
-        unique()
+  name_xwalk <- read_fac_spellings()
 
-    # change this to "dat"
-    dat <- dat %>%
-      mutate(scrape_name_clean = behindbarstools::clean_fac_col_txt(str_to_upper(Name)))
+  dat <- dat %>%
+    mutate(scrape_name_clean = clean_fac_col_txt(str_to_upper(Name)))
 
     nonfederal <- dat %>%
-      filter((State != "Federal") | (jurisdiction != 'federal')) %>% 
+      filter(!str_detect(State, "(?i)federal")) %>%
+      filter(across(any_of("jurisdiction"), ~.x != "federal")) %>%
+      filter(across(any_of("jurisdiction"), ~.x != "Federal")) %>%
       nest_join(name_xwalk, by = c("scrape_name_clean" = "xwalk_name_raw", 
                                 "State" = "State")) %>%
-      hoist(name_xwalk, Name = pluck("facility_name_clean", 1)) %>%
+      hoist(name_xwalk, Name = pluck("xwalk_name_clean", 1)) %>%
       mutate(Name = map(Name, first),
             Name = as.character(Name),
             Name = ifelse(is.na(Name), scrape_name_clean, Name)) 
     
     federal_xwalk <- name_xwalk %>%
-        filter(State == "Federal") 
+      filter(str_detect(State, "(?i)federal"))
       
     federal <- dat %>%
-      filter(jurisdiction == "federal") %>%
+      filter(str_detect(State, "(?i)federal")) %>%
+      filter(across(any_of("jurisdiction"), ~.x == "federal")) %>%
+      filter(across(any_of("jurisdiction"), ~.x == "Federal")) %>%
       select(-State) %>%
       nest_join(name_xwalk, 
                 by = c("scrape_name_clean" = "xwalk_name_raw")) %>%
-      hoist(name_xwalk, Name = pluck("facility_name_clean", 1)) %>%
+      hoist(name_xwalk, Name = pluck("xwalk_name_raw", 1)) %>%
       mutate(Name = map(Name, first),
             Name = as.character(Name),
             Name = ifelse(is.na(Name), scrape_name_clean, Name)) 
