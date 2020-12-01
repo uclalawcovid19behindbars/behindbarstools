@@ -11,24 +11,14 @@
 #' @export
 
 merge_facility_info <- function(dat){
-    facd_df <- "https://raw.githubusercontent.com/uclalawcovid19behindbars" %>%
-        str_c("/facility_data/master/data_sheets/fac_data.csv") %>%
-        read_csv(col_types = cols()) %>%
-        select(
-            ID = Count.ID, State, Name, Address, Zipcode, City, County, 
-            Latitude, Longitude, County.FIPS, hifld_id) %>%
-        mutate(Name = clean_fac_col_txt(str_to_upper(Name))) %>%
-        unique()
-    
-    facdf_df <- "https://raw.githubusercontent.com/uclalawcovid19behindbars" %>%
-      str_c("/facility_data/master/data_sheets/fac_data.csv") %>%
-      read_csv(col_types = cols()) %>%
-      filter(str_detect(Jurisdiction, "(?i)federal")) %>%
-      select(
-        ID = Count.ID, State, Name, Address, Zipcode, City, County, 
-        Latitude, Longitude, County.FIPS, hifld_id) %>%
-      mutate(Name = clean_fac_col_txt(str_to_upper(Name))) %>%
-      unique()
+  fac_info <- read_fac_info()
+
+  federal_fac_info <- read_fac_info() %>%
+    filter(str_detect(Jurisdiction, "(?i)federal"))
+
+  
+
+
 
     return(full_df)
 }

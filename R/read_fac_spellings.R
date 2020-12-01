@@ -13,9 +13,10 @@ read_fac_spellings <- function(){
         read_csv(col_types = cols()) %>%
         select(
             ID = Count.ID, State, 
-            Name = facility_name_clean,
-            Name_Raw = facility_name_raw) %>%
-        mutate(Name = clean_fac_col_txt(str_to_upper(Name))) %>%
-        mutate(Name_Raw = clean_fac_col_txt(str_to_upper(Name_Raw))) %>%
-        unique()
+            facility_name_clean,
+            facility_name_raw) %>%
+        mutate(xwalk_name_clean = clean_fac_col_txt(str_to_upper(facility_name_clean))) %>%
+        mutate(xwalk_name_raw = clean_fac_col_txt(str_to_upper(facility_name_raw))) %>%
+        unique() %>% 
+        select(-c(facility_name_clean, facility_name_raw))
 }
