@@ -34,7 +34,7 @@
 #' @import dplyr
 #' @export
 
-group_by_coalesce <- function(.data, ...) {
+group_by_coalesce <- function(.data, ..., .ignore = c()) {
 
     dots <- dplyr::enquos(...)
     z_list <- dplyr::group_split(.data, !!!dots)
@@ -61,7 +61,7 @@ group_by_coalesce <- function(.data, ...) {
             }
             else{
                 xbar <- unique(as.vector(na.omit(x)))
-                if(length(xbar) != 1){
+                if(length(xbar) != 1 & !(cn %in% .ignore)){
                     warning(paste0(
                         "Group ", z_group_string,
                         " has multiple values that do not match for column ",
