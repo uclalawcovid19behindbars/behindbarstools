@@ -16,6 +16,8 @@ Depends:
     dplyr,
     stringr,
     readxl,
-    readr
+    readr,
+    purrr,
+    tidyr
 LazyData: true
 RoxygenNote: 7.1.1
