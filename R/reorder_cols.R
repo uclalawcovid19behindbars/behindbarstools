@@ -1,24 +1,20 @@
 #' Re-orders columns to respect structure of daily scraped data. 
 #'
 #' Reorders columns in a data frame to agree with the existing structure.
-#' Throws a warning for missing columns and adds them in as all NA rows.
-#' Throws a warning for extra columns and puts them on the end.
+#' Throws a warning for missing columns and optionally adds them in as all NA rows.
+#' Throws a warning for extra columns and optionally keeps them at the end of the dataframe.
 #' 
 #' @param data A data frame, data frame extension (e.g. a tibble), or a lazy
 #' data frame (e.g. from dbplyr or dtplyr).
+#' @param add_missing_cols logical, add missing columns as all NA rows
 #' @param rm_extra_cols logical, remove extra columns 
 #'
-#' @return cleaned character vector
+#' @return re-ordered data frame
 #'
 #' @examples
-#' clean_fac_col_txt(" Messy string \n\r data   ")
+#' reorder_cols(test_data)
 #'
-#' @import magrittr
-#' @import stringr
 #' @export
-#' 
-data <- dat
-test_these <- names(out)
 
 reorder_cols <- function(data, add_missing_cols=TRUE, rm_extra_cols=FALSE) {
     scraper_cols <- c("ID", "jurisdiction", "State", "Name", "Date", "source", "Residents.Confirmed", 
@@ -29,8 +25,8 @@ reorder_cols <- function(data, add_missing_cols=TRUE, rm_extra_cols=FALSE) {
         "Zipcode", "City", "County", "Latitude", "Longitude", "County.FIPS", 
         "hifld_id", "Notes")
     these_cols <- names(data)
-    missing_cols <- if(all(scraper_cols %in% these_cols)) { NULL } else(setdiff(scraper_cols, these_cols))
-    additional_cols <- if(all(these_cols %in% scraper_cols)) { NULL } else(setdiff(these_cols, scraper_cols))
+    missing_cols <- if(all(scraper_cols %in% these_cols)) { NULL } else(base::setdiff(scraper_cols, these_cols))
+    additional_cols <- if(all(these_cols %in% scraper_cols)) { NULL } else(base::setdiff(these_cols, scraper_cols))
 
     # re-order any columns that exist to start with
     data <- data %>% 
@@ -73,5 +69,3 @@ reorder_cols <- function(data, add_missing_cols=TRUE, rm_extra_cols=FALSE) {
         relocate(any_of(scraper_cols))
     return(out)
 }
-
-try_1 <- reorder_cols(dat)
