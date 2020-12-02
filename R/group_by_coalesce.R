@@ -10,6 +10,7 @@
 #' names can be used as if they were positions in the data frame,
 #' so expressions like x:y can be used to select a range of variable
 #' @param .ignore which columns to ignore for warnings
+#' @param .method either 'first' or 'sum'
 #' @return vector of coalesced values
 #'
 #' @examples
@@ -35,7 +36,11 @@
 #' @import dplyr
 #' @export
 
-group_by_coalesce <- function(.data, ..., .ignore = c()) {
+group_by_coalesce <- function(.data, ..., .ignore = c(), .method = "first") {
+
+    if(!(.method %in% c("first", "sum"))){
+        stop(".method should be either 'first' or 'sum'")
+    }
 
     dots <- dplyr::enquos(...)
     z_list <- dplyr::group_split(.data, !!!dots)
@@ -71,7 +76,18 @@ group_by_coalesce <- function(.data, ..., .ignore = c()) {
                         paste0(xbar, collapse = ", ")))
                 }
                 # only grab the first one
-                out <- xbar[1]
+                if(.method == "first"){
+                    out <- xbar[1]
+                }
+                else{
+                    if(is.numeric(xbar)){
+                        # NA's should already be omitted
+                        out <- sum(xbar)
+                    }
+                    else{
+                        out <- paste0(xbar, collapse = "; ")
+                    }
+                }
             }
             out})) %>%
             dplyr::bind_cols(z_group) %>%

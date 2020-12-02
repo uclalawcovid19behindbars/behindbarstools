@@ -4,7 +4,7 @@
 \alias{group_by_coalesce}
 \title{A all in one group by and coalesce function}
 \usage{
-group_by_coalesce(.data, ..., .ignore = c())
+group_by_coalesce(.data, ..., .ignore = c(), .method = "first")
 }
 \arguments{
 \item{.data}{A data frame, data frame extension (e.g. a tibble), or a lazy
@@ -15,6 +15,8 @@ names can be used as if they were positions in the data frame,
 so expressions like x:y can be used to select a range of variable}
 
 \item{.ignore}{which columns to ignore for warnings}
+
+\item{.method}{either 'first' or 'sum'}
 }
 \value{
 vector of coalesced values
