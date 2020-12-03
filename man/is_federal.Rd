@@ -4,10 +4,12 @@
 \alias{is_federal}
 \title{Simple function that returns TRUE/FALSE if "federal" is detected, case insensitive}
 \usage{
-is_federal(x)
+is_federal(x, ...)
 }
 \arguments{
 \item{x}{string}
+
+\item{...}{inherited argument from str_detect}
 }
 \value{
 TRUE/FALSE

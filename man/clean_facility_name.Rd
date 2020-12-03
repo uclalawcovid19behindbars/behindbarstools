@@ -4,10 +4,12 @@
 \alias{clean_facility_name}
 \title{A facility name cleaning function. Uses GitHub facility name cross-walk to find all possible name variations}
 \usage{
-clean_facility_name(dat)
+clean_facility_name(dat, alt_name_xwalk = FALSE)
 }
 \arguments{
 \item{dat}{Scraped/historical data with columns Name and State, at the very least}
+
+\item{alt_name_xwalk}{Optional parameter provides an alternative facility name crosswalk}
 }
 \value{
 data set with cleaned facility name column, "Name", from crosswalk on GitHub

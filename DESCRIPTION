@@ -18,6 +18,7 @@ Depends:
     readxl,
     readr,
     purrr,
-    tidyr
+    tidyr,
+    assertthat
 LazyData: true
 RoxygenNote: 7.1.1
