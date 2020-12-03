@@ -19,6 +19,7 @@ Depends:
     readr,
     purrr,
     tidyr,
-    assertthat
+    assertthat,
+    ggplot2
 LazyData: true
 RoxygenNote: 7.1.1
