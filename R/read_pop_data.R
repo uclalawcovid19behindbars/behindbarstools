@@ -6,6 +6,9 @@
 #'
 #' @importFrom readr read_csv
 #' @export
+#'
+#' @examples
+#' read_pop_data()
 
 read_pop_data <- function(){
     "https://raw.githubusercontent.com/uclalawcovid19behindbars/Population/" %>%
@@ -19,7 +22,7 @@ read_pop_data <- function(){
         distinct(Name_Raw, State, .keep_all = TRUE) %>%
         left_join(
             read_fac_crosswalk() %>%
-                select(Name, Name_Raw, State),
+                select(Name= xwalk_name_clean, Name_Raw = xwalk_name_raw, State),
             by = c("Name_Raw", "State")) %>%
         mutate(Name = ifelse(is.na(Name), Name_Raw, Name)) %>%
         select(-Name_Raw)

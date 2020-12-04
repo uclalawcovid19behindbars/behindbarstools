@@ -12,3 +12,6 @@ data frame with facility identifiers and variations on those names
 \description{
 Reads in facility alternative name spellings
 }
+\examples{
+read_fac_spellings()
+}

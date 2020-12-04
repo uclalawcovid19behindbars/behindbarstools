@@ -12,3 +12,6 @@ data frame with population data
 \description{
 Reads in population data
 }
+\examples{
+read_pop_data()
+}

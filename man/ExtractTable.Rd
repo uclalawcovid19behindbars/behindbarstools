@@ -4,14 +4,11 @@
 \alias{ExtractTable}
 \title{Function to extract all tables from an image}
 \usage{
-ExtractTable(img, file_type = ".png", api_key = NULL)
+ExtractTable(img, api_key = NULL)
 }
 \arguments{
 \item{img}{character indicating file location of image or an object of
 class 'magick-image'}
-
-\item{file_type}{character image type to save magick image to temp file for
-extraction}
 
 \item{api_key}{character extractable api key. If NULL will search Environment
 variables for object 'EXTRACTABLE_API_KEY'}
