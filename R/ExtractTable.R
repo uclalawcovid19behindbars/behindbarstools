@@ -55,8 +55,6 @@ process_file <- function(api_key, filepath) {
 #'
 #' @param img character indicating file location of image or an object of
 #' class 'magick-image'
-#' @param file_type character image type to save magick image to temp file for
-#' extraction
 #' @param api_key character extractable api key. If NULL will search Environment
 #' variables for object 'EXTRACTABLE_API_KEY'
 #' @return list of matrices and vectors of extracted table information
