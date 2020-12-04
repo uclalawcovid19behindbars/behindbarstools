@@ -73,14 +73,14 @@ process_file <- function(api_key, filepath) {
 #'     magick::image_read() %>%
 #'     ExtractTable()
 
-ExtractTable <- function(img, file_type = ".png", api_key = NULL) {
+ExtractTable <- function(img,  api_key = NULL) {
     if(is.null(api_key)){
         api_key <- Sys.getenv("EXTRACTABLE_API_KEY")
     }
 
     # TODO: this cant be the right way to check this? right
     if(class(img) == "magick-image"){
-        f_ <- tempfile(fileext = file_type)
+        f_ <- tempfile(fileext = ".png")
         magick::image_write(img, f_)
         img <- f_
     }
