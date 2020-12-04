@@ -13,7 +13,7 @@
 #' @importFrom purrr pluck
 #' @importFrom purrr map
 #' @importFrom assertthat has_name
-#' @importFrom assertthat see_ifd
+#' @importFrom assertthat see_if
 #'
 #' @export
 

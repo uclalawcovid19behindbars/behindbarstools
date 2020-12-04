@@ -21,5 +21,9 @@ Depends:
     tidyr,
     assertthat,
     ggplot2
+Imports:
+    httr,
+    jsonlite,
+    magick
 LazyData: true
 RoxygenNote: 7.1.1
