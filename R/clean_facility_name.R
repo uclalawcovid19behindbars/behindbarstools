@@ -30,6 +30,12 @@ clean_facility_name <- function(dat, alt_name_xwalk = FALSE){
   } else {
     dat$jurisdiction <- dat$jurisdiction
   }
+  check_facility <- see_if(dat %has_name% "Facility")
+  if(check_facility == FALSE){
+    dat$facility <- NA
+  } else {
+    dat$facility <- dat$Facility
+  }
 
   dat <- dat %>%
     mutate(scrape_name_clean = clean_fac_col_txt(Name, to_upper = TRUE),
