@@ -32,9 +32,9 @@ clean_facility_name <- function(dat, alt_name_xwalk = FALSE){
   }
   check_facility <- see_if(dat %has_name% "Facility")
   if(check_facility == FALSE){
-    dat$facility <- NA
+    dat$Facility <- NA
   } else {
-    dat$facility <- dat$Facility
+    dat$Facility <- dat$Facility
   }
 
   dat <- dat %>%
