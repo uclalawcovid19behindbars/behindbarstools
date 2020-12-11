@@ -24,13 +24,13 @@ clean_facility_name <- function(dat, alt_name_xwalk = FALSE){
   else {
     name_xwalk <- read_fac_spellings()
   }
-  check_jurisdiction <- see_if(dat assertthat::%has_name% "jurisdiction")
+  check_jurisdiction <- see_if(dat %has_name% "jurisdiction")
   if(check_jurisdiction == FALSE){
     dat$jurisdiction <- NA
   } else {
     dat$jurisdiction <- dat$jurisdiction
   }
-  check_facility <- see_if(dat assertthat::%has_name% "Facility")
+  check_facility <- see_if(dat %has_name% "Facility")
   if(check_facility == FALSE){
     dat$Facility <- NA
   } else {
