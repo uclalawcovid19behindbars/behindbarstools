@@ -2,7 +2,8 @@
 #'
 #' Cleans data usually associated with facilities or column names. Specifically
 #' removes special characters (except spaces and dashes), capitalizes COVID, standardizes
-#' COVID-19 references removes new line indicators and excess white space.
+#' COVID-19 references, removes new line indicators and excess white space,
+#' and changes "state-wide" to "statewide" (case-insensitive).
 #' Optionally capitalizes output.
 #'
 #' @param x character vector to clean
@@ -26,6 +27,8 @@ clean_fac_col_txt <- function(x, to_upper = FALSE){
         stringr::str_replace_all("(?i)covid", "COVID") %>%
         # replace COVID - 19 with  some form of spaces with COVID-19
         stringr::str_replace_all("COVID[ ]*-[ ]*19", "COVID-19") %>%
+        # replace STATE-WIDE with STATEWIDE
+        stringr::str_replace_all("(?i)state-wide", "STATEWIDE") %>%
         stringr::str_replace_all("\\n", " ") %>%
         stringr::str_replace_all("\\r", " ") %>%
         stringr::str_squish()
