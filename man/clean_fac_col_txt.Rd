@@ -17,7 +17,8 @@ cleaned character vector
 \description{
 Cleans data usually associated with facilities or column names. Specifically
 removes special characters (except spaces and dashes), capitalizes COVID, standardizes
-COVID-19 references removes new line indicators and excess white space.
+COVID-19 references, removes new line indicators and excess white space,
+and changes "state-wide" to "statewide" (case-insensitive).
 Optionally capitalizes output.
 }
 \examples{
