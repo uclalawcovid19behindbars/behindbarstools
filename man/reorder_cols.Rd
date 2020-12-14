@@ -23,7 +23,7 @@ Throws a warning for missing columns and optionally adds them in as all NA rows.
 Throws a warning for extra columns and optionally keeps them at the end of the dataframe.
 }
 \examples{
-test_data <- tibble("jurisdiction" = "jail",
+test_data <- tibble::tibble("jurisdiction" = "jail",
                     "City" = "Los Angeles")
 reorder_cols(test_data)
 

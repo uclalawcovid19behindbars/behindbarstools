@@ -5,6 +5,7 @@
 #' @return data frame with facility crosswalk data
 #'
 #' @importFrom readr read_csv
+#' @importFrom dplyr left_join
 #' @export
 
 read_fac_crosswalk <- function(){

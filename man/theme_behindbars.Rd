@@ -22,6 +22,7 @@ scale_fill_bbcontinous()
 a set of themes and colors for behind bars plots
 }
 \examples{
+library(ggplot2)
 iris \%>\%
     ggplot(aes(x = Petal.Width, y = Petal.Length, color = Species)) +
     geom_point() +

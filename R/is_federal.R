@@ -10,8 +10,8 @@
 #' is_federal("FedeRal")
 #' is_federal("test")
 #'
-#' @import stringr
+#' @importFrom stringr str_detect
 #'
 #' @export
 
-is_federal <- function(x, ...) stringr::str_detect(x, "(?i)federal", ...)
+is_federal <- function(x, ...) str_detect(x, "(?i)federal", ...)

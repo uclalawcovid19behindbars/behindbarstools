@@ -12,9 +12,12 @@
 #' @return re-ordered data frame
 #'
 #' @examples
-#' test_data <- tibble("jurisdiction" = "jail",
+#' test_data <- tibble::tibble("jurisdiction" = "jail",
 #'                     "City" = "Los Angeles")
 #' reorder_cols(test_data)
+#'
+#' @importFrom dplyr relocate
+#' @importFrom dplyr any_of
 #'
 #' @export
 
