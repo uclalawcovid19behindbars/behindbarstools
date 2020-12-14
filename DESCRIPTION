@@ -2,7 +2,7 @@ Package: behindbarstools
 Type: Package
 Title: Tools for the UCLA Behind Bars Data team
 Version: 0.1.0
-Authors@R: c(person("Michael","Everett",role=c("aut"),email="everett@law.ucla.edu"),person("Hope","Johnson",role=c("aut"),email="johnsonh@law.ucla.edu"),person("Neal","Marquez",role=c("aut","cre"),email="marquezn@law.ucla.edu"))
+Authors@R: c(person("Michael","Everett",role=c("aut"),email="everett@law.ucla.edu"),person("Hope","Johnson",role=c("aut"),email="johnsonh@law.ucla.edu"),person("Neal","Marquez",role=c("aut","cre"),email="marquezn@law.ucla.edu"),person("Erika","Tyagi",role=c("aut"),email="tyagi@law.ucla.edu"))
 Maintainer: Neal Marquez <marquezn@law.ucla.edu>
 Description: A set of shared tools for use among the UCLA Behind Bars Data team
     for all data projects.
@@ -24,6 +24,10 @@ Depends:
 Imports:
     httr,
     jsonlite,
-    magick
+    magick,
+    xml2,
+    lubridate,
+    tibble,
+    rvest
 LazyData: true
 RoxygenNote: 7.1.1

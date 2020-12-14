@@ -12,7 +12,7 @@
 
 read_pop_data <- function(){
     "https://raw.githubusercontent.com/uclalawcovid19behindbars/Population/" %>%
-        str_c("main/Merg_Pop.csv") %>%
+        str_c("main/initial/Merg_Pop.csv") %>%
         read_csv(col_types = cols()) %>%
         rename(Name_Raw = Name) %>%
         select(Name_Raw, Population, State) %>%
