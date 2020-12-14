@@ -7,6 +7,7 @@
 #' @importFrom readr read_csv
 #' @importFrom readr cols
 #' @importFrom utils download.file
+#' @importFrom dplyr rename
 #' @export
 
 read_hifld_data <- function(){
@@ -19,6 +20,6 @@ read_hifld_data <- function(){
         download.file(tf)
 
     read_csv(tf, col_types = cols()) %>%
-        dplyr::rename(hifld_id = FACILITYID)
+        rename(hifld_id = FACILITYID)
 }
 

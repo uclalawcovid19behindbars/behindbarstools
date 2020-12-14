@@ -6,6 +6,7 @@
 #' @export
 #'
 #' @examples
+#' library(ggplot2)
 #' iris %>%
 #'     ggplot(aes(x = Petal.Width, y = Petal.Length, color = Species)) +
 #'     geom_point() +
@@ -88,7 +89,7 @@ scale_fill_bbdiscrete <- function(){
 #' @rdname theme_behindbars
 
 scale_color_bbcontinous <- function(){
-    scale_colour_gradient(
+    ggplot2::scale_colour_gradient(
         low = "#71A9C9",
         high = "#bd2828",
         na.value = "grey50",
@@ -102,7 +103,7 @@ scale_color_bbcontinous <- function(){
 #' @rdname theme_behindbars
 
 scale_fill_bbcontinous <- function(){
-    scale_fill_gradient(
+    ggplot2::scale_fill_gradient(
         low = "#71A9C9",
         high = "#bd2828",
         na.value = "grey50",

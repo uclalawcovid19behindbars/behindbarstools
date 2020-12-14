@@ -5,6 +5,12 @@
 #' @return data frame with population data
 #'
 #' @importFrom readr read_csv
+#' @importFrom dplyr rename
+#' @importFrom dplyr select
+#' @importFrom dplyr mutate
+#' @importFrom dplyr distinct
+#' @importFrom dplyr left_join
+#' @importFrom stringr str_c
 #' @export
 #'
 #' @examples

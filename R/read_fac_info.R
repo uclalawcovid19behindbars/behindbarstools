@@ -5,6 +5,8 @@
 #' @return data frame with facility metadata
 #'
 #' @importFrom readr read_csv
+#' @importFrom stringr str_c
+#' @importFrom dplyr select
 #' @export
 
 read_fac_info <- function(){

@@ -8,6 +8,10 @@
 #'
 #' @importFrom readxl read_excel
 #' @importFrom utils download.file
+#' @importFrom dplyr filter
+#' @importFrom dplyr select
+#' @importFrom dplyr mutate
+#' @importFrom utils download.file
 #' @export
 
 read_vera_pop <- function(updated = TRUE){

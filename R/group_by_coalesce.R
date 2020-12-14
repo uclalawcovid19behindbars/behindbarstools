@@ -33,7 +33,8 @@
 #'
 #' @importFrom magrittr %>%
 #' @importFrom stats na.omit
-#' @import dplyr
+#' @importFrom dplyr enquos
+#' @importFrom dplyr group_split
 #' @export
 
 group_by_coalesce <- function(.data, ..., .ignore = c(), .method = "first") {

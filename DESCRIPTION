@@ -10,24 +10,24 @@ License: GPL (>= 2)
 Encoding: UTF-8
 Depends: 
     R (>= 4.0.0),
-    stats,
-    datasets,
-    magrittr,
-    dplyr,
-    stringr,
-    readxl,
-    readr,
-    purrr,
-    tidyr,
-    assertthat,
-    ggplot2
+    dplyr
 Imports:
     httr,
     jsonlite,
     magick,
     xml2,
+    magrittr,
     lubridate,
     tibble,
-    rvest
+    rvest,
+    ggplot2,
+    datasets,
+    assertthat,
+    purrr,
+    tidyr,
+    readxl,
+    readr,
+    stringr,
+    stats
 LazyData: true
 RoxygenNote: 7.1.1

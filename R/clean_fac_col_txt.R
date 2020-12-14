@@ -14,27 +14,29 @@
 #' @examples
 #' clean_fac_col_txt(" Messy string \n\r data   ")
 #'
-#' @import magrittr
-#' @import stringr
+#' @importFrom magrittr %>%
+#' @importFrom stringr str_replace_all
+#' @importFrom stringr str_squish
+#' @importFrom stringr str_to_upper
 #' @export
 
 clean_fac_col_txt <- function(x, to_upper = FALSE){
     # get rid of excessive white space
-    out <- stringr::str_squish(x) %>%
+    out <- str_squish(x) %>%
         # remove all special characters except spaces and dashes
         str_remove_all("[^-|^[:space:]|^[:alnum:]]") %>%
         # capitalize COVID wherever its found
-        stringr::str_replace_all("(?i)covid", "COVID") %>%
+        str_replace_all("(?i)covid", "COVID") %>%
         # replace COVID - 19 with  some form of spaces with COVID-19
-        stringr::str_replace_all("COVID[ ]*-[ ]*19", "COVID-19") %>%
+        str_replace_all("COVID[ ]*-[ ]*19", "COVID-19") %>%
         # replace STATE-WIDE with STATEWIDE
-        stringr::str_replace_all("(?i)state-wide", "STATEWIDE") %>%
-        stringr::str_replace_all("\\n", " ") %>%
-        stringr::str_replace_all("\\r", " ") %>%
-        stringr::str_squish()
+        str_replace_all("(?i)state-wide", "STATEWIDE") %>%
+        str_replace_all("\\n", " ") %>%
+        str_replace_all("\\r", " ") %>%
+        str_squish()
 
     if(to_upper){
-        out <- stringr::str_to_upper(out)
+        out <- str_to_upper(out)
     }
 
     out

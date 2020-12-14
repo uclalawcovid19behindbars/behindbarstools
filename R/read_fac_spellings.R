@@ -5,6 +5,10 @@
 #' @return data frame with facility identifiers and variations on those names
 #'
 #' @importFrom readr read_csv
+#' @importFrom stringr str_c
+#' @importFrom stringr str_to_upper
+#' @importFrom dplyr select
+#' @importFrom dplyr mutate
 #' @export
 #'
 #' @examples
