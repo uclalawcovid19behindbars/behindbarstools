@@ -5,16 +5,19 @@
 #' @param all_dates logical, get all data from all dates recorded by webscaraper
 #' @param coalesce logical, collapse common facilities into single row
 #' @param debug logical, print debug statements on number of rows maintained in
+#' @param state character vector, states to limit data to
 #' cleaning process
 #'
 #' @return character vector of state names
 #'
 #' @examples
 #' read_scrape_data(all_dates = FALSE)
+#' read_scrape_data(all_dates = TRUE, state = "Wyoming")
 #'
 #' @export
 
-read_scrape_data <- function(all_dates = FALSE, coalesce = TRUE, debug = FALSE){
+read_scrape_data <- function(
+    all_dates = FALSE, coalesce = TRUE, debug = FALSE, state = NULL){
 
     facd_df <- "https://raw.githubusercontent.com/uclalawcovid19behindbars" %>%
         stringr::str_c("/facility_data/master/data_sheets/fac_data.csv") %>%
@@ -115,6 +118,16 @@ read_scrape_data <- function(all_dates = FALSE, coalesce = TRUE, debug = FALSE){
 
     out_df <- full_df %>%
         mutate(Residents.Released = NA, Notes = NA)
+
+    if(!is.null(state)){
+        out_df <- out_df %>%
+            filter(State %in% state)
+
+        if(debug){
+            message(stringr::str_c(
+                "State specific data frame contains ", nrow(out_df), " rows."))
+        }
+    }
 
     if(coalesce){
         out_df <- out_df %>%
