@@ -4,14 +4,21 @@
 \alias{read_scrape_data}
 \title{Read data extracted by webscraper}
 \usage{
-read_scrape_data(all_dates = FALSE, coalesce = TRUE, debug = FALSE)
+read_scrape_data(
+  all_dates = FALSE,
+  coalesce = TRUE,
+  debug = FALSE,
+  state = NULL
+)
 }
 \arguments{
 \item{all_dates}{logical, get all data from all dates recorded by webscaraper}
 
 \item{coalesce}{logical, collapse common facilities into single row}
 
-\item{debug}{logical, print debug statements on number of rows maintained in
+\item{debug}{logical, print debug statements on number of rows maintained in}
+
+\item{state}{character vector, states to limit data to
 cleaning process}
 }
 \value{
@@ -22,5 +29,6 @@ Reads either time series or latest data from the web scraper runs
 }
 \examples{
 read_scrape_data(all_dates = FALSE)
+read_scrape_data(all_dates = TRUE, state = "Wyoming")
 
 }
