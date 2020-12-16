@@ -24,6 +24,6 @@ read_fac_spellings <- function(){
             facility_name_raw) %>%
         mutate(xwalk_name_clean = clean_fac_col_txt(str_to_upper(facility_name_clean))) %>%
         mutate(xwalk_name_raw = clean_fac_col_txt(str_to_upper(facility_name_raw))) %>%
-        unique() %>%
-        select(-c(facility_name_clean, facility_name_raw))
+        select(-c(facility_name_clean, facility_name_raw)) %>%
+        unique()
 }
