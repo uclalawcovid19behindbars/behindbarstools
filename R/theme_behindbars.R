@@ -36,17 +36,17 @@ theme_behindbars <- function(){
             axis.line.x = ggplot2::element_line(
                 color = "#555526"),
             axis.title.x = ggplot2::element_text(
-                family = "Arial", size = 27, color = "#555526"),
+                family = "Times", size = 27, color = "#555526"),
             axis.title.y = ggplot2::element_text(
-                family = "Arial", size = 27, color = "#555526"),
+                family = "Times", size = 27, color = "#555526"),
             legend.text = ggplot2::element_text(
-                family = "Arial", size = 22, color = "#555526"),
+                family = "Times", size = 22, color = "#555526"),
             legend.title = ggplot2::element_text(
-                family = "Arial", size = 22, color = "#555526"),
+                family = "Times", size = 22, color = "#555526"),
             axis.text.x = ggplot2::element_text(
-                family = "Arial", size = 22, color = "#555526"),
+                family = "Times", size = 22, color = "#555526"),
             axis.text.y = ggplot2::element_text(
-                family = "Arial", size = 22, color = "#555526"))
+                family = "Times", size = 22, color = "#555526"))
 }
 
 

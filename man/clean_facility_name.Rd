@@ -4,12 +4,14 @@
 \alias{clean_facility_name}
 \title{A facility name cleaning function. Uses GitHub facility name cross-walk to find all possible name variations}
 \usage{
-clean_facility_name(dat, alt_name_xwalk = FALSE)
+clean_facility_name(dat, alt_name_xwalk = FALSE, debug = FALSE)
 }
 \arguments{
 \item{dat}{Scraped/historical data with columns Name and State, at the very least}
 
 \item{alt_name_xwalk}{Optional parameter provides an alternative facility name crosswalk}
+
+\item{debug}{Boolean whether to include additional columns geneated during the merging process}
 }
 \value{
 data set with cleaned facility name column, "Name", from crosswalk on GitHub
@@ -17,4 +19,9 @@ data set with cleaned facility name column, "Name", from crosswalk on GitHub
 \description{
 A facility name cleaning function. Uses GitHub facility name cross-walk to find all possible name variations.
 Cleans federal and non-federal facilities in separate processes, in order to use "State" to merge or not
+}
+\examples{
+clean_facility_name(
+    tibble(Name = "BULLOCK CORRECTIONAL FACILITY", State = "Alabama"))
+
 }
