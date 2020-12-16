@@ -100,20 +100,30 @@ read_scrape_data <- function(
             "Pop data frame contains ", nrow(pop_df), " rows."))
     }
 
-    pop_df %>%
+    pop_df <- pop_df %>%
         mutate(Residents.Population = Population) %>%
         # fill in HIFLD pop where no alternative exists
         mutate(Residents.Population = ifelse(
-            is.na(Residents.Population), hifld_pop, Residents.Population)) %>%
-        # Select the order for names corresponding to Public facing Google sheet
-        select(
-            ID, jurisdiction, State, Name, Date, source,
-            Residents.Confirmed, Staff.Confirmed,
-            Residents.Deaths, Staff.Deaths, Residents.Recovered,
-            Staff.Recovered, Residents.Tadmin, Staff.Tested, Residents.Negative,
-            Staff.Negative, Residents.Pending, Staff.Pending,
-            Residents.Quarantine, Staff.Quarantine, Residents.Active,
-            Residents.Population, Address, Zipcode, City, County, Latitude,
-            Longitude, County.FIPS, hifld_id, Notes) %>%
-        arrange(State, Name, Date)
+            is.na(Residents.Population), hifld_pop, Residents.Population)) 
+    
+    if(debug){
+        # leave all columns present for debugging
+        pop_df <- pop_df %>% 
+            arrange(State, Name, Date)
+    }
+    else {
+        pop_df <- pop_df %>% 
+            # Select the order for names corresponding to Public facing Google sheet
+            select(
+                ID, jurisdiction, State, Name, Date, source,
+                Residents.Confirmed, Staff.Confirmed,
+                Residents.Deaths, Staff.Deaths, Residents.Recovered,
+                Staff.Recovered, Residents.Tadmin, Staff.Tested, Residents.Negative,
+                Staff.Negative, Residents.Pending, Staff.Pending,
+                Residents.Quarantine, Staff.Quarantine, Residents.Active,
+                Residents.Population, Address, Zipcode, City, County, Latitude,
+                Longitude, County.FIPS, hifld_id, Notes) %>%
+            arrange(State, Name, Date)
+    }
+    return(pop_df)
 }
