@@ -13,5 +13,5 @@ read_fac_info <- function(){
     "https://raw.githubusercontent.com/uclalawcovid19behindbars" %>%
         str_c("/facility_data/master/data_sheets/fac_data.csv") %>%
         read_csv(col_types = cols()) %>%
-        select(-Jurisdiction, - Count.ID)
+        select(-Jurisdiction)
 }
