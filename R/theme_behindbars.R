@@ -25,30 +25,31 @@
 #'     theme_behindbars() +
 #'     scale_color_bbcontinous()
 
-theme_behindbars <- function(){
-    ggplot2::theme_classic() +
+theme_behindbars <- function(
+    base_size = 24, base_family = "Helvetica") {
+    
+    ggplot2::theme_classic(
+        base_family = base_family, 
+        base_size = base_size
+    ) +
         ggplot2::theme(
-            panel.grid.major.y = ggplot2::element_line(
-                color = "#92926C",
-                linetype = 9),
-            axis.line.y = ggplot2::element_blank(),
-            axis.ticks.y = ggplot2::element_blank(),
-            axis.line.x = ggplot2::element_line(
-                color = "#555526"),
-            axis.title.x = ggplot2::element_text(
-                family = "Times", size = 27, color = "#555526"),
-            axis.title.y = ggplot2::element_text(
-                family = "Times", size = 27, color = "#555526"),
-            legend.text = ggplot2::element_text(
-                family = "Times", size = 22, color = "#555526"),
-            legend.title = ggplot2::element_text(
-                family = "Times", size = 22, color = "#555526"),
-            axis.text.x = ggplot2::element_text(
-                family = "Times", size = 22, color = "#555526"),
-            axis.text.y = ggplot2::element_text(
-                family = "Times", size = 22, color = "#555526"))
+            text =                element_text(color = "#555526"), 
+            panel.grid.major.y =  element_line(color = "#92926C", linetype = "dotted"),
+            plot.title.position = "plot", 
+            axis.line.y =         element_blank(),
+            axis.ticks.y =        element_blank(), 
+            axis.text =           element_text(color = "#555526"), 
+            axis.line =           element_line(color = "#555526"), 
+            axis.ticks =          element_line(color = "#555526"), 
+            plot.caption =        element_text(margin = margin(t = 1.2 * base_size)), 
+            plot.subtitle =       element_text(margin = margin(b = 1.2 * base_size)), 
+            axis.title.y =        element_text(margin = margin(r = 1.2 * base_size)), 
+            axis.title.x =        element_text(margin = margin(t = 0.6 * base_size)),
+            axis.text.y =         element_text(vjust = -0.5, hjust = -0.5, margin = margin(r = -1.5 * base_size)), 
+            plot.tag =            element_text(size = base_size / 2), 
+            plot.tag.position =   c(0.9, 0.02) 
+        )
 }
-
 
 #' @import ggplot2
 #' @export
