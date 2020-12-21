@@ -38,7 +38,8 @@ reorder_cols <- function(data, add_missing_cols=TRUE, rm_extra_cols=FALSE) {
         relocate(any_of(scraper_cols))
 
     if(rm_extra_cols & (length(additional_cols) > 1 )){
-        add_out = data[,!(these_cols %in% additional_cols)]
+         add_out = data %>%
+            select(-all_of(additional_cols))
     }
     else{
         if(length(additional_cols) > 1) {
