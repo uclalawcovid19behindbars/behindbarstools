@@ -42,7 +42,7 @@ reorder_cols <- function(data, add_missing_cols=TRUE, rm_extra_cols=FALSE) {
             select(-all_of(additional_cols))
     }
     else{
-        if(length(additional_cols) > 1) {
+        if(length(additional_cols) > 0) {
             warning(paste0("Input data has ", length(additional_cols),
             " additional columns: ", paste0(additional_cols, collapse = ", "),
             ". Moving these to the end of the data set."))
@@ -60,7 +60,7 @@ reorder_cols <- function(data, add_missing_cols=TRUE, rm_extra_cols=FALSE) {
         missing_out <- add_out
     }
     else{
-        if(length(missing_cols) > 1) {
+        if(length(missing_cols) > 0) {
             warning(paste0("Input data has ", length(missing_cols),
             " missing columns: ", paste0(missing_cols, collapse = ", "),
             ". Adding these columns in as NA rows."))
