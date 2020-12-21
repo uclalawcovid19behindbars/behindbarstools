@@ -10,7 +10,8 @@ plot_fac_trend(
   metric,
   scrape_df = NULL,
   plot_days = NULL,
-  annotate = F
+  annotate = F,
+  auto_label = F
 )
 }
 \arguments{
@@ -25,15 +26,27 @@ plot_fac_trend(
 \item{plot_days}{integer, number of days to plot}
 
 \item{annotate}{logical, whether to include text annotations for most recent value}
+
+\item{auto_label}{logical, whether to label plot title, subtitle, axes based on behindbarstools::get_metric_description}
 }
 \value{
 ggplot object
 }
 \description{
 Creates time series plots showing the trend for a single facility for a given
-metric, formatted according to the style guide.
+metric, formatted according to the style guide. Returns a ggplot object, so 
+additional layers can be added, per the examples.
 }
 \examples{
+\dontrun{
 plot_fac_trend("Los Angeles Jails", "California", "Residents.Active")
+} 
+
+\dontrun{
+plot_fac_trend("Los Angeles Jails", "California", "Residents.Active") + 
+    scale_x_date(date_labels = "\%m/\%y") + 
+    labs(x = "Cases") + 
+    ylim(0, 150)
+}
 
 }

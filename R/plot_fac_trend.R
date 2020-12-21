@@ -1,7 +1,8 @@
 #' Plot a single facility metric 
 #'
 #' Creates time series plots showing the trend for a single facility for a given
-#' metric, formatted according to the style guide. 
+#' metric, formatted according to the style guide. Returns a ggplot object, so 
+#' additional layers can be added, per the examples. 
 #'
 #' @param fac_name character string of the facility to plot 
 #' @param state character string of the facility's state 
@@ -9,11 +10,21 @@
 #' @param scrape_df data frame with scraped data 
 #' @param plot_days integer, number of days to plot  
 #' @param annotate logical, whether to include text annotations for most recent value  
+#' @param auto_label logical, whether to label plot title, subtitle, axes based on behindbarstools::get_metric_description
 #' 
 #' @return ggplot object 
 #' 
 #' @examples
+#' \dontrun{
 #' plot_fac_trend("Los Angeles Jails", "California", "Residents.Active")
+#' } 
+#' 
+#' \dontrun{
+#' plot_fac_trend("Los Angeles Jails", "California", "Residents.Active") + 
+#'     scale_x_date(date_labels = "%m/%y") + 
+#'     labs(x = "Cases") + 
+#'     ylim(0, 150)
+#' }
 #' 
 #' @import ggplot2
 #' @import dplyr 
@@ -24,7 +35,7 @@
 #' @export
 
 plot_fac_trend <- function(
-    fac_name, state, metric, scrape_df = NULL, plot_days = NULL, annotate = F) {
+    fac_name, state, metric, scrape_df = NULL, plot_days = NULL, annotate = F, auto_label = F) {
     
     if (! behindbarstools::is_fac_name(fac_name, state)) {
         stop(str_c(fac_name, " in ", state, " is not a valid facility."))
@@ -53,13 +64,16 @@ plot_fac_trend <- function(
         geom_point(size = 3.0) +
         {if (annotate) 
             geom_label_repel(na.rm = T, show.legend = F, label.r = 0, size = 6)} + 
-        labs(title = str_c(get_metric_description(metric, short = T), " in ", fac_name),
-             subtitle = get_metric_description(metric), 
-             x = "Date",
-             y = get_metric_description(metric, short = T), 
-             caption = str_to_upper("UCLA Law COVID-19 Behind Bars Data Project")) +
-        theme_behindbars() +
+        {if (auto_label)
+            labs(title = str_c(get_metric_description(metric, short = T), " in ", fac_name),
+                 subtitle = get_metric_description(metric), 
+                 x = "Date",
+                 y = get_metric_description(metric, short = T), 
+                 caption = str_to_upper("UCLA Law COVID-19 Behind Bars Data Project"))} + 
+        scale_x_date(date_labels = "%b %d", 
+                     limits = c(plot_start_date, plot_end_date)) + 
         scale_color_bbdiscrete() +
+        theme_behindbars() +
         theme(legend.position = "none", 
               axis.title.x = element_blank())
 }
