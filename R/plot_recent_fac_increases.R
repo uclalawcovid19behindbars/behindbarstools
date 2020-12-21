@@ -13,8 +13,10 @@
 #' @return ggplot object 
 #' 
 #' @examples
+#' \dontrun{
 #' plot_recent_fac_increases()
 #' plot_recent_fac_increases(metric = "Residents.Deaths", plot_days = 30, num_fac = 3)
+#' }
 #' 
 #' @import ggplot2
 #' @import dplyr 

@@ -13,7 +13,7 @@
 #' @return ggplot object 
 #' 
 #' @examples
-#' plot_fac_trend("Los Angeles Jails", "California", "Residents.Active", scrape_df)
+#' plot_fac_trend("Los Angeles Jails", "California", "Residents.Active")
 #' 
 #' @import ggplot2
 #' @import dplyr 
@@ -31,7 +31,7 @@ plot_fac_trend <- function(
     }
     
     if (is.null(scrape_df)) {
-        scrape_df <- read_scrape_data(T, T)
+        scrape_df <- read_scrape_data(T, T, state = state)
     }
     
     plot_end_date <-  max(scrape_df$Date)

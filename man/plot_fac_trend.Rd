@@ -34,6 +34,6 @@ Creates time series plots showing the trend for a single facility for a given
 metric, formatted according to the style guide.
 }
 \examples{
-plot_fac_trend("Los Angeles Jails", "California", "Residents.Active", scrape_df)
+plot_fac_trend("Los Angeles Jails", "California", "Residents.Active")
 
 }

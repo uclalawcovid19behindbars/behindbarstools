@@ -34,7 +34,9 @@ Creates time series plots showing trends for facilities with the steepest recent
 increases in a given metric, formatted according to the style guide.
 }
 \examples{
+\dontrun{
 plot_recent_fac_increases()
 plot_recent_fac_increases(metric = "Residents.Deaths", plot_days = 30, num_fac = 3)
+}
 
 }
