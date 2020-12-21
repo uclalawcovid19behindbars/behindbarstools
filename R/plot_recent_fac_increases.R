@@ -87,5 +87,4 @@ plot_recent_fac_increases <- function(
         scale_color_bbdiscrete() + 
         theme_behindbars() +
         theme(axis.text.y = element_text(vjust = -0.6, hjust = 0, margin = margin(r = -45))) 
-        
 }

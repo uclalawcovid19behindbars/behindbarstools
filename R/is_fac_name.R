@@ -47,7 +47,7 @@ is_fac_name <- function(
         all_names <- rbind(fac_data_names, fac_spelling_names)
     }
     
-    behindbarstools::clean_fac_col_txt(fac_name, to_upper = T) %in% (
+    rv <- behindbarstools::clean_fac_col_txt(fac_name, to_upper = T) %in% (
         all_names %>%
             filter(State == state) %>% 
             mutate(Name = behindbarstools::clean_fac_col_txt(Name, to_upper = T)) %>% 
@@ -55,4 +55,6 @@ is_fac_name <- function(
             distinct() %>% 
             unlist()
         )
+    
+    return(rv)
 }

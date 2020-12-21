@@ -38,17 +38,19 @@ get_metric_description <- function(metric, short = FALSE) {
     
     if (short) {
         if (metric %in% names(short_lookup)) {
-            short_lookup[metric] %>% 
+            rv <- short_lookup[metric] %>% 
                 unname()
         } else {
             stop(str_c(metric, " is not a valid metric name.\n  Metrics include: ", 
                         toString(names(short_lookup))))}
     } else {
         if (metric %in% names(long_lookup)) {
-            long_lookup[metric] %>% 
+            rv <- long_lookup[metric] %>% 
                 unname()
         } else {
             stop(str_c(metric, " is not a valid metric name.\n  Metrics include: ", 
                        toString(names(long_lookup))))}
     }
+    
+    return(rv)
 }
