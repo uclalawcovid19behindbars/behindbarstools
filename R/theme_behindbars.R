@@ -5,6 +5,9 @@
 #' @import ggplot2
 #' @export
 #'
+#' @param base_size base font size, given in pts 
+#' @param base_family base font family
+#' 
 #' @examples
 #' library(ggplot2)
 #' iris %>%
@@ -36,6 +39,7 @@ theme_behindbars <- function(
             text =                element_text(color = "#555526"), 
             panel.grid.major.y =  element_line(color = "#92926C", linetype = "dotted"),
             plot.title.position = "plot", 
+            plot.tag.position =   "bottomright", 
             axis.line.y =         element_blank(),
             axis.ticks.y =        element_blank(), 
             axis.text =           element_text(color = "#555526"), 
@@ -45,9 +49,7 @@ theme_behindbars <- function(
             plot.subtitle =       element_text(margin = margin(b = 1.2 * base_size)), 
             axis.title.y =        element_text(margin = margin(r = 1.2 * base_size)), 
             axis.title.x =        element_text(margin = margin(t = 0.6 * base_size)),
-            axis.text.y =         element_text(vjust = -0.5, hjust = -0.5, margin = margin(r = -1.5 * base_size)), 
-            plot.tag =            element_text(size = base_size / 2), 
-            plot.tag.position =   c(0.9, 0.02) 
+            plot.tag =            element_text(size = base_size / 2, hjust = 0)
         )
 }
 

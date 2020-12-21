@@ -8,7 +8,7 @@
 \alias{scale_fill_bbcontinous}
 \title{Theme and colors for behind bars plots}
 \usage{
-theme_behindbars()
+theme_behindbars(base_size = 24, base_family = "Helvetica")
 
 scale_color_bbdiscrete()
 
@@ -17,6 +17,11 @@ scale_fill_bbdiscrete()
 scale_color_bbcontinous()
 
 scale_fill_bbcontinous()
+}
+\arguments{
+\item{base_size}{base font size, given in pts}
+
+\item{base_family}{base font family}
 }
 \description{
 a set of themes and colors for behind bars plots
