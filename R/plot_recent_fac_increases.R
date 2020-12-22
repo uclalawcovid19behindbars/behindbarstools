@@ -28,7 +28,7 @@
 #' 
 #' @import ggplot2
 #' @import dplyr 
-#' @importFrom ggrepel geom_label_repel
+#' @importFrom ggrepel geom_text_repel
 #' @importFrom stringr str_c
 #' @importFrom stringr str_detect
 #' @importFrom stringr str_to_title
@@ -74,7 +74,7 @@ plot_recent_fac_increases <- function(
         geom_line(size = 2.0) +
         geom_point(size = 3.0, show.legend = F) +
         {if (annotate) 
-            geom_label_repel(na.rm = T, show.legend = F, label.r = 0, size = 6)} + 
+            geom_text_repel(na.rm = T, show.legend = F, size = 6, nudge_x = 1, point.padding = 0.1)} + 
         {if (auto_label) 
             labs(title = str_c("Facilities with Recent Spikes in ", get_metric_description(metric, short = T)),
                  subtitle = get_metric_description(metric),
@@ -83,7 +83,8 @@ plot_recent_fac_increases <- function(
                  color = "Facility",
                  tag = str_to_upper("UCLA Law COVID-19\nBehind Bars Data Project\ncovid19behindbars.org"))} +
         scale_x_date(date_labels = "%b %d", 
-                     limits = c(plot_start_date, plot_end_date)) + 
+                     limits = c(plot_start_date, plot_end_date),  
+                     expand = c(0.15, 0)) + 
         scale_color_bbdiscrete() + 
         theme_behindbars() +
         theme(axis.text.y = element_text(vjust = -0.6, hjust = 0, margin = margin(r = -45))) 
