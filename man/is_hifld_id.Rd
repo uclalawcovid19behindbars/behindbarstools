@@ -4,7 +4,7 @@
 \alias{is_hifld_id}
 \title{Returns TRUE if the given ID is a valid HIFLD ID}
 \usage{
-is_hifld_id(id, hifld_data = NULL, na_is_na = T)
+is_hifld_id(id, hifld_data = NULL, na_is_na = F)
 }
 \arguments{
 \item{id}{integer or character string of the ID to check}
@@ -22,5 +22,5 @@ return FALSE vs. NA if the given ID is NA.
 }
 \examples{
 is_hifld_id(10002598) 
-is_hifld_id("10002598")
+is_hifld_id(c(10002598, 123, NA))
 }

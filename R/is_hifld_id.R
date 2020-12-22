@@ -12,11 +12,9 @@
 #'
 #' @examples
 #' is_hifld_id(10002598) 
-#' is_hifld_id("10002598")
+#' is_hifld_id(c(10002598, 123, NA))
 
-is_hifld_id <- function(id, hifld_data = NULL, na_is_na = T) {
-    
-    if (is.na(id) & na_is_na) {return(NA)}
+is_hifld_id <- function(id, hifld_data = NULL, na_is_na = F) {
     
     if (is.null(hifld_data)) {
         hifld_data <- behindbarstools::read_hifld_data()
@@ -27,9 +25,5 @@ is_hifld_id <- function(id, hifld_data = NULL, na_is_na = T) {
         distinct() %>% 
         unlist()
     
-    rv <- id %in% valid_ids
-    
-    if (!rv) {warning(paste0(id, " is not a valid HIFLD."))}
-    
-    return(rv) 
+    return(ifelse(na_is_na & is.na(id), NA, id %in% valid_ids))
 }
