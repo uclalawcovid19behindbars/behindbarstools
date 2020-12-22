@@ -20,7 +20,7 @@ read_scrape_data <- function(
     all_dates = FALSE, coalesce = TRUE, debug = FALSE, state = NULL){
 
     if(!all_dates){
-        dat_df <- "http://nmmarquez.twilightparadox.com:3838/summary_data/" %>%
+        dat_df <- "http://104.131.72.50:3838/scraper_data/summary_data/" %>%
             stringr::str_c("aggregated_data.csv") %>%
             readr::read_csv(col_types = "Dccccddddddddddcddddddd") %>%
             group_by(State, id, jurisdiction) %>%
@@ -29,7 +29,7 @@ read_scrape_data <- function(
     }
 
     else{
-        dat_df <- "http://nmmarquez.twilightparadox.com:3838/summary_data/" %>%
+        dat_df <- "http://104.131.72.50:3838/scraper_data/summary_data/" %>%
             stringr::str_c("aggregated_data.csv") %>%
             readr::read_csv(col_types = "Dccccddddddddddcddddddd")
     }
@@ -104,15 +104,15 @@ read_scrape_data <- function(
         mutate(Residents.Population = Population) %>%
         # fill in HIFLD pop where no alternative exists
         mutate(Residents.Population = ifelse(
-            is.na(Residents.Population), HIFLD.Population, Residents.Population)) 
-    
+            is.na(Residents.Population), HIFLD.Population, Residents.Population))
+
     if(debug){
         # leave all columns present for debugging
-        pop_df <- pop_df %>% 
+        pop_df <- pop_df %>%
             arrange(State, Name, Date)
     }
     else {
-        pop_df <- pop_df %>% 
+        pop_df <- pop_df %>%
             # Select the order for names corresponding to Public facing Google sheet
             select(
                 ID, jurisdiction, State, Name, Date, source,
