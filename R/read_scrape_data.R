@@ -46,7 +46,7 @@ read_scrape_data <- function(
             mutate(State = translate_state(State)) %>%
             clean_facility_name(debug = TRUE) %>%
             left_join(read_fac_info(), by = c("Name", "State")) %>%
-            rename(hifld_pop= POPULATION)
+            rename(HIFLD.Population = POPULATION)
     }
     else{
         full_df <- dat_df %>%
@@ -55,7 +55,7 @@ read_scrape_data <- function(
             mutate(State = translate_state(State)) %>%
             clean_facility_name() %>%
             left_join(read_fac_info(), by = c("Name", "State")) %>%
-            rename(hifld_pop= POPULATION)
+            rename(HIFLD.Population = POPULATION)
     }
 
     if(debug){
@@ -104,7 +104,7 @@ read_scrape_data <- function(
         mutate(Residents.Population = Population) %>%
         # fill in HIFLD pop where no alternative exists
         mutate(Residents.Population = ifelse(
-            is.na(Residents.Population), hifld_pop, Residents.Population)) 
+            is.na(Residents.Population), HIFLD.Population, Residents.Population)) 
     
     if(debug){
         # leave all columns present for debugging
