@@ -4,12 +4,12 @@
 \alias{is_valid_state}
 \title{Returns TRUE if the given state is a valid state spelling}
 \usage{
-is_valid_state(state, na_is_na = F)
+is_valid_state(state, missing_as_na = T)
 }
 \arguments{
 \item{state}{character string of the state to check}
 
-\item{na_is_na}{logical, whether NA should return NA (vs. FALSE)}
+\item{missing_as_na}{logical, whether NA should return NA (vs. FALSE)}
 }
 \value{
 logical, TRUE if the given state is a valid state spelling

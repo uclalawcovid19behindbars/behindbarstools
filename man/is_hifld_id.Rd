@@ -4,14 +4,14 @@
 \alias{is_hifld_id}
 \title{Returns TRUE if the given ID is a valid HIFLD ID}
 \usage{
-is_hifld_id(id, hifld_data = NULL, na_is_na = F)
+is_hifld_id(id, hifld_data = NULL, missing_as_na = T)
 }
 \arguments{
 \item{id}{integer or character string of the ID to check}
 
 \item{hifld_data}{data frame with HIFLD information}
 
-\item{na_is_na}{logical, whether NA should return NA (vs. FALSE)}
+\item{missing_as_na}{logical, whether NA should return NA (vs. FALSE)}
 }
 \value{
 logical, TRUE if the given ID is a valid HIFLD ID

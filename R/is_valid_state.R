@@ -8,7 +8,7 @@
 #' if the given state spelling is NA. 
 #'
 #' @param state character string of the state to check 
-#' @param na_is_na logical, whether NA should return NA (vs. FALSE)
+#' @param missing_as_na logical, whether NA should return NA (vs. FALSE)
 #'
 #' @return logical, TRUE if the given state is a valid state spelling 
 #' @export
@@ -17,7 +17,7 @@
 #' is_valid_state("DC")
 #' is_valid_state(c("DC", NA, "District of Columbia"))
 
-is_valid_state <- function(state, na_is_na = F) {
+is_valid_state <- function(state, missing_as_na = T) {
     
     valid_states <- datasets::state.name %>% 
         append(c(
@@ -30,5 +30,5 @@ is_valid_state <- function(state, na_is_na = F) {
             "Not Available"
         ))
     
-    return(ifelse(na_is_na & is.na(state), NA, state %in% valid_states))
+    return(ifelse(missing_as_na & is.na(state), NA, state %in% valid_states))
 }
