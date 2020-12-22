@@ -28,6 +28,7 @@ Imports:
     readxl,
     readr,
     stringr,
-    stats
+    stats, 
+    ggrepel
 LazyData: true
 RoxygenNote: 7.1.1
