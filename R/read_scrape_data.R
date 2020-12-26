@@ -39,24 +39,21 @@ read_scrape_data <- function(
             "Base data frame contains ", nrow(dat_df), " rows."))
     }
 
-    if(debug){
-        full_df <- dat_df %>%
-            select(-starts_with("Resident.Deaths")) %>%
-            mutate(Name = clean_fac_col_txt(Name, to_upper = TRUE)) %>%
-            mutate(State = translate_state(State)) %>%
-            clean_facility_name(debug = TRUE) %>%
-            left_join(read_fac_info(), by = c("Name", "State")) %>%
-            rename(HIFLD.Population = POPULATION)
-    }
-    else{
-        full_df <- dat_df %>%
-            select(-starts_with("Resident.Deaths")) %>%
-            mutate(Name = clean_fac_col_txt(Name, to_upper = TRUE)) %>%
-            mutate(State = translate_state(State)) %>%
-            clean_facility_name() %>%
-            left_join(read_fac_info(), by = c("Name", "State")) %>%
-            rename(HIFLD.Population = POPULATION)
-    }
+    comb_df <- dat_df %>%
+        select(-starts_with("Resident.Deaths")) %>%
+        mutate(Name = clean_fac_col_txt(Name, to_upper = TRUE)) %>%
+        mutate(State = translate_state(State)) %>%
+        clean_facility_name(debug = debug)
+
+    full_df <- comb_df %>%
+        filter(jurisdiction == "federal") %>%
+        select(-State) %>%
+        left_join(read_fac_info(federal_only = TRUE), by = c("Name")) %>%
+        bind_rows(
+            comb_df %>%
+                filter(jurisdiction != "federal") %>%
+                left_join(read_fac_info(), by = c("Name", "State"))) %>%
+        rename(HIFLD.Population = POPULATION)
 
     if(debug){
         message(stringr::str_c(

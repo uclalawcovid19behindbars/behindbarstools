@@ -4,11 +4,18 @@
 \alias{read_fac_info}
 \title{Read in UCLA Prison and Jail Facility Data}
 \usage{
-read_fac_info()
+read_fac_info(federal_only = FALSE)
+}
+\arguments{
+\item{federal_only}{filter to only federal facilities}
 }
 \value{
 data frame with facility metadata
 }
 \description{
 Reads in facility metadata
+}
+\examples{
+read_fac_info(federal_only = TRUE)
+
 }
