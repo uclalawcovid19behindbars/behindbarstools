@@ -37,18 +37,19 @@ theme_behindbars <- function(
     ) +
         ggplot2::theme(
             text =                element_text(color = "#555526"), 
+            strip.text =          element_text(color = '#555526'), 
+            axis.text =           element_text(color = "#555526"), 
             panel.grid.major.y =  element_line(color = "#92926C", linetype = "dotted"),
             plot.title.position = "plot", 
             plot.tag.position =   "bottomright", 
             axis.line.y =         element_blank(),
             axis.ticks.y =        element_blank(), 
-            axis.text =           element_text(color = "#555526"), 
+            axis.title.x =        element_blank(), 
             axis.line =           element_line(color = "#555526"), 
             axis.ticks =          element_line(color = "#555526"), 
             plot.caption =        element_text(margin = margin(t = 1.2 * base_size)), 
             plot.subtitle =       element_text(margin = margin(b = 1.2 * base_size)), 
             axis.title.y =        element_text(margin = margin(r = 1.2 * base_size)), 
-            axis.title.x =        element_text(margin = margin(t = 0.6 * base_size)),
             plot.tag =            element_text(size = base_size / 2, hjust = 0)
         )
 }
