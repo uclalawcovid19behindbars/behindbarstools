@@ -4,7 +4,7 @@
 \alias{group_by_coalesce}
 \title{A all in one group by and coalesce function}
 \usage{
-group_by_coalesce(.data, ..., .ignore = c(), .method = "first")
+group_by_coalesce(.data, ..., .ignore = c(), .method = "first", debug = FALSE)
 }
 \arguments{
 \item{.data}{A data frame, data frame extension (e.g. a tibble), or a lazy
@@ -17,6 +17,8 @@ so expressions like x:y can be used to select a range of variable}
 \item{.ignore}{which columns to ignore for warnings}
 
 \item{.method}{either 'first' or 'sum'}
+
+\item{debug}{logical, print debug statements}
 }
 \value{
 vector of coalesced values
@@ -29,10 +31,10 @@ a warning is returned with the offending group, column name, and values.
 \examples{
 df_safe <- data.frame(
     A=c(1,1,2,2,2),
-    B=c(NA,2,NA,4,4),
+    B=c(NA,2,NA,NA,4),
     C=c(3,NA,NA,5,NA),
     D=c(NA,2,3,NA,NA),
-    E=c(NA,NA,NA,4,4))
+    E=c(NA,NA,NA,4,NA))
 
 df_warn <- data.frame(
     A=c(1,1,2,2,2),

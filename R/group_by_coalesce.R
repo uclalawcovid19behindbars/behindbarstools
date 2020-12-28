@@ -1,3 +1,24 @@
+comb_vector <- function(x, .method){
+
+    if(all(is.na(x))){
+        return(first(x))
+    }
+
+    if(.method == "sum" & is.numeric(x)){
+        return(sum(x, na.rm = TRUE))
+    }
+
+    else if(.method == "sum"){
+        return(paste0(unique(as.vector(na.omit(x))), collapse = "; "))
+    }
+
+    else{
+        return(first(unique(as.vector(na.omit(x)))))
+    }
+
+}
+
+
 #' A all in one group by and coalesce function
 #'
 #' Groups by and coalesces the remaining columns such that only one value
@@ -11,15 +32,16 @@
 #' so expressions like x:y can be used to select a range of variable
 #' @param .ignore which columns to ignore for warnings
 #' @param .method either 'first' or 'sum'
+#' @param debug logical, print debug statements
 #' @return vector of coalesced values
 #'
 #' @examples
 #' df_safe <- data.frame(
 #'     A=c(1,1,2,2,2),
-#'     B=c(NA,2,NA,4,4),
+#'     B=c(NA,2,NA,NA,4),
 #'     C=c(3,NA,NA,5,NA),
 #'     D=c(NA,2,3,NA,NA),
-#'     E=c(NA,NA,NA,4,4))
+#'     E=c(NA,NA,NA,4,NA))
 #'
 #' df_warn <- data.frame(
 #'     A=c(1,1,2,2,2),
@@ -37,7 +59,7 @@
 #' @importFrom dplyr group_split
 #' @export
 
-group_by_coalesce <- function(.data, ..., .ignore = c(), .method = "first") {
+group_by_coalesce <- function(.data, ..., .ignore = c(), .method = "first", debug = FALSE) {
 
     if(!(.method %in% c("first", "sum"))){
         stop(".method should be either 'first' or 'sum'")
@@ -46,7 +68,17 @@ group_by_coalesce <- function(.data, ..., .ignore = c(), .method = "first") {
     dots <- dplyr::enquos(...)
     z_list <- dplyr::group_split(.data, !!!dots)
 
-    dplyr::bind_rows(lapply(z_list, function(z){
+    if(!debug){
+        out <- .data %>%
+            group_by(!!!dots) %>%
+            summarize_all(comb_vector, .method = .method) %>%
+            ungroup()
+
+        return(out)
+    }
+
+
+    out <- dplyr::bind_rows(lapply(z_list, function(z){
 
         z_group <- z %>%
             dplyr::select(!!!dots) %>%
@@ -67,32 +99,22 @@ group_by_coalesce <- function(.data, ..., .ignore = c(), .method = "first") {
                 out <- x[[1]]
             }
             else{
-                xbar <- unique(as.vector(na.omit(x)))
+                xbar <- as.vector(na.omit(x))
                 if(length(xbar) != 1 & !(cn %in% .ignore)){
                     warning(paste0(
                         "Group ", z_group_string,
                         " has multiple values that do not match for column ",
-                        cn, ". Only using first observed value from the ",
-                        "following unique values ",
+                        cn, ". Only using ", .method, " of observed value ",
+                        "from the following unique values ",
                         paste0(xbar, collapse = ", ")))
                 }
-                # only grab the first one
-                if(.method == "first"){
-                    out <- xbar[1]
-                }
-                else{
-                    if(is.numeric(xbar)){
-                        # NA's should already be omitted
-                        out <- sum(xbar)
-                    }
-                    else{
-                        out <- paste0(xbar, collapse = "; ")
-                    }
-                }
+                out <- comb_vector(x, .method = .method)
             }
             out})) %>%
             dplyr::bind_cols(z_group) %>%
             dplyr::select(!!!dots, !!z_cols)
 
     }))
+
+    return(out)
 }
