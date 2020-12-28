@@ -27,6 +27,7 @@ Imports:
     tidyr,
     readxl,
     readr,
+    scales,
     stringr,
     stats, 
     ggrepel
