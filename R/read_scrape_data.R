@@ -45,6 +45,22 @@ read_scrape_data <- function(
         mutate(State = translate_state(State)) %>%
         clean_facility_name(debug = debug)
 
+    if(coalesce){
+        comb_df <- comb_df %>%
+            select(-id) %>%
+            group_by_coalesce(
+                Date, Name, State, jurisdiction, ID,
+                .ignore = c(
+                    "source", "scrape_name_clean", "federal_bool",
+                    "xwalk_name_clean", "name_match"),
+                .method = "sum", debug = debug)
+
+        if(debug){
+            message(stringr::str_c(
+                "Coalesced data frame contains ", nrow(comb_df), " rows."))
+        }
+    }
+
     full_df <- comb_df %>%
         filter(jurisdiction == "federal") %>%
         select(-State) %>%
@@ -70,19 +86,6 @@ read_scrape_data <- function(
         if(debug){
             message(stringr::str_c(
                 "State specific data frame contains ", nrow(out_df), " rows."))
-        }
-    }
-
-    if(coalesce){
-        out_df <- out_df %>%
-            select(-id) %>%
-            group_by_coalesce(
-                Date, Name, State, jurisdiction,
-                .ignore = "source", .method = "sum")
-
-        if(debug){
-            message(stringr::str_c(
-                "Coalesced data frame contains ", nrow(out_df), " rows."))
         }
     }
 
