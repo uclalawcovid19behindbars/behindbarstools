@@ -7,6 +7,9 @@
 #'
 #' @import dplyr 
 #' @export
+#' 
+#' @examples 
+#' read_hifld_data()
 
 read_hifld_data <- function(){
     "https://opendata.arcgis.com/datasets/2d6109d4127d458eaf0958e4c5296b67_0.geojson" %>% 
