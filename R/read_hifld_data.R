@@ -15,7 +15,9 @@
 read_hifld_data <- function(){
     "https://opendata.arcgis.com/datasets/2d6109d4127d458eaf0958e4c5296b67_0.geojson" %>%
         geojson_sf() %>%
-        mutate(coords = sf::st_centroid(sf::st_transform(geometry, 2901)),
+        mutate(geometry = sf::st_set_crs(geometry, 4326), 
+               geometry = sf::st_transform(geometry, 2901), 
+               coords = sf::st_centroid(geometry), 
                coords = sf::st_transform(coords, 4326)) %>%
         as_tibble() %>%
         mutate(lat = sf::st_coordinates(coords)[,1] %>% unname(),
