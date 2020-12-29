@@ -11,7 +11,8 @@ data frame with facility info and coordinates
 }
 \description{
 Reads in data from HIFLD on facility information including population, adds
-coordinates (latitude and longitude) for the centroid of each facility.
+coordinates (latitude and longitude) for the centroid of each facility, replaces 
+-999 population and capacity values with NA.
 }
 \examples{
 read_hifld_data()
