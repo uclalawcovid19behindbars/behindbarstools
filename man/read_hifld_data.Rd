@@ -7,8 +7,9 @@
 read_hifld_data()
 }
 \value{
-data frame with facility info
+data frame with facility info and coordinates
 }
 \description{
-Reads in data sheet from HIFLD on facility information including population
+Reads in data from HIFLD on facility information including population, adds 
+coordinates (latitude and longitude) for the centroid of each facility.
 }

@@ -1,25 +1,44 @@
 #' Read in HIFLD Facility level Data
 #'
-#' Reads in data sheet from HIFLD on facility information including population
+#' Reads in data from HIFLD on facility information including population, adds 
+#' coordinates (latitude and longitude) for the centroid of each facility.
 #'
-#' @return data frame with facility info
+#' @return data frame with facility info and coordinates 
 #'
-#' @importFrom readr read_csv
-#' @importFrom readr cols
-#' @importFrom utils download.file
-#' @importFrom dplyr rename
+#' @import dplyr 
 #' @export
 
 read_hifld_data <- function(){
-    tf <- tempfile(fileext = ".csv")
-
-    "https://opendata.arcgis.com/datasets/" %>%
-        paste0(
-            "2d6109d4127d458eaf0958e4c5296b67_0.csv?",
-            "outSR=%7B%22latestWkid%22%3A3857%2C%22wkid%22%3A102100%7D") %>%
-        download.file(tf)
-
-    read_csv(tf, col_types = cols()) %>%
-        rename(hifld_id = FACILITYID)
+    "https://opendata.arcgis.com/datasets/2d6109d4127d458eaf0958e4c5296b67_0.geojson" %>% 
+        geojsonsf::geojson_sf() %>% 
+        mutate(coords = sf::st_centroid(sf::st_transform(geometry, 2901)), 
+               coords = sf::st_transform(coords, 4326)) %>% 
+        as_tibble() %>% 
+        mutate(lat = sf::st_coordinates(coords)[,1],
+               lon = sf::st_coordinates(coords)[,2]) %>% 
+        rename(hifld_id = FACILITYID) %>% 
+        select(hifld_id, 
+               NAME, 
+               ADDRESS, 
+               CITY, 
+               STATE, 
+               ZIP, 
+               TELEPHONE, 
+               TYPE, 
+               STATUS, 
+               POPULATION, 
+               COUNTY, 
+               COUNTYFIPS, 
+               COUNTRY, 
+               NAICS_CODE, 
+               NAICS_DESC, 
+               SOURCE, 
+               SOURCEDATE, 
+               VAL_METHOD, 
+               VAL_DATE, 
+               WEBSITE, 
+               SECURELVL, 
+               CAPACITY, 
+               lat, 
+               lon)
 }
-
