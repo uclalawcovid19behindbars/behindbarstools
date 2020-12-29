@@ -14,8 +14,8 @@ read_hifld_data <- function(){
         mutate(coords = sf::st_centroid(sf::st_transform(geometry, 2901)), 
                coords = sf::st_transform(coords, 4326)) %>% 
         as_tibble() %>% 
-        mutate(lat = sf::st_coordinates(coords)[,1],
-               lon = sf::st_coordinates(coords)[,2]) %>% 
+        mutate(lat = sf::st_coordinates(coords)[,1] %>% unname(),
+               lon = sf::st_coordinates(coords)[,2] %>% unname()) %>% 
         rename(hifld_id = FACILITYID) %>% 
         select(hifld_id, 
                NAME, 
