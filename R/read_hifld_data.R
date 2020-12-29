@@ -13,21 +13,11 @@
 #' read_hifld_data()
 
 read_hifld_data <- function(){
-<<<<<<< HEAD
     "https://opendata.arcgis.com/datasets/2d6109d4127d458eaf0958e4c5296b67_0.geojson" %>%
         geojson_sf() %>%
         mutate(coords = sf::st_centroid(sf::st_transform(geometry, 2901)),
                coords = sf::st_transform(coords, 4326)) %>%
         as_tibble() %>%
-=======
-    "https://opendata.arcgis.com/datasets/2d6109d4127d458eaf0958e4c5296b67_0.geojson" %>% 
-        geojsonsf::geojson_sf() %>% 
-        mutate(geometry = sf::st_set_crs(geometry, 4326), 
-               geometry = sf::st_transform(geometry, 2901), 
-               coords = sf::st_centroid(geometry), 
-               coords = sf::st_transform(coords, 4326)) %>% 
-        as_tibble() %>% 
->>>>>>> dde3348b0a224ec3cef4586e7ca1308b3646c13c
         mutate(lat = sf::st_coordinates(coords)[,1] %>% unname(),
                lon = sf::st_coordinates(coords)[,2] %>% unname()) %>%
         rename(hifld_id = FACILITYID) %>%
