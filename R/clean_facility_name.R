@@ -15,6 +15,7 @@
 #' @importFrom purrr map
 #' @importFrom assertthat %has_name%
 #' @importFrom assertthat see_if
+#' @importFrom readr cols
 #'
 #' @examples
 #' clean_facility_name(
