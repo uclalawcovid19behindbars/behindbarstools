@@ -13,3 +13,12 @@
 ```
 devtools::install_github("uclalawcovid19behindbars/behindbarstools")
 ```
+
+This package uses [renv](https://rstudio.github.io/renv/) to ensure that our environment is reproducible. 
+```
+# Recreate the package environment 
+renv::restore()
+
+# Update the lockfile after installing or updating packages 
+renv::snapshot()
+```
