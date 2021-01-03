@@ -11,7 +11,9 @@
 #' @return character vector of state names
 #'
 #' @examples
+#' \dontrun{
 #' read_scrape_data(all_dates = FALSE)
+#' }
 #' read_scrape_data(all_dates = TRUE, state = "Wyoming")
 #'
 #' @export

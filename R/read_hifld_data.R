@@ -1,25 +1,55 @@
 #' Read in HIFLD Facility level Data
 #'
-#' Reads in data sheet from HIFLD on facility information including population
+#' Reads in data from HIFLD on facility information including population, adds
+#' coordinates (latitude and longitude) for the centroid of each facility, replaces 
+#' -999 population and capacity values with NA. 
 #'
-#' @return data frame with facility info
+#' @return data frame with facility info and coordinates
 #'
-#' @importFrom readr read_csv
-#' @importFrom readr cols
-#' @importFrom utils download.file
-#' @importFrom dplyr rename
+#' @import dplyr
+#' @importFrom geojsonsf geojson_sf
 #' @export
+#'
+#' @examples
+#' read_hifld_data()
 
 read_hifld_data <- function(){
-    tf <- tempfile(fileext = ".csv")
-
-    "https://opendata.arcgis.com/datasets/" %>%
-        paste0(
-            "2d6109d4127d458eaf0958e4c5296b67_0.csv?",
-            "outSR=%7B%22latestWkid%22%3A3857%2C%22wkid%22%3A102100%7D") %>%
-        download.file(tf)
-
-    read_csv(tf, col_types = cols()) %>%
-        rename(hifld_id = FACILITYID)
+    "https://opendata.arcgis.com/datasets/2d6109d4127d458eaf0958e4c5296b67_0.geojson" %>%
+        geojson_sf() %>%
+        # we have to manually set the CRS here because of GDAL version issues
+        # so ignoring the warnings is fine in this case
+        {suppressWarnings(mutate(., geometry = sf::st_set_crs(geometry, 4326)))} %>%
+        mutate(geometry = sf::st_transform(geometry, 2901),
+               coords = sf::st_centroid(geometry),
+               coords = sf::st_transform(coords, 4326)) %>%
+        as_tibble() %>%
+        mutate(lat = sf::st_coordinates(coords)[,1] %>% unname(),
+               lon = sf::st_coordinates(coords)[,2] %>% unname()) %>%
+        rename(hifld_id = FACILITYID) %>%
+        mutate(POPULATION = na_if(POPULATION, -999), 
+               CAPACITY = na_if(CAPACITY, -999)) %>% 
+        select(hifld_id,
+               NAME,
+               ADDRESS,
+               CITY,
+               STATE,
+               ZIP,
+               TELEPHONE,
+               TYPE,
+               STATUS,
+               POPULATION,
+               COUNTY,
+               COUNTYFIPS,
+               COUNTRY,
+               NAICS_CODE,
+               NAICS_DESC,
+               SOURCE,
+               SOURCEDATE,
+               VAL_METHOD,
+               VAL_DATE,
+               WEBSITE,
+               SECURELVL,
+               CAPACITY,
+               lat,
+               lon)
 }
-
