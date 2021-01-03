@@ -34,18 +34,18 @@ ggplot object
 }
 \description{
 Creates time series plots showing the trend for a single facility for a given
-metric, formatted according to the style guide. Returns a ggplot object, so 
+metric, formatted according to the style guide. Returns a ggplot object, so
 additional layers can be added, per the examples.
 }
 \examples{
 \dontrun{
 plot_fac_trend("Los Angeles Jails", "California", "Residents.Active")
-} 
+}
 
 \dontrun{
-plot_fac_trend("Los Angeles Jails", "California", "Residents.Active") + 
-    scale_x_date(date_labels = "\%m/\%y") + 
-    labs(x = "Cases") + 
+plot_fac_trend("Los Angeles Jails", "California", "Residents.Active") +
+    scale_x_date(date_labels = "\%m/\%y") +
+    labs(x = "Cases") +
     ylim(0, 150)
 }
 
