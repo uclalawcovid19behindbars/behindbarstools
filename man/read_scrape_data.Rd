@@ -28,7 +28,9 @@ character vector of state names
 Reads either time series or latest data from the web scraper runs
 }
 \examples{
+\dontrun{
 read_scrape_data(all_dates = FALSE)
+}
 read_scrape_data(all_dates = TRUE, state = "Wyoming")
 
 }

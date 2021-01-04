@@ -50,7 +50,7 @@ theme_behindbars <- function(
             plot.caption =        element_text(margin = margin(t = 1.2 * base_size)),
             plot.subtitle =       element_text(margin = margin(b = 1.2 * base_size)),
             axis.title.y =        element_text(margin = margin(r = 1.2 * base_size)),
-            plot.tag =            element_text(size = base_size / 2, hjust = 0)
+            plot.tag =            element_text(size = base_size / 1.6, hjust = 0)
         )
 }
 

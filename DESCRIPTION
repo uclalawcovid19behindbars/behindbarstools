@@ -30,6 +30,8 @@ Imports:
     scales,
     stringr,
     stats, 
-    ggrepel
+    ggrepel, 
+    sf,
+    geojsonsf 
 LazyData: true
 RoxygenNote: 7.1.1
