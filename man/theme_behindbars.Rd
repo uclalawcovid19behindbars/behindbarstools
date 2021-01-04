@@ -2,6 +2,7 @@
 % Please edit documentation in R/theme_behindbars.R
 \name{theme_behindbars}
 \alias{theme_behindbars}
+\alias{theme_map_behindbars}
 \alias{scale_color_bbdiscrete}
 \alias{scale_fill_bbdiscrete}
 \alias{scale_color_bbcontinous}
@@ -9,6 +10,8 @@
 \title{Theme and colors for behind bars plots}
 \usage{
 theme_behindbars(base_size = 24, base_family = "Helvetica")
+
+theme_map_behindbars(base_size = 24, base_family = "Helvetica")
 
 scale_color_bbdiscrete()
 
@@ -45,4 +48,7 @@ iris \%>\%
     geom_point() +
     theme_behindbars() +
     scale_color_bbcontinous()
+
+usmap::plot_usmap() +
+    theme_map_behindbars()
 }

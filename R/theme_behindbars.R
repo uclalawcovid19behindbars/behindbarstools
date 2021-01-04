@@ -27,6 +27,9 @@
 #'     geom_point() +
 #'     theme_behindbars() +
 #'     scale_color_bbcontinous()
+#'
+#' usmap::plot_usmap() +
+#'     theme_map_behindbars()
 
 theme_behindbars <- function(
     base_size = 24, base_family = "Helvetica") {
@@ -52,6 +55,30 @@ theme_behindbars <- function(
             axis.title.y =        element_text(margin = margin(r = 1.2 * base_size)),
             plot.tag =            element_text(size = base_size / 1.6, hjust = 0)
         )
+}
+
+#' @import ggplot2
+#' @export
+#' @rdname theme_behindbars
+
+theme_map_behindbars <- function(
+    base_size = 24, base_family = "Helvetica") {
+
+    behindbarstools::theme_behindbars(
+        base_size = base_size,
+        base_family = base_family
+    ) +
+        ggplot2::theme(
+            axis.line =           element_blank(),
+            axis.ticks =          element_blank(),
+            axis.text =           element_blank(),
+            axis.title =          element_blank(),
+            axis.title.y =        element_blank(),
+            panel.grid.major =    element_blank(),
+            panel.grid.minor =    element_blank(),
+            panel.grid.major.y =  element_blank(),
+            legend.position =     "top",
+            legend.title =        element_blank())
 }
 
 #' @import ggplot2
