@@ -10,7 +10,8 @@ License: GPL (>= 2)
 Encoding: UTF-8
 Depends: 
     R (>= 4.0.0),
-    dplyr
+    dplyr, 
+    ggplot2 
 Imports:
     httr,
     jsonlite,
@@ -33,5 +34,7 @@ Imports:
     ggrepel, 
     sf,
     geojsonsf 
+Suggests: 
+    usmap
 LazyData: true
 RoxygenNote: 7.1.1

@@ -54,6 +54,20 @@ theme_behindbars <- function(
         )
 }
 
+#' Theme for behind bars maps
+#'
+#' @description a set of themes for behind bars maps
+#'
+#' @import ggplot2
+#' @export
+#'
+#' @param base_size base font size, given in pts
+#' @param base_family base font family
+#'
+#' @examples
+#' usmap::plot_usmap() +
+#'     theme_map_behindbars()
+
 theme_map_behindbars <- function(
     base_size = 24, base_family = "Helvetica") {
 
