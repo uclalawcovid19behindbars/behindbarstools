@@ -1,5 +1,5 @@
 
-[![logo](logo.svg)](https://uclacovidbehindbars.org/)
+[![logo](README_files/logo.svg)](https://uclacovidbehindbars.org/)
 
 # behindbarstools
 
@@ -59,9 +59,9 @@ following:
     `clean_facility_name()`
   - Coalescing data from various sources,
     e.g. `coalesce_with_warnings()`, `group_by_coalesce()`
-  - Enforcing data validation, e.g. `is_valid_state()`, `is_federal()`)
+  - Enforcing data validation, e.g. `is_valid_state()`, `is_federal()`
   - Standardizing our data scraping infrastructure,
-    e.g. `ExtractTable()`, `wayback_archives()`, `get_src_by_attr()`
+    e.g. `ExtractTable()`, `get_src_by_attr()`
 
 See [our package
 documentation](https://github.com/uclalawcovid19behindbars/behindbarstools/tree/master/man)

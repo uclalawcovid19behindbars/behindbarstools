@@ -3,7 +3,7 @@ title: "&nbsp;"
 output: github_document
 ---
 
-[![logo](logo.svg)](https://uclacovidbehindbars.org/)
+[![logo](README_files/logo.svg)](https://uclacovidbehindbars.org/)
 
 # behindbarstools
 
@@ -45,8 +45,8 @@ The majority of the functions in `behindbarstools` help standardize our ETL and 
 
 * Cleaning facility names, e.g.`clean_fac_col_txt()`, `clean_facility_name()`
 * Coalescing data from various sources, e.g. `coalesce_with_warnings()`, `group_by_coalesce()`
-* Enforcing data validation, e.g. `is_valid_state()`, `is_federal()`) 
-* Standardizing our data scraping infrastructure, e.g. `ExtractTable()`, `wayback_archives()`, `get_src_by_attr()` 
+* Enforcing data validation, e.g. `is_valid_state()`, `is_federal()` 
+* Standardizing our data scraping infrastructure, e.g. `ExtractTable()`, `get_src_by_attr()` 
 
 See [our package documentation](https://github.com/uclalawcovid19behindbars/behindbarstools/tree/master/man) for more information and examples for each function.  
 
