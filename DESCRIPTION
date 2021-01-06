@@ -21,7 +21,6 @@ Imports:
     lubridate,
     tibble,
     rvest,
-    ggplot2,
     datasets,
     assertthat,
     purrr,
