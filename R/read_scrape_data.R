@@ -2,7 +2,7 @@
 #'
 #' Reads either time series or latest data from the web scraper runs
 #'
-#' @param all_dates logical, get all data from all dates recorded by webscaraper
+#' @param all_dates logical, get all data from all dates recorded by webscraper
 #' @param coalesce logical, collapse common facilities into single row
 #' @param debug logical, print debug statements on number of rows maintained in
 #' @param state character vector, states to limit data to
@@ -21,8 +21,10 @@
 read_scrape_data <- function(
     all_dates = FALSE, coalesce = TRUE, debug = FALSE, state = NULL){
 
+    remote_loc <- stringr::str_c(SRVR_SCRAPE_LOC, "summary_data/")
+
     if(!all_dates){
-        dat_df <- "http://104.131.72.50:3838/scraper_data/summary_data/" %>%
+        dat_df <- remote_loc %>%
             stringr::str_c("aggregated_data.csv") %>%
             readr::read_csv(col_types = "Dccccddddddddddcddddddd") %>%
             group_by(State, id, jurisdiction) %>%
@@ -31,7 +33,7 @@ read_scrape_data <- function(
     }
 
     else{
-        dat_df <- "http://104.131.72.50:3838/scraper_data/summary_data/" %>%
+        dat_df <- remote_loc %>%
             stringr::str_c("aggregated_data.csv") %>%
             readr::read_csv(col_types = "Dccccddddddddddcddddddd")
     }

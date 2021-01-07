@@ -12,7 +12,7 @@ read_scrape_data(
 )
 }
 \arguments{
-\item{all_dates}{logical, get all data from all dates recorded by webscaraper}
+\item{all_dates}{logical, get all data from all dates recorded by webscraper}
 
 \item{coalesce}{logical, collapse common facilities into single row}
 
