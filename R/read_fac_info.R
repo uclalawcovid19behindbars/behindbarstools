@@ -15,12 +15,10 @@
 #' @export
 
 read_fac_info <- function(federal_only = FALSE){
-    "https://raw.githubusercontent.com/uclalawcovid19behindbars" %>%
-        str_c("/facility_data/fac_sheet_restruct/data/fac_data.csv") %>%
+    FAC_DATA_LOC %>%
         read_csv(col_types = cols()) %>%
         `if`(
             federal_only,
             filter(., stringr::str_detect(.$Jurisdiction, "(?i)federal")),
-            .) %>%
-        select(-Jurisdiction)
+            .)
 }
