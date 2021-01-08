@@ -16,7 +16,7 @@
 
 read_fac_info <- function(federal_only = FALSE){
     "https://raw.githubusercontent.com/uclalawcovid19behindbars" %>%
-        str_c("/facility_data/master/data_sheets/fac_data.csv") %>%
+        str_c("/facility_data/fac_sheet_restruct/data/fac_data.csv") %>%
         read_csv(col_types = cols()) %>%
         `if`(
             federal_only,

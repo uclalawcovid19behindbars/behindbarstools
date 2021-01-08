@@ -16,7 +16,7 @@
 
 read_fac_spellings <- function(){
     "https://raw.githubusercontent.com/uclalawcovid19behindbars" %>%
-        str_c("/facility_data/master/data_sheets/fac_spellings.csv") %>%
+        str_c("/facility_data/fac_sheet_restruct/data/fac_spellings.csv") %>%
         read_csv(col_types = cols()) %>%
         select(
             ID = Count.ID, State,
