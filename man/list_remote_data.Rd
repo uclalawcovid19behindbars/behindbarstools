@@ -4,7 +4,7 @@
 \alias{list_remote_data}
 \title{List remote data locations for Behind Bars Data}
 \usage{
-list_remote_data(folder, scraper_name = NULL)
+list_remote_data(folder, scraper_name = NULL, dates_only = FALSE)
 }
 \arguments{
 \item{folder}{character, a single character indicating the folder to pull
@@ -13,6 +13,9 @@ file locations from. Must be one of "raw_files", "log_files", or
 
 \item{scraper_name}{character, a character string indicating a particular
 scraper to pull data for. Defaults to NULL which pulls all file locations}
+
+\item{dates_only}{logical, only return the dates rather than full file name.
+Should only be used when scraper_name is not null}
 }
 \value{
 character vector of file location urls
@@ -25,5 +28,6 @@ only a specific subset of locations.
 \examples{
 list_remote_data("log_files")
 list_remote_data("raw_files", "lasd")
+list_remote_data("raw_files", "lasd", TRUE)
 
 }
