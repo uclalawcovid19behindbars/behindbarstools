@@ -9,3 +9,6 @@ addons:
            - libmagick++-dev
            - libudunits2-dev
            - libgdal-dev
+           - libprotobuf-dev
+           - protobuf-compiler
+           - libjq-dev
