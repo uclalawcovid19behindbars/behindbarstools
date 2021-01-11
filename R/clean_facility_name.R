@@ -24,6 +24,7 @@
 #' @export
 
 clean_facility_name <- function(dat, alt_name_xwalk = FALSE, debug = FALSE){
+  browser()
     if(alt_name_xwalk) {
       name_xwalk <- alt_name_xwalk
     }else {
@@ -53,7 +54,7 @@ clean_facility_name <- function(dat, alt_name_xwalk = FALSE, debug = FALSE){
 
     nonfederal_xwalk <- name_xwalk %>%
       filter(Is.Federal == 0) %>%
-      select(-Is.Federal, -Jurisdiction) # look here for potential errors (upper/lower J)
+      select(-Is.Federal)
 
     nonfederal <- dat %>%
       filter(!federal_bool) %>%
@@ -70,7 +71,7 @@ clean_facility_name <- function(dat, alt_name_xwalk = FALSE, debug = FALSE){
 
     federal_xwalk <- name_xwalk %>%
       filter(Is.Federal == 1) %>%
-      select(-Is.Federal, -Jurisdiction) # look here for potential errors (upper/lower J)
+      select(-Is.Federal)
 
     federal <- dat %>%
         filter(federal_bool) %>%
@@ -82,7 +83,7 @@ clean_facility_name <- function(dat, alt_name_xwalk = FALSE, debug = FALSE){
         mutate(Name = xwalk_name_clean) %>%
         mutate(name_match = !is.na(Name)) %>%
         mutate(Name = ifelse(is.na(Name), scrape_name_clean, Name)) %>%
-        mutate(State = ifelse(is.na(State), "Not Available", State)) # not sure if this should stay here
+        mutate(State = ifelse(is.na(State), "Not Available", State)) # need to confirm
 
     nrow_federal <- nrow(federal)
     if(nrow_federal == 0) {federal <- NULL}
@@ -95,7 +96,9 @@ clean_facility_name <- function(dat, alt_name_xwalk = FALSE, debug = FALSE){
               -scrape_name_clean,
               -federal_bool,
               -xwalk_name_clean,
-              -name_match)
+              -name_match,
+              -Facility,
+              -jurisdiction)
     }
 
     return(full_df)
