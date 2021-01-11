@@ -21,7 +21,7 @@ Extracts tables from an image, returns a list of matrices and vectors with
 extracted information.
 }
 \examples{
-\dontrun {
+\dontrun{
 "https://dps.hawaii.gov/wp-content/uploads/2020/03/" \%>\%
     paste0("Inmate-Test-Report-12.1.20.jpg") \%>\%
     magick::image_read() \%>\%

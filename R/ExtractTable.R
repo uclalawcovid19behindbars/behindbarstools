@@ -65,7 +65,7 @@ process_file <- function(api_key, filepath) {
 #' @export
 #'
 #' @examples
-#' \dontrun {
+#' \dontrun{
 #' "https://dps.hawaii.gov/wp-content/uploads/2020/03/" %>%
 #'     paste0("Inmate-Test-Report-12.1.20.jpg") %>%
 #'     magick::image_read() %>%
