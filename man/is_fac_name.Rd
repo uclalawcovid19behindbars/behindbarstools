@@ -27,8 +27,8 @@ is_fac_name(
 logical, TRUE if fac_name is a valid name and FALSE otherwise
 }
 \description{
-Returns TRUE if a facility name exists in the facility crosswalks, FALSE 
-otherwise. Function is case-insensitive, and strips special characters, new line 
+Returns TRUE if a facility name exists in the facility crosswalks, FALSE
+otherwise. Function is case-insensitive, and strips special characters, new line
 indicators, and excess white space (per behindbarstools::clean_fac_col_txt).
 }
 \examples{

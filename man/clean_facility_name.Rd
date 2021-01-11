@@ -14,7 +14,7 @@ clean_facility_name(dat, alt_name_xwalk = FALSE, debug = FALSE)
 \item{debug}{Boolean whether to include additional columns geneated during the merging process}
 }
 \value{
-data set with cleaned facility name column, "Name", from crosswalk on GitHub
+data set with cleaned facility name column, "Name", and "Facility.ID"
 }
 \description{
 A facility name cleaning function. Uses GitHub facility name cross-walk to find all possible name variations.
@@ -22,6 +22,6 @@ Cleans federal and non-federal facilities in separate processes, in order to use
 }
 \examples{
 clean_facility_name(
-    tibble(Name = "BULLOCK CORRECTIONAL FACILITY", State = "Alabama"))
+    tibble(Name = "BULLOCK CORRECTIONAL FACILITY", State = "Alabama", jurisdiction = "state"))
 
 }
