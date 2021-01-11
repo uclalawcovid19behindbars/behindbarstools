@@ -96,8 +96,7 @@ clean_facility_name <- function(dat, alt_name_xwalk = FALSE, debug = FALSE){
               -federal_bool,
               -xwalk_name_clean,
               -name_match,
-              -Facility,
-              -jurisdiction)
+              -Facility)
     }
 
     return(full_df)

@@ -20,11 +20,10 @@ read_fac_spellings <- function(){
         select(
             Facility.ID,
             State,
-            facility_name_clean,
-            facility_name_raw,
+            xwalk_name_clean,
+            xwalk_name_raw,
             Is.Federal) %>%
-        mutate(xwalk_name_clean = clean_fac_col_txt(str_to_upper(facility_name_clean))) %>%
-        mutate(xwalk_name_raw = clean_fac_col_txt(str_to_upper(facility_name_raw))) %>%
-        select(-c(facility_name_clean, facility_name_raw)) %>%
+        mutate(xwalk_name_clean = clean_fac_col_txt(str_to_upper(xwalk_name_clean))) %>%
+        mutate(xwalk_name_raw = clean_fac_col_txt(str_to_upper(xwalk_name_raw))) %>%
         unique()
 }
