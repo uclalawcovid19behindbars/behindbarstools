@@ -7,7 +7,7 @@
 #' @param alt_name_xwalk Optional parameter provides an alternative facility name crosswalk
 #' @param debug Boolean whether to include additional columns geneated during the merging process
 #'
-#' @return data set with cleaned facility name column, "Name", from crosswalk on GitHub
+#' @return data set with cleaned facility name column, "Name", and "Facility.ID"
 #'
 #' @import stringr
 #' @importFrom tidyr hoist
@@ -19,12 +19,11 @@
 #'
 #' @examples
 #' clean_facility_name(
-#'     tibble(Name = "BULLOCK CORRECTIONAL FACILITY", State = "Alabama"))
+#'     tibble(Name = "BULLOCK CORRECTIONAL FACILITY", State = "Alabama", jurisdiction = "state"))
 #'
 #' @export
 
 clean_facility_name <- function(dat, alt_name_xwalk = FALSE, debug = FALSE){
-  browser()
     if(alt_name_xwalk) {
       name_xwalk <- alt_name_xwalk
     }else {
