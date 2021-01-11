@@ -10,6 +10,8 @@
 #'
 #' @return character vector of state names
 #'
+#' @importFrom assertthat see_if
+#'
 #' @examples
 #' \dontrun{
 #' read_scrape_data(all_dates = FALSE)
@@ -27,7 +29,7 @@ read_scrape_data <- function(
         dat_df <- remote_loc %>%
             stringr::str_c("aggregated_data.csv") %>%
             readr::read_csv(col_types = "Dccccddddddddddcddddddd") %>%
-            group_by(State, id, jurisdiction) %>%
+            group_by(State, id, jurisdiction) %>% # `id` here refers to scraper id
             filter(Date == max(Date)) %>%
             ungroup()
     }
@@ -53,7 +55,7 @@ read_scrape_data <- function(
         comb_df <- comb_df %>%
             select(-id) %>%
             group_by_coalesce(
-                Date, Name, State, jurisdiction, ID,
+                Date, Name, State, jurisdiction, Facility.ID,
                 .ignore = c(
                     "source", "scrape_name_clean", "federal_bool",
                     "xwalk_name_clean", "name_match"),
@@ -65,23 +67,12 @@ read_scrape_data <- function(
         }
     }
 
-    full_df <- comb_df %>%
-        filter(jurisdiction == "federal") %>%
-        select(-State) %>%
-        left_join(read_fac_info(federal_only = TRUE), by = c("Name")) %>%
-        bind_rows(
-            comb_df %>%
-                filter(jurisdiction != "federal") %>%
-                left_join(read_fac_info(), by = c("Name", "State"))) %>%
-        rename(HIFLD.Population = POPULATION)
+    out_df <- merge_facility_info(comb_df)
 
     if(debug){
         message(stringr::str_c(
-            "Named data frame contains ", nrow(full_df), " rows."))
+            "Named data frame contains ", nrow(out_df), " rows."))
     }
-
-    out_df <- full_df %>%
-        mutate(Residents.Released = NA, Notes = NA)
 
     if(!is.null(state)){
         out_df <- out_df %>%
@@ -93,41 +84,24 @@ read_scrape_data <- function(
         }
     }
 
-    pop_df <- out_df  %>%
-        left_join(
-            read_pop_data(),
-            by = c("Name", "State")
-        )
-
-    if(debug){
-        message(stringr::str_c(
-            "Pop data frame contains ", nrow(pop_df), " rows."))
-    }
-
-    pop_df <- pop_df %>%
-        mutate(Residents.Population = Population) %>%
-        # fill in HIFLD pop where no alternative exists
-        mutate(Residents.Population = ifelse(
-            is.na(Residents.Population), HIFLD.Population, Residents.Population))
-
     if(debug){
         # leave all columns present for debugging
-        pop_df <- pop_df %>%
+        out_df <- out_df %>%
             arrange(State, Name, Date)
     }
     else {
-        pop_df <- pop_df %>%
+        out_df <- out_df %>%
             # Select the order for names corresponding to Public facing Google sheet
             select(
-                ID, jurisdiction, State, Name, Date, source,
+                Facility.ID, Jurisdiction, State, Name, Date, source,
                 Residents.Confirmed, Staff.Confirmed,
                 Residents.Deaths, Staff.Deaths, Residents.Recovered,
                 Staff.Recovered, Residents.Tadmin, Staff.Tested, Residents.Negative,
                 Staff.Negative, Residents.Pending, Staff.Pending,
                 Residents.Quarantine, Staff.Quarantine, Residents.Active,
-                Residents.Population, Address, Zipcode, City, County, Latitude,
-                Longitude, County.FIPS, hifld_id, Notes) %>%
+                Population.Feb20, Address, Zipcode, City, County, Latitude,
+                Longitude, County.FIPS, HIFLD.ID) %>%
             arrange(State, Name, Date)
     }
-    return(pop_df)
+    return(out_df)
 }

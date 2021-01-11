@@ -15,15 +15,15 @@
 #' read_fac_spellings()
 
 read_fac_spellings <- function(){
-    "https://raw.githubusercontent.com/uclalawcovid19behindbars" %>%
-        str_c("/facility_data/master/data_sheets/fac_spellings.csv") %>%
+    FAC_SPELLINGS_LOC %>%
         read_csv(col_types = cols()) %>%
         select(
-            ID = Count.ID, State,
-            facility_name_clean,
-            facility_name_raw) %>%
-        mutate(xwalk_name_clean = clean_fac_col_txt(str_to_upper(facility_name_clean))) %>%
-        mutate(xwalk_name_raw = clean_fac_col_txt(str_to_upper(facility_name_raw))) %>%
-        select(-c(facility_name_clean, facility_name_raw)) %>%
+            Facility.ID,
+            State,
+            xwalk_name_clean,
+            xwalk_name_raw,
+            Is.Federal) %>%
+        mutate(xwalk_name_clean = clean_fac_col_txt(str_to_upper(xwalk_name_clean))) %>%
+        mutate(xwalk_name_raw = clean_fac_col_txt(str_to_upper(xwalk_name_raw))) %>%
         unique()
 }

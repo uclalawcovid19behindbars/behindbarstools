@@ -2,18 +2,25 @@
 % Please edit documentation in R/merge_facility_info.R
 \name{merge_facility_info}
 \alias{merge_facility_info}
-\title{A facility name cleaning function. Uses GitHub facility name cross-walk to find all possible name variations}
+\title{Merges informative facility information such as capacity, geographic information, and population.}
 \usage{
 merge_facility_info(dat)
 }
 \arguments{
-\item{dat}{Scraped/historical data with columns Name, State, jurisdiction}
+\item{dat}{Scraped/historical data with column "Facility.ID"}
 }
 \value{
-data set with cleaned facility name column, "Name", from crosswalk on GitHub
+data set with facility information columns
 }
 \description{
-A facility name cleaning function. Uses GitHub facility name cross-walk to find all possible name variations.
-Cleans federal and non-federal facilities in separate processes, which requires a column named "jurisdiction"
-to indicate federal/nonfederal
+Merges our facility dataset with detailed descriptive information on each entity in our
+dataset (e.g. type of entity, capacity, population, geographic information, etc.).
+Each row represents a unique entity.
+Data source here: https://github.com/uclalawcovid19behindbars/facility_data/data/fac_data.csv
+}
+\examples{
+merge_facility_info(
+    tibble(Name = "BULLOCK CORRECTIONAL FACILITY", State = "Alabama", jurisdiction = "state", Facility.ID = 7))
+
+
 }

@@ -1,42 +1,37 @@
-#' A facility name cleaning function. Uses GitHub facility name cross-walk to find all possible name variations
+#' Merges informative facility information such as capacity, geographic information, and population.
 #'
-#' A facility name cleaning function. Uses GitHub facility name cross-walk to find all possible name variations.
-#' Cleans federal and non-federal facilities in separate processes, which requires a column named "jurisdiction"
-#' to indicate federal/nonfederal
+#' Merges our facility dataset with detailed descriptive information on each entity in our
+#' dataset (e.g. type of entity, capacity, population, geographic information, etc.).
+#' Each row represents a unique entity.
+#' Data source here: https://github.com/uclalawcovid19behindbars/facility_data/data/fac_data.csv
 #'
-#' @param dat Scraped/historical data with columns Name, State, jurisdiction
-#' @return data set with cleaned facility name column, "Name", from crosswalk on GitHub
+#' @param dat Scraped/historical data with column "Facility.ID"
+#' @return data set with facility information columns
 #'
 #' @importFrom dplyr filter_all
+#'
+#' @examples
+#' merge_facility_info(
+#'     tibble(Name = "BULLOCK CORRECTIONAL FACILITY", State = "Alabama", jurisdiction = "state", Facility.ID = 7))
+#'
 #'
 #' @export
 
 merge_facility_info <- function(dat){
-  all_fac_info <- read_fac_info()
+  fac_info <- read_fac_info()
 
-  federal_fac_info <- all_fac_info %>%
-    dplyr::filter_all(any_vars(is_federal(.)))
+  dat_with_fac_info <- dat %>%
+    left_join(fac_info,
+              by = "Facility.ID",
+              suffix = c("", ".y")) %>%
+    mutate(State = ifelse(is.na(State), State.y, State),
+           Jurisdiction = ifelse(is.na(jurisdiction), Jurisdiction, jurisdiction)) %>%
+    select(
+      -State.y,
+      -jurisdiction,
+      -Name.y
+    ) %>%
+    relocate(Facility.ID)
 
-  # this needs review
-  federal <- federal_fac_info %>%
-    right_join(
-        dat %>%
-            filter(jurisdiction == "federal") %>%
-            select(-State),
-        by = "Facility") %>%
-    mutate(Name = ifelse(is.na(Name), Facility, Name)) %>%
-    select(-Facility, -State) %>%
-    left_join(all_fac_info,  by = c("Name", "ID")) %>%
-    mutate(State = ifelse(is.na(State), "Not Available", State))
-
-  nonfederal <- dat %>%
-    filter(State != "Federal") %>%
-    left_join(all_fac_info, by = c("Facility", "State")) %>%
-    mutate(Name = ifelse(is.na(Name), Facility, Name)) %>%
-    select(-Facility) %>%
-    left_join(all_fac_info,  by = c("Name", "State", "ID"))
-
-  full_df <- bind_rows(federal, nonfederal)
-
-  return(full_df)
+  return(dat_with_fac_info)
 }
