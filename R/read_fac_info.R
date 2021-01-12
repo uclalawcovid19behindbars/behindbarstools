@@ -16,7 +16,7 @@
 
 read_fac_info <- function(federal_only = FALSE){
     FAC_DATA_LOC %>%
-        read_csv(col_types = cols()) %>%
+        read_csv(col_types = "dcccccccdcddddcccccddccc") %>%
         `if`(
             federal_only,
             filter(., stringr::str_detect(.$Jurisdiction, "(?i)federal")),
