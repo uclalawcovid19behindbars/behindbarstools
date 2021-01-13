@@ -1,8 +1,8 @@
 #' Read in HIFLD Facility level Data
 #'
 #' Reads in data from HIFLD on facility information including population, adds
-#' coordinates (latitude and longitude) for the centroid of each facility, replaces 
-#' -999 population and capacity values with NA. 
+#' coordinates (latitude and longitude) for the centroid of each facility, replaces
+#' -999 population and capacity values with NA.
 #'
 #' @return data frame with facility info and coordinates
 #'
@@ -23,11 +23,11 @@ read_hifld_data <- function(){
                coords = sf::st_centroid(geometry),
                coords = sf::st_transform(coords, 4326)) %>%
         as_tibble() %>%
-        mutate(lat = sf::st_coordinates(coords)[,1] %>% unname(),
-               lon = sf::st_coordinates(coords)[,2] %>% unname()) %>%
+        mutate(lon = sf::st_coordinates(coords)[,1] %>% unname(),
+               lat = sf::st_coordinates(coords)[,2] %>% unname()) %>%
         rename(hifld_id = FACILITYID) %>%
-        mutate(POPULATION = na_if(POPULATION, -999), 
-               CAPACITY = na_if(CAPACITY, -999)) %>% 
+        mutate(POPULATION = na_if(POPULATION, -999),
+               CAPACITY = na_if(CAPACITY, -999)) %>%
         select(hifld_id,
                NAME,
                ADDRESS,
