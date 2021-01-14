@@ -22,7 +22,7 @@ read_fac_spellings <- function(){
             State,
             xwalk_name_clean,
             xwalk_name_raw,
-            Is.Federal) %>%
+            Jurisdiction) %>%
         mutate(xwalk_name_clean = clean_fac_col_txt(str_to_upper(xwalk_name_clean))) %>%
         mutate(xwalk_name_raw = clean_fac_col_txt(str_to_upper(xwalk_name_raw))) %>%
         unique()
