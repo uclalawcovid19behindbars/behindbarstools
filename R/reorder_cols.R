@@ -22,13 +22,13 @@
 #' @export
 
 reorder_cols <- function(data, add_missing_cols=TRUE, rm_extra_cols=FALSE) {
-    scraper_cols <- c("ID", "jurisdiction", "State", "Name", "Date", "source", "Residents.Confirmed",
-        "Staff.Confirmed", "Residents.Deaths", "Staff.Deaths", "Residents.Recovered",
-        "Staff.Recovered", "Residents.Tadmin", "Staff.Tested", "Residents.Negative",
-        "Staff.Negative", "Residents.Pending", "Staff.Pending", "Residents.Quarantine",
-        "Staff.Quarantine", "Residents.Active", "Residents.Population", "Address",
-        "Zipcode", "City", "County", "Latitude", "Longitude", "County.FIPS",
-        "hifld_id", "Notes")
+    scraper_cols <- c("Facility.ID", "Jurisdiction", "State", "Name", "Date", "source",
+                      "Residents.Confirmed", "Staff.Confirmed", "Residents.Deaths", "Staff.Deaths",
+                      "Residents.Recovered","Staff.Recovered", "Residents.Tadmin", "Staff.Tested",
+                      "Residents.Negative","Staff.Negative", "Residents.Pending", "Staff.Pending",
+                      "Residents.Quarantine", "Staff.Quarantine", "Residents.Active", "Residents.Population",
+                      "Address", "Zipcode", "City", "County", "Latitude", "Longitude", "County.FIPS",
+                      "HIFLD.ID")
     these_cols <- names(data)
     missing_cols <- if(all(scraper_cols %in% these_cols)) { NULL } else(base::setdiff(scraper_cols, these_cols))
     additional_cols <- if(all(these_cols %in% scraper_cols)) { NULL } else(base::setdiff(these_cols, scraper_cols))
