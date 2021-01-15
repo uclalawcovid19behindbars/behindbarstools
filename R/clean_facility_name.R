@@ -26,7 +26,7 @@
 clean_facility_name <- function(dat, alt_name_xwalk = FALSE, debug = FALSE){
     if(alt_name_xwalk) {
       name_xwalk <- alt_name_xwalk
-    }else {
+    } else {
       name_xwalk <- read_fac_spellings()
     }
     check_jurisdiction <- see_if(dat %has_name% "jurisdiction")
@@ -52,25 +52,25 @@ clean_facility_name <- function(dat, alt_name_xwalk = FALSE, debug = FALSE){
              ))
 
     nonfederal_xwalk <- name_xwalk %>%
-      filter(Is.Federal == 0) %>%
-      select(-Is.Federal)
+        filter(Jurisdiction %in% c("state", "county")) %>%
+        select(-Jurisdiction)
 
     nonfederal <- dat %>%
-      filter(!federal_bool) %>%
-      left_join(nonfederal_xwalk,
-                by = c(
-                  "scrape_name_clean" = "xwalk_name_raw",
-                  "State" = "State")) %>%
-      mutate(Name = xwalk_name_clean) %>%
-      mutate(name_match = !is.na(Name)) %>%
-      mutate(Name = ifelse(is.na(Name), scrape_name_clean, Name))
+        filter(!federal_bool) %>%
+        left_join(nonfederal_xwalk,
+                  by = c(
+                      "scrape_name_clean" = "xwalk_name_raw",
+                      "State" = "State")) %>%
+        mutate(Name = xwalk_name_clean) %>%
+        mutate(name_match = !is.na(Name)) %>%
+        mutate(Name = ifelse(is.na(Name), scrape_name_clean, Name))
 
     nrow_nonfederal <- nrow(nonfederal)
     if(nrow_nonfederal == 0) {nonfederal <- NULL}
 
     federal_xwalk <- name_xwalk %>%
-      filter(Is.Federal == 1) %>%
-      select(-Is.Federal)
+        filter(Jurisdiction %in% c("federal", "immigration")) %>%
+        select(-Jurisdiction)
 
     federal <- dat %>%
         filter(federal_bool) %>%
