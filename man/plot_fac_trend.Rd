@@ -10,6 +10,7 @@ plot_fac_trend(
   metric,
   scrape_df = NULL,
   plot_days = NULL,
+  area_plot = F,
   annotate = F,
   auto_label = F
 )
@@ -24,6 +25,8 @@ plot_fac_trend(
 \item{scrape_df}{data frame with scraped data}
 
 \item{plot_days}{integer, number of days to plot}
+
+\item{area_plot}{logical, whether to create an area plot (vs. a line plot)}
 
 \item{annotate}{logical, whether to include text annotations for most recent value}
 

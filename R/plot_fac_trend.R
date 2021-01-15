@@ -9,6 +9,7 @@
 #' @param metric character string of the metric to plot
 #' @param scrape_df data frame with scraped data
 #' @param plot_days integer, number of days to plot
+#' @param area_plot logical, whether to create an area plot (vs. a line plot)
 #' @param annotate logical, whether to include text annotations for most recent value
 #' @param auto_label logical, whether to label plot title, subtitle, axes based on behindbarstools::get_metric_description
 #'
@@ -34,7 +35,7 @@
 #' @export
 
 plot_fac_trend <- function(
-    fac_name, state, metric, scrape_df = NULL, plot_days = NULL, annotate = F, auto_label = F) {
+    fac_name, state, metric, scrape_df = NULL, plot_days = NULL, area_plot = F, annotate = F, auto_label = F) {
 
     if (! behindbarstools::is_fac_name(fac_name, state)) {
         stop(str_c(fac_name, " in ", state, " is not a valid facility."))
@@ -58,9 +59,10 @@ plot_fac_trend <- function(
         filter(State == state) %>%
         filter(Name == behindbarstools::clean_fac_col_txt(fac_name, T)) %>%
         mutate(last_value = if_else(Date == max(Date), as.character(!!sym(metric)), NA_character_)) %>%
-        ggplot(aes(x = Date, y = !!sym(metric), color = fac_name, label = last_value)) +
+        ggplot(aes(x = Date, y = !!sym(metric), color = fac_name, fill = fac_name, label = last_value)) +
         geom_line(size = 2.0) +
-        geom_point(size = 3.0) +
+        {if (!area_plot) geom_point(size = 3.0)} +
+        {if (area_plot) geom_area(alpha = 0.5)} +
         {if (annotate)
             ggrepel::geom_text_repel(na.rm = T, show.legend = F, size = 6, nudge_x = 1, point.padding = 0.1)} +
         {if (auto_label)
@@ -73,7 +75,9 @@ plot_fac_trend <- function(
                      limits = c(plot_start_date, plot_end_date),
                      expand = c(0.15, 0)) +
         scale_color_bbdiscrete() +
+        scale_fill_bbdiscrete() +
         theme_behindbars() +
-        theme(legend.position = "none",
+        theme(axis.text.y = element_text(vjust = -0.6, hjust = 0, margin = margin(r = -45)),
+              legend.position = "none",
               axis.title.x = element_blank())
 }
