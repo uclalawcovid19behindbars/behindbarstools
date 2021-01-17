@@ -16,7 +16,7 @@
 
 read_fac_spellings <- function(){
     FAC_SPELLINGS_LOC %>%
-        read_csv(col_types = cols()) %>%
+        read_csv(col_types = "dccccc") %>%
         select(
             Facility.ID,
             State,
