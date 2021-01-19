@@ -9,6 +9,7 @@
 #' @param base_family base font family
 #'
 #' @examples
+#' \dontrun{
 #' library(ggplot2)
 #' iris %>%
 #'     ggplot(aes(x = Petal.Width, y = Petal.Length, color = Species)) +
@@ -30,6 +31,7 @@
 #'
 #' usmap::plot_usmap() +
 #'     theme_map_behindbars()
+#'     }
 
 theme_behindbars <- function(
     base_size = 24, base_family = "Helvetica") {
