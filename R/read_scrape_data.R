@@ -99,6 +99,7 @@ read_scrape_data <- function(
                 Staff.Recovered, Residents.Tadmin, Staff.Tested, Residents.Negative,
                 Staff.Negative, Residents.Pending, Staff.Pending,
                 Residents.Quarantine, Staff.Quarantine, Residents.Active,
+                Residents.Popultion, Residents.Tested,
                 Population.Feb20, Address, Zipcode, City, County, Latitude,
                 Longitude, County.FIPS, HIFLD.ID) %>%
             arrange(State, Name, Date)
