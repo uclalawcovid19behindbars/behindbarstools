@@ -13,12 +13,12 @@
 #' @export
 
 translate_state <- function(x, reverse = FALSE){
-    state_vec <- c(datasets::state.name, "DC", "Federal")
+    state_vec <- c(datasets::state.name, "District of Columbia", "Federal")
     names(state_vec) <- c(datasets::state.abb, "DC", "federal")
 
     if(reverse){
         state_vec <- c(datasets::state.abb, "DC", "Federal")
-        names(state_vec) <- c(datasets::state.name, "DC", "federal")
+        names(state_vec) <- c(datasets::state.name, "District of Columbia", "federal")
     }
 
     state_vec[x]
