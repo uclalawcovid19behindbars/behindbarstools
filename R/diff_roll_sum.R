@@ -1,8 +1,11 @@
 # rolling sum window for n days
-rsum.cumsum <- function(x, n = 3L) {
+rsum.cumsum <- function(x, n = 3L){
+    if(length(x) <= n ){
+        return(rep(NA_real_, length(x)))
+    }
     out <- cumsum(x) - cumsum(c(rep(0, n), head(x, -n)))
     out[1:(n-1)] <- NA
-    out
+    return(out)
 }
 
 #' A function to calculate a rolling sum of first differences
@@ -18,8 +21,11 @@ rsum.cumsum <- function(x, n = 3L) {
 #' @examples
 #' \dontrun{
 #' read_scrape_data(all_dates = TRUE, state = "North Carolina") %>%
-#'     filter(Name == "NORTH CAROLINA CORRECTIONAL INSTITUTION FOR WOMEN") %>%
+#'     group_by(Name, Jurisdiction) %>%
+#'     # calculate values by name and jurisdication for all of state of NC
 #'     mutate(Res.Act.Est = diff_roll_sum(Residents.Confirmed, Date)) %>%
+#'     # filter here only for the example plot
+#'     filter(Name == "NORTH CAROLINA CORRECTIONAL INSTITUTION FOR WOMEN") %>%
 #'     ggplot(aes(
 #'         x = Date, y = Res.Act.Est, color = Name, fill = Name)) +
 #'     geom_line(size = 1.5) +
@@ -52,14 +58,8 @@ diff_roll_sum <- function(x, date_vec = NULL, window = 14){
         stop("window should be a single numeric value of length one")
     }
 
-    if(length(x) < window){
-        stop("window value should not be greater than length of x")
-    }
-
-    if(any(is.na(x))){
-        warning(
-            "x has na values which will be treated as equal to ",
-            "the previous value")
+    if(all(is.na(x))){
+        return(rep(NA_real_, length(x)))
     }
 
     if(is.null(date_vec)){

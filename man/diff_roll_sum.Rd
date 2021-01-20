@@ -21,8 +21,11 @@ missing day values are treated as the same as the last observed value.
 \examples{
 \dontrun{
 read_scrape_data(all_dates = TRUE, state = "North Carolina") \%>\%
-    filter(Name == "NORTH CAROLINA CORRECTIONAL INSTITUTION FOR WOMEN") \%>\%
+    group_by(Name, Jurisdiction) \%>\%
+    # calculate values by name and jurisdication for all of state of NC
     mutate(Res.Act.Est = diff_roll_sum(Residents.Confirmed, Date)) \%>\%
+    # filter here only for the example plot
+    filter(Name == "NORTH CAROLINA CORRECTIONAL INSTITUTION FOR WOMEN") \%>\%
     ggplot(aes(
         x = Date, y = Res.Act.Est, color = Name, fill = Name)) +
     geom_line(size = 1.5) +
