@@ -45,10 +45,26 @@ read_scrape_data <- function(
             "Base data frame contains ", nrow(dat_df), " rows."))
     }
 
-    comb_df <- dat_df %>%
+    dat_df <- dat_df %>%
+        mutate(State = translate_state(State))
+
+    ## moved this here just now! make sure it works
+    if(!is.null(state)){
+        filt_df <- dat_df %>%
+            filter(State %in% state)
+
+        if(debug){
+            message(stringr::str_c(
+                "State specific data frame contains ", nrow(out_df), " rows."))
+        }
+    }
+    else {
+        filt_df <- dat_df
+    }
+
+    comb_df <- filt_df %>%
         select(-starts_with("Resident.Deaths")) %>%
         mutate(Name = clean_fac_col_txt(Name, to_upper = TRUE)) %>%
-        mutate(State = translate_state(State)) %>%
         clean_facility_name(debug = debug)
 
     if(coalesce){
@@ -72,16 +88,6 @@ read_scrape_data <- function(
     if(debug){
         message(stringr::str_c(
             "Named data frame contains ", nrow(out_df), " rows."))
-    }
-
-    if(!is.null(state)){
-        out_df <- out_df %>%
-            filter(State %in% state)
-
-        if(debug){
-            message(stringr::str_c(
-                "State specific data frame contains ", nrow(out_df), " rows."))
-        }
     }
 
     if(debug){
