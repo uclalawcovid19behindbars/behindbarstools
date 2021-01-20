@@ -55,7 +55,7 @@ read_scrape_data <- function(
 
         if(debug){
             message(stringr::str_c(
-                "State specific data frame contains ", nrow(out_df), " rows."))
+                "State specific data frame contains ", nrow(filt_df), " rows."))
         }
     }
     else {
