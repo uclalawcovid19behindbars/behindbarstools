@@ -48,7 +48,6 @@ read_scrape_data <- function(
     dat_df <- dat_df %>%
         mutate(State = translate_state(State))
 
-    ## moved this here just now! make sure it works
     if(!is.null(state)){
         filt_df <- dat_df %>%
             filter(State %in% state)
@@ -88,17 +87,6 @@ read_scrape_data <- function(
     if(debug){
         message(stringr::str_c(
             "Named data frame contains ", nrow(out_df), " rows."))
-    }
-
-
-    if(!is.null(state)){
-        out_df <- out_df %>%
-            filter(State %in% state)
-
-        if(debug){
-            message(stringr::str_c(
-                "State specific data frame contains ", nrow(out_df), " rows."))
-        }
     }
 
     out_df <- out_df %>%
