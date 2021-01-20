@@ -90,24 +90,19 @@ read_scrape_data <- function(
             "Named data frame contains ", nrow(out_df), " rows."))
     }
 
-    if(debug){
-        # leave all columns present for debugging
+
+    if(!is.null(state)){
         out_df <- out_df %>%
-            arrange(State, Name, Date)
+            filter(State %in% state)
+
+        if(debug){
+            message(stringr::str_c(
+                "State specific data frame contains ", nrow(out_df), " rows."))
+        }
     }
-    else {
-        out_df <- out_df %>%
-            # Select the order for names corresponding to Public facing Google sheet
-            select(
-                Facility.ID, Jurisdiction, State, Name, Date, source,
-                Residents.Confirmed, Staff.Confirmed,
-                Residents.Deaths, Staff.Deaths, Residents.Recovered,
-                Staff.Recovered, Residents.Tadmin, Staff.Tested, Residents.Negative,
-                Staff.Negative, Residents.Pending, Staff.Pending,
-                Residents.Quarantine, Staff.Quarantine, Residents.Active,
-                Population.Feb20, Address, Zipcode, City, County, Latitude,
-                Longitude, County.FIPS, HIFLD.ID) %>%
-            arrange(State, Name, Date)
-    }
+
+    out_df <- out_df %>%
+        arrange(State, Name, Date)
+
     return(out_df)
 }
