@@ -30,6 +30,7 @@ scale_fill_bbcontinous()
 a set of themes and colors for behind bars plots
 }
 \examples{
+\dontrun{
 library(ggplot2)
 iris \%>\%
     ggplot(aes(x = Petal.Width, y = Petal.Length, color = Species)) +
@@ -51,4 +52,5 @@ iris \%>\%
 
 usmap::plot_usmap() +
     theme_map_behindbars()
+    }
 }

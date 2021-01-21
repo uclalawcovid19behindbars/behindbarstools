@@ -45,10 +45,25 @@ read_scrape_data <- function(
             "Base data frame contains ", nrow(dat_df), " rows."))
     }
 
-    comb_df <- dat_df %>%
+    dat_df <- dat_df %>%
+        mutate(State = translate_state(State))
+
+    if(!is.null(state)){
+        filt_df <- dat_df %>%
+            filter(State %in% state)
+
+        if(debug){
+            message(stringr::str_c(
+                "State specific data frame contains ", nrow(filt_df), " rows."))
+        }
+    }
+    else {
+        filt_df <- dat_df
+    }
+
+    comb_df <- filt_df %>%
         select(-starts_with("Resident.Deaths")) %>%
         mutate(Name = clean_fac_col_txt(Name, to_upper = TRUE)) %>%
-        mutate(State = translate_state(State)) %>%
         clean_facility_name(debug = debug)
 
     if(coalesce){
@@ -74,34 +89,8 @@ read_scrape_data <- function(
             "Named data frame contains ", nrow(out_df), " rows."))
     }
 
-    if(!is.null(state)){
-        out_df <- out_df %>%
-            filter(State %in% state)
+    out_df <- out_df %>%
+        arrange(State, Name, Date)
 
-        if(debug){
-            message(stringr::str_c(
-                "State specific data frame contains ", nrow(out_df), " rows."))
-        }
-    }
-
-    if(debug){
-        # leave all columns present for debugging
-        out_df <- out_df %>%
-            arrange(State, Name, Date)
-    }
-    else {
-        out_df <- out_df %>%
-            # Select the order for names corresponding to Public facing Google sheet
-            select(
-                Facility.ID, Jurisdiction, State, Name, Date, source,
-                Residents.Confirmed, Staff.Confirmed,
-                Residents.Deaths, Staff.Deaths, Residents.Recovered,
-                Staff.Recovered, Residents.Tadmin, Staff.Tested, Residents.Negative,
-                Staff.Negative, Residents.Pending, Staff.Pending,
-                Residents.Quarantine, Staff.Quarantine, Residents.Active,
-                Population.Feb20, Address, Zipcode, City, County, Latitude,
-                Longitude, County.FIPS, HIFLD.ID) %>%
-            arrange(State, Name, Date)
-    }
     return(out_df)
 }
