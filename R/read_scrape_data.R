@@ -90,7 +90,8 @@ read_scrape_data <- function(
     }
 
     out_df <- out_df %>%
-        arrange(State, Name, Date)
+        arrange(State, Name, Date) %>%
+        reorder_cols()
 
     return(out_df)
 }
