@@ -15,15 +15,23 @@
 #' read_fac_spellings()
 
 read_fac_spellings <- function(){
-    FAC_SPELLINGS_LOC %>%
+
+    # Add all alternative spellings
+    alt_spellings <- FAC_SPELLINGS_LOC %>%
         read_csv(col_types = "dccccc") %>%
-        select(
-            Facility.ID,
-            State,
-            xwalk_name_clean,
-            xwalk_name_raw,
-            Jurisdiction) %>%
         mutate(xwalk_name_clean = clean_fac_col_txt(str_to_upper(xwalk_name_clean))) %>%
-        mutate(xwalk_name_raw = clean_fac_col_txt(str_to_upper(xwalk_name_raw))) %>%
+        mutate(xwalk_name_raw = clean_fac_col_txt(str_to_upper(xwalk_name_raw)))
+
+    # Add all entries in fac_info where the clean name is the same as the alt name
+    clean_spellings <- read_fac_info() %>%
+        mutate(xwalk_name_raw = Name,
+               xwalk_name_clean = Name) %>%
+        select(Facility.ID, State, xwalk_name_raw, xwalk_name_clean, Jurisdiction)
+
+    out <- bind_rows(alt_spellings, clean_spellings) %>%
+        select(Facility.ID, State, xwalk_name_raw, xwalk_name_clean, Jurisdiction) %>%
         unique()
+
+    return (out)
+
 }
