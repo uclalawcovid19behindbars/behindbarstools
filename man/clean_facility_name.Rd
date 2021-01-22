@@ -14,14 +14,18 @@ clean_facility_name(dat, alt_name_xwalk = FALSE, debug = FALSE)
 \item{debug}{Boolean whether to include additional columns geneated during the merging process}
 }
 \value{
-data set with cleaned facility name column, "Name", and "Facility.ID"
+data set with cleaned columns, "Name", "Facility.ID", and "Jurisdiction" from fac_spellings
 }
 \description{
 A facility name cleaning function. Uses GitHub facility name cross-walk to find all possible name variations.
-Cleans federal and non-federal facilities in separate processes, in order to use "State" to merge or not
+Cleans federal and non-federal facilities in separate processes, in order to use "State" to merge or not.
+If no match is found in the crosswalk, both Facility.ID and Jurisdiction will equal NA in the resulting output.
 }
 \examples{
 clean_facility_name(
-    tibble(Name = "BULLOCK CORRECTIONAL FACILITY", State = "Alabama", jurisdiction = "state"))
+    tibble(Name = "BULLOCK CORRECTIONAL FACILITY", State = "Alabama", Jurisdiction = "state"))
+
+clean_facility_name(
+    tibble(Name = "LEE USP", State = "Federal", Facility = "prison"))
 
 }

@@ -12,7 +12,7 @@
 #'
 #' @examples
 #' merge_facility_info(
-#'     tibble(Name = "BULLOCK CORRECTIONAL FACILITY", State = "Alabama", jurisdiction = "state", Facility.ID = 7))
+#'     tibble(Name = "BULLOCK CORRECTIONAL FACILITY", State = "Alabama", Jurisdiction = "state", Facility.ID = 7))
 #'
 #'
 #' @export
@@ -24,12 +24,20 @@ merge_facility_info <- function(dat){
     left_join(fac_info,
               by = "Facility.ID",
               suffix = c("", ".y")) %>%
-    mutate(State = ifelse(is.na(State), State.y, State),
-           Jurisdiction = ifelse(is.na(jurisdiction), Jurisdiction, jurisdiction)) %>%
+    # if Name, State, or Jurisdiction are NA in data, use the values from fac_info
+    # note: we NEVER expect Name, State, or Jurisdiction to be in fac_info and
+    #       not fac_spellings. but in case this ever happens, the code below will
+    #       populate those missing values
+    mutate(
+      Name = ifelse(is.na(Name), Name.y, Name),
+      State = ifelse(is.na(State), State.y, State),
+      Jurisdiction = ifelse(is.na(Jurisdiction), Jurisdiction.y, Jurisdiction)
+      ) %>%
+    # de-select Name, State, and Jurisdiction from fac_info sheet
     select(
+      -Name.y,
       -State.y,
-      -jurisdiction,
-      -Name.y
+      -Jurisdiction.y,
     ) %>%
     relocate(Facility.ID)
 
