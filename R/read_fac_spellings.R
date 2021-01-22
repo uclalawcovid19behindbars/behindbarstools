@@ -29,7 +29,7 @@ read_fac_spellings <- function(){
         select(Facility.ID, State, xwalk_name_raw, xwalk_name_clean, Jurisdiction)
 
     out <- bind_rows(alt_spellings, clean_spellings) %>%
-        select(Facility.ID, State, xwalk_name_raw, xwalk_name_clean, Jurisdiction, Source) %>%
+        select(Facility.ID, State, xwalk_name_raw, xwalk_name_clean, Jurisdiction) %>%
         unique()
 
     return (out)
