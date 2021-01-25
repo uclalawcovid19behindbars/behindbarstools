@@ -21,6 +21,16 @@ A facility name cleaning function. Uses GitHub facility name cross-walk to find 
 Cleans federal and non-federal facilities in separate processes, in order to use "State" to merge or not.
 If no match is found in the crosswalk, both Facility.ID and Jurisdiction will equal NA in the resulting output.
 }
+\details{
+This function assumes that if a faceility is federal, then vars "Facility" OR "State" OR "Jurisdiction" will
+contain the word federal (case-insensitive).
+
+For non-federal entities, the data returned gets "Jurisdiction" from fac_spellings
+
+For federal + immigration entities, the data returned gets "Jurisdiction" and "State" from fac_spellings
+
+When there is not enough info to get a match, both "Jurisdiction" and "Facility.ID" will be returned as NA
+}
 \examples{
 clean_facility_name(
     tibble(Name = "BULLOCK CORRECTIONAL FACILITY", State = "Alabama", Jurisdiction = "state"))
