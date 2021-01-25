@@ -10,7 +10,7 @@ read_pop_data()
 data frame with population data
 }
 \description{
-Reads in population data
+Reads in population data. If Facility.ID = NA, we don't have the pop data in our crosswalk.
 }
 \examples{
 read_pop_data()

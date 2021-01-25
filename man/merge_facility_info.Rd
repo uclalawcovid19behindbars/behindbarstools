@@ -20,7 +20,7 @@ Data source here: https://github.com/uclalawcovid19behindbars/facility_data/data
 }
 \examples{
 merge_facility_info(
-    tibble(Name = "BULLOCK CORRECTIONAL FACILITY", State = "Alabama", jurisdiction = "state", Facility.ID = 7))
+    tibble(Name = "BULLOCK CORRECTIONAL FACILITY", State = "Alabama", Jurisdiction = "state", Facility.ID = 7))
 
 
 }

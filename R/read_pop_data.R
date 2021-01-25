@@ -1,6 +1,6 @@
 #' Read in UCLA Population Data with cleaned names
 #'
-#' Reads in population data
+#' Reads in population data. If Facility.ID = NA, we don't have the pop data in our crosswalk.
 #'
 #' @return data frame with population data
 #'
@@ -17,7 +17,7 @@
 #' read_pop_data()
 
 read_pop_data <- function(){
-    "https://raw.githubusercontent.com/uclalawcovid19behindbars/Population/" %>%
+    pop <- "https://raw.githubusercontent.com/uclalawcovid19behindbars/Population/" %>%
         str_c("main/initial/Merg_Pop.csv") %>%
         read_csv(col_types = cols()) %>%
         rename(Name_Raw = Name) %>%
@@ -25,11 +25,13 @@ read_pop_data <- function(){
         mutate(Name_Raw = str_remove(Name_Raw, "ASPC ")) %>%
         mutate(Name_Raw = clean_fac_col_txt(str_to_upper(Name_Raw))) %>%
         # there are some duplicate names in here that shouldnt be happening
-        distinct(Name_Raw, State, .keep_all = TRUE) %>%
-        left_join(
-            read_fac_crosswalk() %>%
-                select(Name= xwalk_name_clean, Name_Raw = xwalk_name_raw, State),
-            by = c("Name_Raw", "State")) %>%
+        distinct(Name_Raw, State, .keep_all = TRUE)
+    xwalk <- read_fac_crosswalk() %>%
+        select(Name = xwalk_name_clean, Name_Raw = xwalk_name_raw, State, Facility.ID)
+    pop_w_info <- pop %>%
+        left_join(xwalk,
+                  by = c("Name_Raw", "State")) %>%
         mutate(Name = ifelse(is.na(Name), Name_Raw, Name)) %>%
         select(-Name_Raw)
+    return(pop_w_info)
 }

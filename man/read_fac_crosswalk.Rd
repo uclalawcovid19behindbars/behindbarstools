@@ -10,5 +10,5 @@ read_fac_crosswalk()
 data frame with facility crosswalk data
 }
 \description{
-Reads in facility crosswalk data
+Reads in facility crosswalk data. NB:
 }
