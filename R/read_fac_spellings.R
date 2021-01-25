@@ -18,7 +18,7 @@ read_fac_spellings <- function(){
 
     # Add all alternative spellings
     alt_spellings <- FAC_SPELLINGS_LOC %>%
-        read_csv(col_types = "dccccc") %>%
+        read_csv(col_types = "dcccc") %>%
         mutate(xwalk_name_clean = clean_fac_col_txt(str_to_upper(xwalk_name_clean))) %>%
         mutate(xwalk_name_raw = clean_fac_col_txt(str_to_upper(xwalk_name_raw)))
 
