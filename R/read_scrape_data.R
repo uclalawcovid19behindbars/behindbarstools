@@ -28,7 +28,7 @@ read_scrape_data <- function(
     if(!all_dates){
         dat_df <- remote_loc %>%
             stringr::str_c("aggregated_data.csv") %>%
-            readr::read_csv(col_types = "Dccccddddddddddcddddddd") %>%
+            readr::read_csv(col_types = "Dccccddddddddddddcddddddddd") %>%
             group_by(State, id, jurisdiction) %>% # `id` here refers to scraper id
             filter(Date == max(Date)) %>%
             ungroup()
@@ -37,7 +37,7 @@ read_scrape_data <- function(
     else{
         dat_df <- remote_loc %>%
             stringr::str_c("aggregated_data.csv") %>%
-            readr::read_csv(col_types = "Dccccddddddddddcddddddd")
+            readr::read_csv(col_types = "Dccccddddddddddddcddddddddd")
     }
 
     if(debug){
