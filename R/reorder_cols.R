@@ -27,7 +27,10 @@ reorder_cols <- function(data, add_missing_cols=TRUE, rm_extra_cols=FALSE) {
                       "Residents.Recovered","Staff.Recovered", "Residents.Tadmin", "Staff.Tested",
                       "Residents.Negative","Staff.Negative", "Residents.Pending", "Staff.Pending",
                       "Residents.Quarantine", "Staff.Quarantine", "Residents.Active", "Population.Feb20",
-                      "Residents.Population", "Residents.Tested", "Address", "Zipcode", "City", "County",
+                      "Residents.Population", "Residents.Tested", 
+                      "Residents.Initiated", "Residents.Vadmin", 
+                      "Staff.Initiated", "Staff.Vadmin", 
+                      "Address", "Zipcode", "City", "County",
                       "Latitude", "Longitude", "County.FIPS", "HIFLD.ID")
     these_cols <- names(data)
     missing_cols <- if(all(scraper_cols %in% these_cols)) { NULL } else(base::setdiff(scraper_cols, these_cols))
