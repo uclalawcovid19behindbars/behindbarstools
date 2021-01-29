@@ -16,7 +16,32 @@
 
 read_fac_info <- function(federal_only = FALSE){
     FAC_DATA_LOC %>%
-        read_csv(col_types = "dccccccdccdddccccccdcccc") %>%
+        read_csv(col_types = cols(
+            Facility.ID = "d",
+            State = "c",
+            Name = "c",
+            Description = "c",
+            Security = "c",
+            Age = "c",
+            Gender = "c",
+            Is.Different.Operator = "l",
+            Different.Operator = "c",
+            Population.Feb20 = "d",
+            Capacity = "d",
+            HIFLD.ID = "d",
+            BJS.ID = "d",
+            Source.Population.Feb20 = "c",
+            Source.Capacity = "c",
+            Address = "c",
+            City = "c",
+            Zipcode = "d",
+            Latitude = "d",
+            Longitude = "d",
+            County = "c",
+            County.FIPS = "d",
+            Website = "c",
+            Jurisdiction = "c")
+            ) %>%
         select(Facility.ID, State, Name, Jurisdiction, Description, Security,
                Age, Gender, Is.Different.Operator, Different.Operator, Population.Feb20,
                Capacity, HIFLD.ID, BJS.ID, Source.Population.Feb20, Source.Capacity, Address,
