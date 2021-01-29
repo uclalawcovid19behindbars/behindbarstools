@@ -28,8 +28,8 @@ reorder_cols <- function(data, add_missing_cols=TRUE, rm_extra_cols=FALSE) {
                       "Residents.Negative","Staff.Negative", "Residents.Pending", "Staff.Pending",
                       "Residents.Quarantine", "Staff.Quarantine", "Residents.Active", "Population.Feb20",
                       "Residents.Population", "Residents.Tested", 
-                      "Residents.Initiated", "Residents.Vadmin", 
-                      "Staff.Initiated", "Staff.Vadmin", 
+                      "Residents.Initiated", "Residents.Completed", "Residents.Vadmin", 
+                      "Staff.Initiated", "Staff.Completed", "Staff.Vadmin", 
                       "Address", "Zipcode", "City", "County",
                       "Latitude", "Longitude", "County.FIPS", "HIFLD.ID")
     these_cols <- names(data)
