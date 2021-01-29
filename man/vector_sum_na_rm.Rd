@@ -10,14 +10,13 @@ vector_sum_na_rm(...)
 \item{...}{numeric vectors of equal length}
 }
 \value{
-numeric vector of length 1
+numeric vector of length equal to provided vectors
 }
 \description{
 A re-coding of the sum function which returns NA if all values are NA.
 This function sums vectors together.
 }
 \examples{
-sum_na_rm(c(1:2, NA))
-sum_na_rm(c(NA, NA))
-
+tibble(x = c(NA, NA, NA), y = c(NA, 2, NA), z = c(1, NA, NA)) \%>\%
+   mutate(new = vector_sum_na_rm(x, y, z))
 }
