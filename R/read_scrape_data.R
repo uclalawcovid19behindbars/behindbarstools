@@ -46,7 +46,8 @@ read_scrape_data <- function(
     }
 
     dat_df <- dat_df %>%
-        mutate(State = translate_state(State))
+        mutate(State = translate_state(State)) %>%
+        rename(jurisdiction_scraper = jurisdiction) # rename this variable for clarity
 
     if(!is.null(state)){
         filt_df <- dat_df %>%
@@ -64,16 +65,21 @@ read_scrape_data <- function(
     comb_df <- filt_df %>%
         select(-starts_with("Resident.Deaths")) %>%
         mutate(Name = clean_fac_col_txt(Name, to_upper = TRUE)) %>%
-        clean_facility_name(debug = debug)
+        clean_facility_name(debug = debug) %>%
+        # if Jurisdiction is NA (no match in facility_spellings), make it scraper jurisdiction
+        mutate(Jurisdiction = ifelse((is.na(Jurisdiction) & !is.na(jurisdiction_scraper)),
+                                     jurisdiction_scraper,
+                                     Jurisdiction)
+               )
 
     if(coalesce){
         comb_df <- comb_df %>%
             select(-id) %>%
             group_by_coalesce(
-                Date, Name, State, jurisdiction, Facility.ID,
+                Date, Name, State, jurisdiction_scraper, Facility.ID,
                 .ignore = c(
                     "source", "scrape_name_clean", "federal_bool",
-                    "xwalk_name_clean", "name_match"),
+                    "xwalk_name_clean", "name_match", "Jurisdiction"),
                 .method = "sum", debug = debug)
 
         if(debug){

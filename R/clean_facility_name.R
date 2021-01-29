@@ -45,6 +45,12 @@ clean_facility_name <- function(dat, alt_name_xwalk = FALSE, debug = FALSE){
         # don't want to keep ambiguous jurisdiction xwalk entries
         filter(!is.na(Jurisdiction))
     }
+    check_jurisdiction_scraper <- see_if(dat %has_name% "jurisdiction_scraper")
+    if(check_jurisdiction_scraper == FALSE){
+      dat$jurisdiction_scraper <- NA_character_
+    } else {
+      dat$jurisdiction_scraper <- dat$jurisdiction_scraper
+    }
     check_jurisdiction <- see_if(dat %has_name% "Jurisdiction")
     if(check_jurisdiction == FALSE){
       dat$Jurisdiction <- NA_character_
@@ -61,6 +67,7 @@ clean_facility_name <- function(dat, alt_name_xwalk = FALSE, debug = FALSE){
     dat <- dat %>%
       mutate(scrape_name_clean = clean_fac_col_txt(Name, to_upper = TRUE),
              federal_bool = case_when(
+               is_federal(jurisdiction_scraper) ~ TRUE,
                is_federal(Jurisdiction) ~ TRUE,
                is_federal(State) ~ TRUE,
                is_federal(Facility) ~ TRUE,
@@ -74,7 +81,7 @@ clean_facility_name <- function(dat, alt_name_xwalk = FALSE, debug = FALSE){
 
     nonfederal <- dat %>%
         filter(!federal_bool) %>%
-        select(-Jurisdiction) %>% # if Jurisdiction is NA in the data, we get jurisdiction from xwalk
+        select(-Jurisdiction) %>% # if Jurisdiction is NA in the data (which we expect), we get Jurisdiction from xwalk
         left_join(nonfederal_xwalk,
                   by = c(
                       "scrape_name_clean" = "xwalk_name_raw",
@@ -92,7 +99,7 @@ clean_facility_name <- function(dat, alt_name_xwalk = FALSE, debug = FALSE){
     federal <- dat %>%
         filter(federal_bool) %>%
         select(-State,              # if State = Federal in the data, we get state from xwalk
-               -Jurisdiction) %>%   # if Jurisdiction = NA in the data, we get JUR from xwalk
+               -Jurisdiction) %>%   # if Jurisdiction = NA in the data, we get Jurisdiction from xwalk
         left_join(
             federal_xwalk,
             by = c("scrape_name_clean" = "xwalk_name_raw")
