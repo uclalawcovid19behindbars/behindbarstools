@@ -23,12 +23,21 @@
 read_scrape_data <- function(
     all_dates = FALSE, coalesce = TRUE, debug = FALSE, state = NULL){
 
-    remote_loc <- stringr::str_c(SRVR_SCRAPE_LOC, "summary_data/")
+    remote_loc <- stringr::str_c(
+        SRVR_SCRAPE_LOC, "summary_data/aggregated_data.csv")
+
+    jnk <- read.csv(remote_loc, nrows=1, check.names=FALSE)
+    # all columns are character columns unless otherwise denoted
+    ctypes <- rep("c", ncol(jnk))
+    names(ctypes) <- names(jnk)
+    # columns that start with residents or staff or data
+    ctypes[str_starts(names(ctypes), "Residents|Staff")] <- "d"
+    # date is date type
+    ctypes[names(ctypes) == "Date"] <- "D"
 
     if(!all_dates){
         dat_df <- remote_loc %>%
-            stringr::str_c("aggregated_data.csv") %>%
-            readr::read_csv(col_types = "Dccccddddddddddddcddddddddd") %>%
+            readr::read_csv(col_types = paste0(ctypes, collapse = "")) %>%
             group_by(State, id, jurisdiction) %>% # `id` here refers to scraper id
             filter(Date == max(Date)) %>%
             ungroup()
@@ -36,8 +45,7 @@ read_scrape_data <- function(
 
     else{
         dat_df <- remote_loc %>%
-            stringr::str_c("aggregated_data.csv") %>%
-            readr::read_csv(col_types = "Dccccddddddddddddcddddddddd")
+            readr::read_csv(col_types = paste0(ctypes, collapse = ""))
     }
 
     if(debug){
@@ -98,6 +106,13 @@ read_scrape_data <- function(
     out_df <- out_df %>%
         arrange(State, Name, Date) %>%
         reorder_cols()
+
+    if(!all_dates){
+        out_df <- out_df %>%
+            group_by(Facility.ID, jurisdiction_scraper, State, Name) %>%
+            filter(Date == max(Date)) %>%
+            ungroup()
+    }
 
     return(out_df)
 }
