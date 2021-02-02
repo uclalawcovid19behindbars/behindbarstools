@@ -107,5 +107,12 @@ read_scrape_data <- function(
         arrange(State, Name, Date) %>%
         reorder_cols()
 
+    if(!all_dates){
+        out_df <- out_df %>%
+            group_by(Facility.ID, jurisdiction_scraper, State, Name) %>%
+            filter(Date == max(Date)) %>%
+            ungroup()
+    }
+
     return(out_df)
 }
