@@ -34,11 +34,11 @@ read_fac_info <- function(federal_only = FALSE){
             Source.Capacity = "c",
             Address = "c",
             City = "c",
-            Zipcode = "d",
+            Zipcode = "c",
             Latitude = "d",
             Longitude = "d",
             County = "c",
-            County.FIPS = "d",
+            County.FIPS = "c",
             Website = "c",
             Jurisdiction = "c")
             ) %>%
