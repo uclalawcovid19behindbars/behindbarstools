@@ -29,10 +29,12 @@ read_mpap_data <- function(all_dates = FALSE, window = 14){
             Residents.Confirmed = total_prisoner_cases,
             Residents.Deaths = total_prisoner_deaths,
             Residents.Tadmin = prisoner_tests_with_multiples,
+            Residents.Tested = prisoner_tests,
             Residents.Recovered = prisoners_recovered,
             Staff.Confirmed = total_staff_cases,
             Staff.Deaths = total_staff_deaths,
-            Staff.Recovered = staff_recovered
+            Staff.Tested = staff_tests,
+            Staff.Recovered = staff_recovered,
         )
 
     if(!all_dates){
