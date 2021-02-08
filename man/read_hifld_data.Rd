@@ -15,5 +15,7 @@ coordinates (latitude and longitude) for the centroid of each facility, replaces
 -999 population and capacity values with NA.
 }
 \examples{
+\dontrun{
 read_hifld_data()
+}
 }
