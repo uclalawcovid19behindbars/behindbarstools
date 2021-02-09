@@ -3,6 +3,8 @@
 #' Reads either time series or latest data from the web scraper runs
 #'
 #' @param all_dates logical, get all data from all dates recorded by webscraper
+#' @param window int, if all dates is false how far back to look for values from
+#' a given facility to populate values until value should be NA
 #' @param coalesce logical, collapse common facilities into single row
 #' @param debug logical, print debug statements on number of rows maintained in
 #' @param state character vector, states to limit data to
@@ -21,7 +23,7 @@
 #' @export
 
 read_scrape_data <- function(
-    all_dates = FALSE, coalesce = TRUE, debug = FALSE, state = NULL){
+    all_dates = FALSE, window = 31, coalesce = TRUE, debug = FALSE, state = NULL){
 
     remote_loc <- stringr::str_c(
         SRVR_SCRAPE_LOC, "summary_data/aggregated_data.csv")
@@ -31,22 +33,12 @@ read_scrape_data <- function(
     ctypes <- rep("c", ncol(jnk))
     names(ctypes) <- names(jnk)
     # columns that start with residents or staff or data
-    ctypes[str_starts(names(ctypes), "Residents|Staff")] <- "d"
+    ctypes[stringr::str_starts(names(ctypes), "Residents|Staff")] <- "d"
     # date is date type
     ctypes[names(ctypes) == "Date"] <- "D"
 
-    if(!all_dates){
-        dat_df <- remote_loc %>%
-            readr::read_csv(col_types = paste0(ctypes, collapse = "")) %>%
-            group_by(State, id, jurisdiction) %>% # `id` here refers to scraper id
-            filter(Date == max(Date)) %>%
-            ungroup()
-    }
-
-    else{
-        dat_df <- remote_loc %>%
-            readr::read_csv(col_types = paste0(ctypes, collapse = ""))
-    }
+    dat_df <- remote_loc %>%
+        readr::read_csv(col_types = paste0(ctypes, collapse = ""))
 
     if(debug){
         message(stringr::str_c(
@@ -109,7 +101,13 @@ read_scrape_data <- function(
 
     if(!all_dates){
         out_df <- out_df %>%
+            # only keep values in the last window of days
+            filter(Date >= (Sys.Date() - window)) %>%
             group_by(Facility.ID, jurisdiction_scraper, State, Name) %>%
+            arrange(Facility.ID, jurisdiction_scraper, State, Name, Date) %>%
+            # replace all missing values with last observed real value
+            mutate(across(starts_with("Residents"), last_not_na)) %>%
+            mutate(across(starts_with("Staff"), last_not_na)) %>%
             filter(Date == max(Date)) %>%
             ungroup()
     }
