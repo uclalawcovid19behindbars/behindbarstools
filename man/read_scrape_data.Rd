@@ -6,6 +6,7 @@
 \usage{
 read_scrape_data(
   all_dates = FALSE,
+  window = 31,
   coalesce = TRUE,
   debug = FALSE,
   state = NULL
@@ -13,6 +14,9 @@ read_scrape_data(
 }
 \arguments{
 \item{all_dates}{logical, get all data from all dates recorded by webscraper}
+
+\item{window}{int, if all dates is false how far back to look for values from
+a given facility to populate values until value should be NA}
 
 \item{coalesce}{logical, collapse common facilities into single row}
 
