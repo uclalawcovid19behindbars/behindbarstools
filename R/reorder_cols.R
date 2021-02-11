@@ -36,7 +36,7 @@ reorder_cols <- function(data, add_missing_cols=TRUE, rm_extra_cols=FALSE) {
         "County.FIPS", "HIFLD.ID", "jurisdiction_scraper", "Description",
         "Security", "Age", "Gender", "Is.Different.Operator",
         "Different.Operator", "Capacity", "BJS.ID", "Source.Population.Feb20",
-        "Source.Capacity", "Website")
+        "Source.Capacity", "Website", "ICE.Field.Office")
     these_cols <- names(data)
     missing_cols <- if(all(scraper_cols %in% these_cols)) { NULL } else(base::setdiff(scraper_cols, these_cols))
     additional_cols <- if(all(these_cols %in% scraper_cols)) { NULL } else(base::setdiff(these_cols, scraper_cols))
