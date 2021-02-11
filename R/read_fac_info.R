@@ -40,12 +40,12 @@ read_fac_info <- function(federal_only = FALSE){
             County = "c",
             County.FIPS = "c",
             Website = "c",
-            Jurisdiction = "c")
-            ) %>%
+            Jurisdiction = "c",
+            ICE.Field.Office = "c")) %>%
         select(Facility.ID, State, Name, Jurisdiction, Description, Security,
                Age, Gender, Is.Different.Operator, Different.Operator, Population.Feb20,
                Capacity, HIFLD.ID, BJS.ID, Source.Population.Feb20, Source.Capacity, Address,
-               City, Zipcode, Latitude, Longitude, County, County.FIPS, Website) %>%
+               City, Zipcode, Latitude, Longitude, County, County.FIPS, Website, ICE.Field.Office) %>%
         `if`(
             federal_only,
             filter(., stringr::str_detect(.$Jurisdiction, "(?i)federal")),
