@@ -22,8 +22,11 @@ calc_aggregate_counts <- function(
     window = 31, ucla_only = FALSE, state = FALSE){
     mp_data <- read_mpap_data(window = window) %>%
         select(-Date) %>%
-        pivot_longer(-State, names_to = "Measure", values_to = "MP") %>%
-        mutate(MP = ifelse(ucla_only, NA_real_, MP))
+        tidyr::pivot_longer(-State, names_to = "Measure", values_to = "MP")
+
+    if(ucla_only){
+        mp_data$MP <- NA_real_
+    }
 
     ucla_df <- read_scrape_data(window = window)
 
@@ -32,7 +35,8 @@ calc_aggregate_counts <- function(
         filter(Jurisdiction %in% c("state", "federal")) %>%
         select(Name, State, starts_with("Residents"), starts_with("Staff")) %>%
         select(-Residents.Population) %>%
-        pivot_longer(-(Name:State), names_to = "Measure", values_to = "UCLA") %>%
+        tidyr::pivot_longer(
+            -(Name:State), names_to = "Measure", values_to = "UCLA") %>%
         filter(!is.na(UCLA)) %>%
         group_by(State, Measure) %>%
         mutate(has_statewide = "STATEWIDE" %in% Name) %>%
