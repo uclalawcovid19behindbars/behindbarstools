@@ -49,8 +49,18 @@ read_scrape_data <- function(
         mutate(State = translate_state(State)) %>%
         rename(jurisdiction_scraper = jurisdiction) # rename this variable for clarity
 
+    cln_name_df <- dat_df %>%
+        select(-starts_with("Resident.Deaths")) %>%
+        mutate(Name = clean_fac_col_txt(Name, to_upper = TRUE)) %>%
+        clean_facility_name(debug = debug) %>%
+        # if Jurisdiction is NA (no match in facility_spellings), make it scraper jurisdiction
+        mutate(Jurisdiction = ifelse((is.na(Jurisdiction) & !is.na(jurisdiction_scraper)),
+                                     jurisdiction_scraper,
+                                     Jurisdiction)
+        )
+
     if(!is.null(state)){
-        filt_df <- dat_df %>%
+        filt_df <- cln_name_df %>%
             filter(State %in% state)
 
         if(debug){
@@ -59,21 +69,11 @@ read_scrape_data <- function(
         }
     }
     else {
-        filt_df <- dat_df
+        filt_df <- cln_name_df
     }
 
-    comb_df <- filt_df %>%
-        select(-starts_with("Resident.Deaths")) %>%
-        mutate(Name = clean_fac_col_txt(Name, to_upper = TRUE)) %>%
-        clean_facility_name(debug = debug) %>%
-        # if Jurisdiction is NA (no match in facility_spellings), make it scraper jurisdiction
-        mutate(Jurisdiction = ifelse((is.na(Jurisdiction) & !is.na(jurisdiction_scraper)),
-                                     jurisdiction_scraper,
-                                     Jurisdiction)
-               )
-
     if(coalesce){
-        comb_df <- comb_df %>%
+        comb_df <- filt_df %>%
             select(-id) %>%
             group_by_coalesce(
                 Date, Name, State, jurisdiction_scraper, Facility.ID,
@@ -86,6 +86,9 @@ read_scrape_data <- function(
             message(stringr::str_c(
                 "Coalesced data frame contains ", nrow(comb_df), " rows."))
         }
+    }
+    else {
+        comb_df <- filt_df
     }
 
     out_df <- merge_facility_info(comb_df)
