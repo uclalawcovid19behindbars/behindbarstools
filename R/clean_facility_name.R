@@ -38,7 +38,6 @@
 #' @export
 
 clean_facility_name <- function(dat, alt_name_xwalk = FALSE, debug = FALSE){
-  browser()
     if(alt_name_xwalk) {
       name_xwalk <- alt_name_xwalk
     } else {
