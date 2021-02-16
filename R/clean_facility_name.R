@@ -38,6 +38,7 @@
 #' @export
 
 clean_facility_name <- function(dat, alt_name_xwalk = FALSE, debug = FALSE){
+  browser()
     if(alt_name_xwalk) {
       name_xwalk <- alt_name_xwalk
     } else {
@@ -71,6 +72,9 @@ clean_facility_name <- function(dat, alt_name_xwalk = FALSE, debug = FALSE){
                is_federal(Jurisdiction) ~ TRUE,
                is_federal(State) ~ TRUE,
                is_federal(Facility) ~ TRUE,
+               # include Jurisdiction, jurisdiction_scraper in federal_bool = TRUE
+               str_detect(jurisdiction_scraper, "(?i)immigration") ~ TRUE,
+               str_detect(Jurisdiction, "(?i)immigration") ~ TRUE,
                # when Jurisdiction is NA, and neither State nor Facility
                # contains "federal", federal_bool = FALSE
                TRUE ~ FALSE
