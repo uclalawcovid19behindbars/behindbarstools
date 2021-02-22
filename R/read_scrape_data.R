@@ -1,18 +1,19 @@
 #' Read data extracted by webscraper
 #'
-#' Reads either time series or latest data from the web scraper runs
+#' Reads either time series or latest data from the web scraper runs.
 #'
 #' @param all_dates logical, get all data from all dates recorded by webscraper
-#' @param window int, if all dates is false how far back to look for values from
-#' a given facility to populate values until value should be NA
+#' @param window int, how far to go back (in days) to look for values from a given
+#' facility to populate NAs for ALL scraped variables. Used when all_dates is FALSE
+#' @param window_pop int, how far to go back (in days) to look for values from a given
+#' facility to populate NAs in Residents.Population. Used when coalesce_pop is TRUE
 #' @param coalesce logical, collapse common facilities into single row
 #' @param coalesce_pop logical, collapse population data based on the date window
-#' @param drop_na_covid logical, drop rows missing all COVID variables
+#' @param drop_noncovid_obs logical, drop rows missing all COVID variables
 #' @param debug logical, print debug statements on number of rows maintained in
 #' @param state character vector, states to limit data to
-#' cleaning process
 #'
-#' @return character vector of state names
+#' @return dataframe with scraped data
 #'
 #' @importFrom assertthat see_if
 #'
@@ -25,8 +26,8 @@
 #' @export
 
 read_scrape_data <- function(
-    all_dates = FALSE, window = 31, coalesce = TRUE, coalesce_pop = TRUE,
-    drop_na_covid = TRUE, debug = FALSE, state = NULL){
+    all_dates = FALSE, window = 31, window_pop = 31, coalesce = TRUE,
+    coalesce_pop = TRUE, drop_noncovid_obs = TRUE, debug = FALSE, state = NULL){
 
     remote_loc <- stringr::str_c(
         SRVR_SCRAPE_LOC, "summary_data/aggregated_data.csv")
@@ -105,12 +106,12 @@ read_scrape_data <- function(
                    pop_date_ = last_not_na(pop_date_),
                    pop_fill_ = last_not_na(Residents.Population),
                    Residents.Population = ifelse(
-                       !is.na(Facility.ID) & Date - pop_date_ < window,
+                       !is.na(Facility.ID) & Date - pop_date_ < window_pop,
                        pop_fill_, Residents.Population)) %>%
             select(-ends_with("_"))
     }
 
-    if(drop_na_covid){
+    if(drop_noncovid_obs){
         rowAny <- function(x) rowSums(x) > 0
 
         out_df <- out_df %>%
