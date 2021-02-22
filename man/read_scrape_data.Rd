@@ -8,6 +8,8 @@ read_scrape_data(
   all_dates = FALSE,
   window = 31,
   coalesce = TRUE,
+  coalesce_pop = TRUE,
+  drop_na_covid = TRUE,
   debug = FALSE,
   state = NULL
 )
@@ -19,6 +21,10 @@ read_scrape_data(
 a given facility to populate values until value should be NA}
 
 \item{coalesce}{logical, collapse common facilities into single row}
+
+\item{coalesce_pop}{logical, collapse population data based on the date window}
+
+\item{drop_na_covid}{logical, drop rows missing all COVID variables}
 
 \item{debug}{logical, print debug statements on number of rows maintained in}
 

@@ -6,6 +6,8 @@
 #' @param window int, if all dates is false how far back to look for values from
 #' a given facility to populate values until value should be NA
 #' @param coalesce logical, collapse common facilities into single row
+#' @param coalesce_pop logical, collapse population data based on the date window
+#' @param drop_na_covid logical, drop rows missing all COVID variables
 #' @param debug logical, print debug statements on number of rows maintained in
 #' @param state character vector, states to limit data to
 #' cleaning process
@@ -23,7 +25,8 @@
 #' @export
 
 read_scrape_data <- function(
-    all_dates = FALSE, window = 31, coalesce = TRUE, debug = FALSE, state = NULL){
+    all_dates = FALSE, window = 31, coalesce = TRUE, coalesce_pop = TRUE,
+    drop_na_covid = TRUE, debug = FALSE, state = NULL){
 
     remote_loc <- stringr::str_c(
         SRVR_SCRAPE_LOC, "summary_data/aggregated_data.csv")
@@ -92,6 +95,31 @@ read_scrape_data <- function(
     }
 
     out_df <- merge_facility_info(comb_df)
+
+    if(coalesce_pop){
+        out_df <- out_df %>%
+            arrange(Facility.ID, Date) %>%
+            group_by(Facility.ID) %>%
+            # replace NA Residents.Population with values within date window
+            mutate(pop_date_ = ifelse(is.na(Residents.Population), NA, Date),
+                   pop_date_ = last_not_na(pop_date_),
+                   pop_fill_ = last_not_na(Residents.Population),
+                   Residents.Population = ifelse(
+                       !is.na(Facility.ID) & Date - pop_date_ < window,
+                       pop_fill_, Residents.Population)) %>%
+            select(-ends_with("_"))
+    }
+
+    if(drop_na_covid){
+        rowAny <- function(x) rowSums(x) > 0
+
+        out_df <- out_df %>%
+            # drop rows missing COVID data (e.g. only with population data)
+            filter(rowAny(across(ends_with(c(
+                ".Confirmed", ".Deaths", ".Recovered", ".Tadmin", ".Tested", ".Active",
+                ".Negative", ".Pending", ".Quarantine", ".Initiated", ".Completed", ".Vadmin")),
+                ~ !is.na(.x))))
+    }
 
     if(debug){
         message(stringr::str_c(
