@@ -7,7 +7,10 @@
 read_scrape_data(
   all_dates = FALSE,
   window = 31,
+  window_pop = 31,
   coalesce = TRUE,
+  coalesce_pop = TRUE,
+  drop_noncovid_obs = TRUE,
   debug = FALSE,
   state = NULL
 )
@@ -15,21 +18,27 @@ read_scrape_data(
 \arguments{
 \item{all_dates}{logical, get all data from all dates recorded by webscraper}
 
-\item{window}{int, if all dates is false how far back to look for values from
-a given facility to populate values until value should be NA}
+\item{window}{int, how far to go back (in days) to look for values from a given
+facility to populate NAs for ALL scraped variables. Used when all_dates is FALSE}
+
+\item{window_pop}{int, how far to go back (in days) to look for values from a given
+facility to populate NAs in Residents.Population. Used when coalesce_pop is TRUE}
 
 \item{coalesce}{logical, collapse common facilities into single row}
 
+\item{coalesce_pop}{logical, collapse population data based on the date window}
+
+\item{drop_noncovid_obs}{logical, drop rows missing all COVID variables}
+
 \item{debug}{logical, print debug statements on number of rows maintained in}
 
-\item{state}{character vector, states to limit data to
-cleaning process}
+\item{state}{character vector, states to limit data to}
 }
 \value{
-character vector of state names
+dataframe with scraped data
 }
 \description{
-Reads either time series or latest data from the web scraper runs
+Reads either time series or latest data from the web scraper runs.
 }
 \examples{
 \dontrun{
