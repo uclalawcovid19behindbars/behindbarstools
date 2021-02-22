@@ -32,7 +32,8 @@ calc_aggregate_counts <- function(
 
     state_df <- ucla_df %>%
         mutate(State = ifelse(Jurisdiction == "federal", "Federal", State)) %>%
-        filter(Jurisdiction %in% c("state", "federal")) %>%
+        mutate(State = ifelse(Jurisdiction == "immigration", "ICE", State)) %>%
+        filter(Jurisdiction %in% c("state", "federal", "immigration")) %>%
         select(Name, State, starts_with("Residents"), starts_with("Staff")) %>%
         select(-Residents.Population) %>%
         tidyr::pivot_longer(
@@ -65,4 +66,3 @@ calc_aggregate_counts <- function(
 
     return(agg_df)
 }
-
