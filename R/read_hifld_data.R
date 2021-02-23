@@ -29,7 +29,8 @@ read_hifld_data <- function(){
                lat = sf::st_coordinates(coords)[,2] %>% unname()) %>%
         rename(hifld_id = FACILITYID) %>%
         mutate(POPULATION = na_if(POPULATION, -999),
-               CAPACITY = na_if(CAPACITY, -999)) %>%
+               CAPACITY = na_if(CAPACITY, -999),
+               WEBSITE = na_if(WEBSITE, "NOT AVAILABLE")) %>%
         select(hifld_id,
                NAME,
                ADDRESS,
