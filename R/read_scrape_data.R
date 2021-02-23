@@ -108,7 +108,8 @@ read_scrape_data <- function(
                    Residents.Population = ifelse(
                        !is.na(Facility.ID) & Date - pop_date_ < window_pop,
                        pop_fill_, Residents.Population)) %>%
-            select(-ends_with("_"))
+            select(-ends_with("_")) %>%
+            ungroup()
     }
 
     if(drop_noncovid_obs){
