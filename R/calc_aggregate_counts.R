@@ -9,6 +9,8 @@
 #' @param window integer, the day range of acceptable data to pull from
 #' @param ucla_only logical, only consider data from UCLA
 #' @param state logical, return state level data
+#' @param collapse_vaccine logical, combine vaccine variables for more
+#' intuitive comparisons.
 #'
 #' @return data frame with aggregated counts at state or national level
 #'
@@ -19,7 +21,10 @@
 #' @export
 
 calc_aggregate_counts <- function(
-    window = 31, ucla_only = FALSE, state = FALSE){
+    window = 31, ucla_only = FALSE, state = FALSE, collapse_vaccine = TRUE){
+
+    to_report <- c(datasets::state.name, "Federal", "ICE")
+
     mp_data <- read_mpap_data(window = window) %>%
         select(-Date) %>%
         tidyr::pivot_longer(-State, names_to = "Measure", values_to = "MP")
@@ -36,6 +41,26 @@ calc_aggregate_counts <- function(
         filter(Jurisdiction %in% c("state", "federal", "immigration")) %>%
         select(Name, State, starts_with("Residents"), starts_with("Staff")) %>%
         select(-Residents.Population) %>%
+        `if`(
+            collapse_vaccine,
+            mutate(., Staff.Vadmin = ifelse(
+                is.na(.$Staff.Vadmin), .$Staff.Initiated, .$Staff.Vadmin)),
+            .) %>%
+        `if`(
+            collapse_vaccine,
+            mutate(., Residents.Vadmin = ifelse(
+                is.na(.$Residents.Vadmin), .$Residents.Initiated, .$Residents.Vadmin)),
+            .) %>%
+        `if`(
+            collapse_vaccine,
+            mutate(., Staff.Vadmin = ifelse(
+                is.na(.$Staff.Vadmin), .$Staff.Completed, .$Staff.Vadmin)),
+            .) %>%
+        `if`(
+            collapse_vaccine,
+            mutate(., Residents.Vadmin = ifelse(
+                is.na(.$Residents.Vadmin), .$Residents.Completed, .$Residents.Vadmin)),
+            .) %>%
         tidyr::pivot_longer(
             -(Name:State), names_to = "Measure", values_to = "UCLA") %>%
         filter(!is.na(UCLA)) %>%
@@ -59,9 +84,12 @@ calc_aggregate_counts <- function(
     }
 
     agg_df <- state_df %>%
+        filter(!is.na(Val)) %>%
         group_by(Measure) %>%
         summarize(
             Count = sum_na_rm(Val), Reporting = sum(!is.na(Val)),
+            Missing = paste0(
+                to_report[!(to_report %in% State)], collapse = ", "),
             .groups = "drop")
 
     return(agg_df)
