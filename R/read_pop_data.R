@@ -14,7 +14,9 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' read_pop_data()
+#' }
 
 read_pop_data <- function(){
     pop <- "https://raw.githubusercontent.com/uclalawcovid19behindbars/Population/" %>%
