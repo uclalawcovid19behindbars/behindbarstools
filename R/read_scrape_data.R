@@ -15,8 +15,6 @@
 #'
 #' @return dataframe with scraped data
 #'
-#' @importFrom assertthat see_if
-#'
 #' @examples
 #' \dontrun{
 #' read_scrape_data(all_dates = FALSE)
@@ -78,13 +76,18 @@ read_scrape_data <- function(
 
     if(coalesce){
         comb_df <- filt_df %>%
-            select(-id) %>%
+            arrange(Date, State, Name, jurisdiction_scraper, Facility.ID) %>%
+            mutate(pop_scraper = ifelse(stringr::str_detect(id, "pop"), 1, 0),
+                   historical_covid = ifelse(stringr::str_detect(id, "pre-nov"), 1, 0)) %>%
+            arrange(desc(historical_covid)) %>% # for res.confirmed etc: prioritize historical covid over scraper 2.0
+            arrange(desc(pop_scraper)) %>% # for res.pop: prioritize historical pop over historical covid
+            select(-id, -pop_scraper, -historical_covid) %>%
             group_by_coalesce(
                 Date, Name, State, jurisdiction_scraper, Facility.ID,
                 .ignore = c(
                     "source", "scrape_name_clean", "federal_bool",
                     "xwalk_name_clean", "name_match", "Jurisdiction"),
-                .method = "sum", debug = debug)
+                .method = "first", debug = debug)
 
         if(debug){
             message(stringr::str_c(
