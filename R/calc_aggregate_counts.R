@@ -13,7 +13,8 @@ max_na_rm <- function(x){
 #' District of Columbia for prison in the capitol. If both UCLA and MP report a
 #' value for a state the larger value for is taken.
 #'
-#' @param window integer, the day range of acceptable data to pull from
+#' @param window integer, the day range of acceptable data to pull from, ignored
+#' if all dates is true
 #' @param ucla_only logical, only consider data from UCLA
 #' @param state logical, return state level data
 #' @param collapse_vaccine logical, combine vaccine variables for more
