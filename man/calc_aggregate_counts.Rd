@@ -8,7 +8,9 @@ calc_aggregate_counts(
   window = 31,
   ucla_only = FALSE,
   state = FALSE,
-  collapse_vaccine = TRUE
+  collapse_vaccine = TRUE,
+  all_dates = FALSE,
+  week_grouping = TRUE
 )
 }
 \arguments{
@@ -19,7 +21,11 @@ calc_aggregate_counts(
 \item{state}{logical, return state level data}
 
 \item{collapse_vaccine}{logical, combine vaccine variables for more
-intuitive comparisons.}
+intuitive comparisons}
+
+\item{all_dates}{logical, get time series data rather than just latest counts}
+
+\item{week_grouping}{logical, use weekly grouping for past data? else monthly}
 }
 \value{
 data frame with aggregated counts at state or national level
