@@ -77,7 +77,6 @@ group_by_coalesce <- function(.data, ..., .ignore = c(), .method = "first", debu
         return(out)
     }
 
-
     out <- dplyr::bind_rows(lapply(z_list, function(z){
 
         z_group <- z %>%
@@ -100,7 +99,10 @@ group_by_coalesce <- function(.data, ..., .ignore = c(), .method = "first", debu
             }
             else{
                 xbar <- as.vector(na.omit(x))
-                if(length(xbar) != 1 & !(cn %in% .ignore)){
+                if(length(unique(xbar)) == 1) {
+                    out <- x[[1]]
+                }
+                else if(length(xbar) != 1 & !(cn %in% .ignore)){
                     warning(paste0(
                         "Group ", z_group_string,
                         " has multiple values that do not match for column ",
