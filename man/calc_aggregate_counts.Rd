@@ -14,7 +14,8 @@ calc_aggregate_counts(
 )
 }
 \arguments{
-\item{window}{integer, the day range of acceptable data to pull from}
+\item{window}{integer, the day range of acceptable data to pull from, ignored
+if all dates is true}
 
 \item{ucla_only}{logical, only consider data from UCLA}
 
@@ -33,8 +34,9 @@ data frame with aggregated counts at state or national level
 \description{
 Reads the UCLA and MP/AP dataset aggregates counts for states for most recent
 data within a given window and reports either state level data or national
-data. States include values for the 50 states, Federal for BOP prisons, and
-District of Columbia for prison in the capitol. If both UCLA and MP report a
+data. States include values for the 50 state DOCs, Federal for BOP prisons,
+ICE detention centers, and incarcerated individuals under the administration
+of the District of Columbia DOC. If both UCLA and MP report a
 value for a state the larger value for is taken.
 }
 \examples{

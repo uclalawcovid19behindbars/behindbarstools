@@ -9,8 +9,9 @@ max_na_rm <- function(x){
 #'
 #' Reads the UCLA and MP/AP dataset aggregates counts for states for most recent
 #' data within a given window and reports either state level data or national
-#' data. States include values for the 50 states, Federal for BOP prisons, and
-#' District of Columbia for prison in the capitol. If both UCLA and MP report a
+#' data. States include values for the 50 state DOCs, Federal for BOP prisons,
+#' ICE detention centers, and incarcerated individuals under the administration
+#' of the District of Columbia DOC. If both UCLA and MP report a
 #' value for a state the larger value for is taken.
 #'
 #' @param window integer, the day range of acceptable data to pull from, ignored
@@ -36,7 +37,8 @@ calc_aggregate_counts <- function(
 
     round_ <- ifelse(week_grouping, "week", "month")
 
-    to_report <- c(datasets::state.name, "Federal", "ICE")
+    to_report <- c(
+        datasets::state.name, "Federal", "ICE", "District of Columbia")
 
     mp_data_wide <- read_mpap_data(window = window, all_dates = all_dates)
 
@@ -64,7 +66,9 @@ calc_aggregate_counts <- function(
     state_wide_df <- ucla_df %>%
         mutate(State = ifelse(Jurisdiction == "federal", "Federal", State)) %>%
         mutate(State = ifelse(Jurisdiction == "immigration", "ICE", State)) %>%
-        filter(Jurisdiction %in% c("state", "federal", "immigration")) %>%
+        filter(
+            Jurisdiction %in% c("state", "federal", "immigration") |
+                (State == "District of Columbia" & Jurisdiction == "county")) %>%
         select(
             Name, Date, State,
             starts_with("Residents"), starts_with("Staff")) %>%
