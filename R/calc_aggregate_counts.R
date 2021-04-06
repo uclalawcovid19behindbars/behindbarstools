@@ -75,23 +75,23 @@ calc_aggregate_counts <- function(
         select(-Residents.Population) %>%
         `if`(
             collapse_vaccine,
-            mutate(., Staff.Vadmin = ifelse(
-                is.na(.$Staff.Vadmin), .$Staff.Initiated, .$Staff.Vadmin)),
+            mutate(., Staff.Initiated = ifelse(
+                is.na(.$Staff.Initiated), .$Staff.Completed, .$Staff.Initiated)),
             .) %>%
         `if`(
             collapse_vaccine,
-            mutate(., Residents.Vadmin = ifelse(
-                is.na(.$Residents.Vadmin), .$Residents.Initiated, .$Residents.Vadmin)),
+            mutate(., Residents.Initiated = ifelse(
+                is.na(.$Residents.Initiated), .$Residents.Completed, .$Residents.Initiated)),
+            .)
+        `if`(
+            collapse_vaccine,
+            mutate(., Staff.Initiated = ifelse(
+                is.na(.$Staff.Initiated), .$Staff.Vadmin, .$Staff.Initiated)),
             .) %>%
         `if`(
             collapse_vaccine,
-            mutate(., Staff.Vadmin = ifelse(
-                is.na(.$Staff.Vadmin), .$Staff.Completed, .$Staff.Vadmin)),
-            .) %>%
-        `if`(
-            collapse_vaccine,
-            mutate(., Residents.Vadmin = ifelse(
-                is.na(.$Residents.Vadmin), .$Residents.Completed, .$Residents.Vadmin)),
+            mutate(., Residents.Initiated = ifelse(
+                is.na(.$Residents.Initiated), .$Residents.Vadmin, .$Residents.Initiated)),
             .)
 
     if(all_dates){
