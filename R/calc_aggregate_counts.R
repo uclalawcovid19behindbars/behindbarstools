@@ -82,7 +82,7 @@ calc_aggregate_counts <- function(
             collapse_vaccine,
             mutate(., Residents.Initiated = ifelse(
                 is.na(.$Residents.Initiated), .$Residents.Completed, .$Residents.Initiated)),
-            .)
+            .) %>%
         `if`(
             collapse_vaccine,
             mutate(., Staff.Initiated = ifelse(
