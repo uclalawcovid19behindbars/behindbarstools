@@ -7,6 +7,7 @@
 #'
 #' @param base_size base font size, given in pts
 #' @param base_family base font family
+#' @param base_color base color for text and axis lines
 #'
 #' @examples
 #' \dontrun{
