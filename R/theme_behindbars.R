@@ -34,24 +34,24 @@
 #'     }
 
 theme_behindbars <- function(
-    base_size = 24, base_family = "Helvetica") {
+    base_size = 24, base_family = "Helvetica", base_color = "#555526") {
 
     ggplot2::theme_classic(
         base_family = base_family,
         base_size = base_size
     ) +
         ggplot2::theme(
-            text =                element_text(color = "#555526"),
-            strip.text =          element_text(color = '#555526'),
-            axis.text =           element_text(color = "#555526"),
+            text =                element_text(color = base_color),
+            strip.text =          element_text(color = base_color),
+            axis.text =           element_text(color = base_color),
             panel.grid.major.y =  element_line(color = "#92926C", linetype = "dotted"),
             plot.title.position = "plot",
             plot.tag.position =   "bottomright",
             axis.line.y =         element_blank(),
             axis.ticks.y =        element_blank(),
             axis.title.x =        element_blank(),
-            axis.line =           element_line(color = "#555526"),
-            axis.ticks =          element_line(color = "#555526"),
+            axis.line =           element_line(color = base_color),
+            axis.ticks =          element_line(color = base_color),
             plot.caption =        element_text(margin = margin(t = 1.2 * base_size)),
             plot.subtitle =       element_text(margin = margin(b = 1.2 * base_size)),
             axis.title.y =        element_text(margin = margin(r = 1.2 * base_size)),
