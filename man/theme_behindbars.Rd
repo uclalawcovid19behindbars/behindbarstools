@@ -9,7 +9,11 @@
 \alias{scale_fill_bbcontinous}
 \title{Theme and colors for behind bars plots}
 \usage{
-theme_behindbars(base_size = 24, base_family = "Helvetica")
+theme_behindbars(
+  base_size = 24,
+  base_family = "Helvetica",
+  base_color = "#555526"
+)
 
 theme_map_behindbars(base_size = 24, base_family = "Helvetica")
 
@@ -25,6 +29,8 @@ scale_fill_bbcontinous()
 \item{base_size}{base font size, given in pts}
 
 \item{base_family}{base font family}
+
+\item{base_color}{base color for text and axis lines}
 }
 \description{
 a set of themes and colors for behind bars plots
