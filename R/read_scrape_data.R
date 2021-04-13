@@ -49,7 +49,10 @@ read_scrape_data <- function(
 
     dat_df <- dat_df %>%
         mutate(State = translate_state(State)) %>%
-        rename(jurisdiction_scraper = jurisdiction) # rename this variable for clarity
+        # hack to remove old CA vaccine data for now
+        filter(id != "california_vaccine") %>%
+        # rename this variable for clarity
+        rename(jurisdiction_scraper = jurisdiction)
 
     cln_name_df <- dat_df %>%
         select(-starts_with("Resident.Deaths")) %>%
