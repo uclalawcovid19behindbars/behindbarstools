@@ -31,7 +31,7 @@ reorder_cols <- function(data, add_missing_cols=TRUE, rm_extra_cols=FALSE) {
         "Residents.Quarantine", "Staff.Quarantine", "Residents.Active",
         "Population.Feb20", "Residents.Population", "Residents.Tested",
         "Residents.Initiated", "Residents.Completed", "Residents.Vadmin",
-        "Staff.Initiated", "Staff.Completed", "Staff.Vadmin",
+        "Staff.Population", "Staff.Initiated", "Staff.Completed", "Staff.Vadmin",
         "Address", "Zipcode", "City", "County", "Latitude", "Longitude",
         "County.FIPS", "HIFLD.ID", "jurisdiction_scraper", "Description",
         "Security", "Age", "Gender", "Is.Different.Operator",
