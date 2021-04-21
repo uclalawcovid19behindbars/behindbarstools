@@ -103,7 +103,10 @@ calc_aggregate_counts <- function(
             group_by(State, Date, Measure, Name) %>%
             summarize(UCLA = max_na_rm(UCLA), .groups = "drop_last") %>%
             mutate(has_statewide = "STATEWIDE" %in% Name) %>%
-            # if state wide and other counts exist for a measure only use statewide
+            # if state wide and other counts exist for a measure only take max date
+            filter(!(has_statewide & Date == max(Date))) %>%
+            mutate(has_statewide = "STATEWIDE" %in% Name) %>%
+            # if state wide and other counts still exist for a measure only use statewide
             filter(!(has_statewide & Name != "STATEWIDE")) %>%
             group_by(State, Date, Measure) %>%
             summarise(UCLA = sum_na_rm(UCLA), .groups = "drop")
@@ -118,7 +121,10 @@ calc_aggregate_counts <- function(
             filter(!is.na(UCLA)) %>%
             group_by(State, Measure) %>%
             mutate(has_statewide = "STATEWIDE" %in% Name) %>%
-            # if state wide and other counts exist for a measure only use statewide
+            # if state wide and other counts exist for a measure only take max date
+            filter(!(has_statewide) | Date == max(Date)) %>%
+            mutate(has_statewide = "STATEWIDE" %in% Name) %>%
+            # if state wide and other counts still exist for a measure only use statewide
             filter(!(has_statewide & Name != "STATEWIDE")) %>%
             group_by(State, Measure) %>%
             summarise(
