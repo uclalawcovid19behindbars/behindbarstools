@@ -7,11 +7,11 @@
 #' facility to populate NAs for ALL scraped variables. Used when all_dates is FALSE
 #' @param window_pop int, how far to go back (in days) to look for values from a given
 #' facility to populate NAs in Residents.Population. Used when coalesce_pop is TRUE
-#' @param coalesce logical, collapse common facilities into single row
-#' @param coalesce_pop logical, collapse population data based on the date window
+#' @param coalesce_func function, how to combine redundant rows
 #' @param drop_noncovid_obs logical, drop rows missing all COVID variables
 #' @param debug logical, print debug statements on number of rows maintained in
 #' @param state character vector, states to limit data to
+#' @param wide_data logical, return wide data as opposed to long
 #'
 #' @return dataframe with scraped data
 #'
@@ -24,9 +24,8 @@
 #' @export
 
 read_scrape_data <- function(
-    all_dates = FALSE, window = 31, window_pop = 31, coalesce = TRUE,
-    coalesce_pop = TRUE, drop_noncovid_obs = TRUE, debug = FALSE, state = NULL,
-    wide_data = TRUE){
+    all_dates = FALSE, window = 31, window_pop = 31, coalesce_func = sum_na_rm,
+    drop_noncovid_obs = TRUE, debug = FALSE, state = NULL, wide_data = TRUE){
 
     remote_loc <- stringr::str_c(
         SRVR_SCRAPE_LOC, "summary_data/aggregated_data.csv")
@@ -45,11 +44,20 @@ read_scrape_data <- function(
         mutate(State = translate_state(State)) %>%
         # rename this variable for clarity
         rename(jurisdiction_scraper = jurisdiction) %>%
-        select(-starts_with("Resident.Deaths")) %>%
+        # the following steps are time intensive so its better to do them
+        # while the data is wide
         mutate(Name = clean_fac_col_txt(Name, to_upper = TRUE)) %>%
         mutate(
             pop_scraper = ifelse(stringr::str_detect(id, "pop"), T, F),
-            historical_covid = ifelse(stringr::str_detect(id, "pre-nov"), T, F)) %>%
+            historical_covid = ifelse(stringr::str_detect(id, "pre-nov"), T, F)
+            ) %>%
+        clean_facility_name(debug = debug) %>%
+        # if Jurisdiction is NA (no match in facility_spellings),
+        # make it scraper jurisdiction
+        mutate(Jurisdiction = ifelse(
+            (is.na(Jurisdiction) & !is.na(jurisdiction_scraper)),
+            jurisdiction_scraper, Jurisdiction)) %>%
+        # now we can pivot the data long
         tidyr::pivot_longer(starts_with(c("Residents", "Staff")))
 
 
@@ -58,16 +66,10 @@ read_scrape_data <- function(
             "Base data frame contains ", nrow(dat_df), " rows."))
     }
 
-    cln_name_df <- dat_df %>%
-        clean_facility_name(debug = debug) %>%
-        # if Jurisdiction is NA (no match in facility_spellings), make it scraper jurisdiction
-        mutate(Jurisdiction = ifelse(
-            (is.na(Jurisdiction) & !is.na(jurisdiction_scraper)),
-            jurisdiction_scraper, Jurisdiction))
-
     if(!is.null(state)){
-        filt_df <- cln_name_df %>%
-            filter(State %in% state)
+        filt_df <- dat_df %>%
+            filter(State %in% state & !is.na(value)) %>%
+            as.data.table()
 
         if(debug){
             message(stringr::str_c(
@@ -75,59 +77,104 @@ read_scrape_data <- function(
         }
     }
     else {
-        filt_df <- as.data.table(cln_name_df)[!is.na(value), ]
+        filt_df <- as.data.table(dat_df)[!is.na(value), ]
     }
 
-    if(coalesce){
+    # resolve population issues, prioritize dedicated pop scrapers
+    pop_full_df <- filt_df[name == "Residents.Population",]
+    pop_full_df[,
+                singlepop := length(unique(pop_scraper)) == 1,
+                by = list(
+                    Date, Name, State, jurisdiction_scraper, Facility.ID, name)]
+    pop_sub <- pop_full_df[pop_scraper | singlepop,]
+    pop_sub[,singlepop := NULL]
 
-        pop_full_df <- filt_df[name == "Residents.Population",]
-        pop_full_df[,
-                    singlepop := length(unique(pop_scraper)) == 1,
-                    by = list(
-                        Date, Name, State, jurisdiction_scraper, Facility.ID, name)]
-        pop_sub <- pop_full_df[pop_scraper | singlepop,]
-        pop_sub[,singlepop := NULL]
+    # resolve duplicate scrapers issues, prioritize old scrapers
+    cov_full_df <- filt_df[name != "Residents.Population",]
+    cov_full_df[,
+                singlescrape := length(unique(historical_covid)) == 1,
+                by = list(
+                    Date, Name, State, jurisdiction_scraper, Facility.ID, name)]
+    cov_sub <- cov_full_df[singlescrape | historical_covid,]
 
-        cov_full_df <- filt_df[name != "Residents.Population",]
-        cov_full_df[,
-                    singlescrape := length(unique(historical_covid)) == 1,
-                    by = list(
-                        Date, Name, State, jurisdiction_scraper, Facility.ID, name)]
-        cov_sub <- cov_full_df[singlescrape | historical_covid,]
+    # combine scrapers together
+    var_sub_df <- bind_rows(pop_sub,cov_sub) %>%
+        select(-pop_scraper, -historical_covid, -singlescrape)
 
-        var_sub_df <- bind_rows(pop_sub,cov_sub) %>%
-            select(-pop_scraper, -historical_covid, -singlescrape)
+    # Coalesce values together using the passed in coalesce function
+    metric_df <- var_sub_df %>%
+        select(Date, Name, State, jurisdiction_scraper, Facility.ID, name, value)
 
-        metric_df <- var_sub_df %>%
-            select(Date, Name, State, jurisdiction_scraper, Facility.ID, name, value)
+    metric_coal_df <- metric_df[,.(value = coalesce_func(value)), by = list(
+        Date, Name, State, jurisdiction_scraper, Facility.ID, name
+    )]
 
-        metric_coal_df <- metric_df[,.(value = coalesce_func(value)), by = list(
-            Date, Name, State, jurisdiction_scraper, Facility.ID, name
-        )]
+    # for facilities with missing population data for some days
+    # we want to hold valid data for window_pop days
+    base_df <- metric_coal_df[
+        name == "Residents.Population",
+        list(Name, State, jurisdiction_scraper, Facility.ID)] %>%
+        unique()
 
-        non_metric_df <- var_sub_df %>%
-            select(-value)
+    fill_dates <- tibble(
+        Date = seq.Date(lubridate::ymd("2020-04-01"), Sys.Date(), by = "day")
+        )
 
-        non_metric_coal_df <- non_metric_df[,lapply(.SD, first), by = list(
-            Date, Name, State, jurisdiction_scraper, Facility.ID, name
-        )]
-
-        comb_df <- left_join(
-            metric_coal_df, non_metric_coal_df,
+    full_date_df <- bind_rows(lapply(1:nrow(base_df), function(i){
+        bind_cols(fill_dates, base_df[i,])
+        })) %>%
+        mutate(name = "Residents.Population") %>%
+        left_join(
+            metric_coal_df[name == "Residents.Population",],
             by = c(
-                "Date", "Name", "State", "jurisdiction_scraper", "Facility.ID", "name"))
+                "Date", "Name", "State", "jurisdiction_scraper",
+                "Facility.ID", "name")
+            ) %>%
+        as.data.table() %>%
+        mutate(CDate = ifelse(is.na(value), NA_integer_, Date))
 
-        run_time <- Sys.time() - start_time
+    full_date_df[,
+        CDate := last_not_na(CDate),
+        by = list(Name, State, jurisdiction_scraper, Facility.ID)]
 
-        if(debug){
-            message(stringr::str_c(
-                "Coalesced data frame contains ", nrow(comb_df), " rows."))
-        }
+    sub_date_df <- full_date_df[(as.numeric(Date) - CDate) <= window_pop,]
+    sub_date_df[,
+        value := last_not_na(value),
+        by = list(Name, State, jurisdiction_scraper, Facility.ID)
+        ]
+    sub_date_df[,DDate := Date]
+    sub_date_df[,Date := lubridate::as_date(CDate)]
+    sub_date_df[,CDate := NULL]
+
+    metric_coal_pop_fix_df <- rbindlist(list(
+        metric_coal_df[name != "Residents.Population",] %>%
+            mutate(DDate = lubridate::as_date(NA)),
+        sub_date_df
+        ))
+
+    # for ambiguous non metric values such as source use the first value
+    non_metric_df <- var_sub_df %>%
+        select(-value)
+
+    non_metric_coal_df <- non_metric_df[,lapply(.SD, first), by = list(
+        Date, Name, State, jurisdiction_scraper, Facility.ID, name
+    )]
+
+    # merge metric and non metric groups together
+    comb_df <- left_join(
+        metric_coal_pop_fix_df, non_metric_coal_df,
+        by = c(
+            "Date", "Name", "State", "jurisdiction_scraper",
+            "Facility.ID", "name")) %>%
+        mutate(Date = lubridate::as_date(ifelse(is.na(DDate), Date, DDate))) %>%
+        select(-DDate)
+
+    if(debug){
+        message(stringr::str_c(
+            "Coalesced data frame contains ", nrow(comb_df), " rows."))
     }
-    else {
-        comb_df <- filt_df
-    }
 
+    # merge on facility level info
     out_df <- merge_facility_info(comb_df) %>%
         rename(Measure = name) %>%
         select(-id)
