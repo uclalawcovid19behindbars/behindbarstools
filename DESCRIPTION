@@ -11,7 +11,8 @@ Encoding: UTF-8
 Depends: 
     R (>= 4.0.0),
     dplyr, 
-    ggplot2 
+    ggplot2,
+    data.table
 Imports:
     httr,
     jsonlite,

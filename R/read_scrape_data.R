@@ -60,7 +60,6 @@ read_scrape_data <- function(
         # now we can pivot the data long
         tidyr::pivot_longer(starts_with(c("Residents", "Staff")))
 
-
     if(debug){
         message(stringr::str_c(
             "Base data frame contains ", nrow(dat_df), " rows."))
@@ -116,41 +115,48 @@ read_scrape_data <- function(
         list(Name, State, jurisdiction_scraper, Facility.ID)] %>%
         unique()
 
-    fill_dates <- tibble(
-        Date = seq.Date(lubridate::ymd("2020-04-01"), Sys.Date(), by = "day")
-        )
+    if(nrow(base_df) > 0){
 
-    full_date_df <- bind_rows(lapply(1:nrow(base_df), function(i){
-        bind_cols(fill_dates, base_df[i,])
-        })) %>%
-        mutate(name = "Residents.Population") %>%
-        left_join(
-            metric_coal_df[name == "Residents.Population",],
-            by = c(
-                "Date", "Name", "State", "jurisdiction_scraper",
-                "Facility.ID", "name")
-            ) %>%
-        as.data.table() %>%
-        mutate(CDate = ifelse(is.na(value), NA_integer_, Date))
+        fill_dates <- tibble(
+            Date = seq.Date(lubridate::ymd("2020-04-01"), Sys.Date(), by = "day")
+            )
 
-    full_date_df[,
-        CDate := last_not_na(CDate),
-        by = list(Name, State, jurisdiction_scraper, Facility.ID)]
+        full_date_df <- bind_rows(lapply(1:nrow(base_df), function(i){
+            bind_cols(fill_dates, base_df[i,])
+            })) %>%
+            mutate(name = "Residents.Population") %>%
+            left_join(
+                metric_coal_df[name == "Residents.Population",],
+                by = c(
+                    "Date", "Name", "State", "jurisdiction_scraper",
+                    "Facility.ID", "name")
+                ) %>%
+            as.data.table() %>%
+            mutate(CDate = ifelse(is.na(value), NA_integer_, Date))
 
-    sub_date_df <- full_date_df[(as.numeric(Date) - CDate) <= window_pop,]
-    sub_date_df[,
-        value := last_not_na(value),
-        by = list(Name, State, jurisdiction_scraper, Facility.ID)
-        ]
-    sub_date_df[,DDate := Date]
-    sub_date_df[,Date := lubridate::as_date(CDate)]
-    sub_date_df[,CDate := NULL]
+        full_date_df[,
+            CDate := last_not_na(CDate),
+            by = list(Name, State, jurisdiction_scraper, Facility.ID)]
 
-    metric_coal_pop_fix_df <- rbindlist(list(
-        metric_coal_df[name != "Residents.Population",] %>%
-            mutate(DDate = lubridate::as_date(NA)),
-        sub_date_df
-        ))
+        sub_date_df <- full_date_df[(as.numeric(Date) - CDate) <= window_pop,]
+        sub_date_df[,
+            value := last_not_na(value),
+            by = list(Name, State, jurisdiction_scraper, Facility.ID)
+            ]
+        sub_date_df[,DDate := Date]
+        sub_date_df[,Date := lubridate::as_date(CDate)]
+        sub_date_df[,CDate := NULL]
+
+        metric_coal_pop_fix_df <- rbindlist(list(
+            metric_coal_df[name != "Residents.Population",] %>%
+                mutate(DDate = lubridate::as_date(NA)),
+            sub_date_df
+            ))
+    }
+    else{
+        metric_coal_pop_fix_df <- metric_coal_df %>%
+            mutate(DDate = lubridate::as_date(NA))
+    }
 
     # for ambiguous non metric values such as source use the first value
     non_metric_df <- var_sub_df %>%
@@ -199,7 +205,18 @@ read_scrape_data <- function(
                 group_by(
                     Facility.ID, jurisdiction_scraper, State, Name) %>%
                 mutate(Date = max(Date)) %>%
-                ungroup()
+                ungroup() %>%
+                group_by(State, Date, Measure, jurisdiction_scraper) %>%
+                mutate(has_statewide = "STATEWIDE" %in% Name) %>%
+                # if state wide and other counts exist for a measure only take max date
+                filter(!(has_statewide) | Date == max(Date)) %>%
+                # if state wide and other counts still exist for a measure only
+                # use non-statewide
+                mutate(has_statewide = "STATEWIDE" %in% Name) %>%
+                mutate(has_other = any("STATEWIDE" != Name, na.rm=T)) %>%
+                filter(!(has_other & has_statewide & Name == "STATEWIDE")) %>%
+                ungroup() %>%
+                select(-has_statewide, -has_other)
         }
 
         out_df <- out_df %>%

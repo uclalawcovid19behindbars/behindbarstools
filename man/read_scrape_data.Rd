@@ -8,11 +8,11 @@ read_scrape_data(
   all_dates = FALSE,
   window = 31,
   window_pop = 31,
-  coalesce = TRUE,
-  coalesce_pop = TRUE,
+  coalesce_func = sum_na_rm,
   drop_noncovid_obs = TRUE,
   debug = FALSE,
-  state = NULL
+  state = NULL,
+  wide_data = TRUE
 )
 }
 \arguments{
@@ -24,15 +24,15 @@ facility to populate NAs for ALL scraped variables. Used when all_dates is FALSE
 \item{window_pop}{int, how far to go back (in days) to look for values from a given
 facility to populate NAs in Residents.Population. Used when coalesce_pop is TRUE}
 
-\item{coalesce}{logical, collapse common facilities into single row}
-
-\item{coalesce_pop}{logical, collapse population data based on the date window}
+\item{coalesce_func}{function, how to combine redundant rows}
 
 \item{drop_noncovid_obs}{logical, drop rows missing all COVID variables}
 
 \item{debug}{logical, print debug statements on number of rows maintained in}
 
 \item{state}{character vector, states to limit data to}
+
+\item{wide_data}{logical, return wide data as opposed to long}
 }
 \value{
 dataframe with scraped data

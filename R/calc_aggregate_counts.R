@@ -81,7 +81,7 @@ calc_aggregate_counts <- function(
             summarize(UCLA = max_na_rm(UCLA), .groups = "drop_last") %>%
             mutate(has_statewide = "STATEWIDE" %in% Name) %>%
             # if state wide and other counts exist for a measure only take max date
-            filter(!(has_statewide & Date == max(Date))) %>%
+            filter(!(has_statewide) | Date == max(Date)) %>%
             mutate(has_statewide = "STATEWIDE" %in% Name) %>%
             # if state wide and other counts still exist for a measure only use statewide
             filter(!(has_statewide & Name != "STATEWIDE")) %>%
