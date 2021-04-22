@@ -93,20 +93,20 @@ calc_aggregate_counts <- function(
                 group_by(State, Date) %>%
                 mutate(No.Initiated = !("Residents.Initiated" %in% Measure)) %>%
                 filter(No.Initiated) %>%
-                # add vadmin in the vector if you also want to sub for that val
-                filter(Measure %in% c("Residents.Completed")) %>%
-                arrange(State, Measure, Date) %>%
+                # remove vadmin in the vector if you dont want to sub for that val
+                filter(Measure %in% c("Residents.Completed", "Residents.Vadmin")) %>%
+                arrange(State, Date, Measure) %>%
                 filter(1:n() == 1) %>%
                 mutate(Measure = "Residents.Initiated") %>%
                 ungroup()
 
             sub_vac_staff <- state_df %>%
-                group_by(State) %>%
+                group_by(State, Date) %>%
                 mutate(No.Initiated = !("Staff.Initiated" %in% Measure)) %>%
                 filter(No.Initiated) %>%
-                # add vadmin in the vector if you also want to sub for that val
-                filter(Measure %in% c("Staff.Completed")) %>%
-                arrange(State, Measure, Date) %>%
+                # add vadmin in the vector if you dont to sub for that val
+                filter(Measure %in% c("Staff.Completed", "Staff.Vadmin")) %>%
+                arrange(State, Date, Measure) %>%
                 filter(1:n() == 1) %>%
                 mutate(Measure = "Staff.Initiated") %>%
                 ungroup()
