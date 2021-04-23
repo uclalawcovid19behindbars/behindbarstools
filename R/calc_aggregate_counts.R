@@ -69,30 +69,31 @@ calc_aggregate_counts <- function(
         filter(
             Jurisdiction %in% c("state", "federal", "immigration") |
                 (State == "District of Columbia" & Jurisdiction == "county")) %>%
+        filter(Age != "Juvenile" | is.na(Age)) %>%
         select(
-            Name, Date, State,
-            starts_with("Residents"), starts_with("Staff")) %>%
-        select(-Residents.Population) %>%
-        `if`(
-            collapse_vaccine,
-            mutate(., Staff.Initiated = ifelse(
-                is.na(.$Staff.Initiated), .$Staff.Completed, .$Staff.Initiated)),
-            .) %>%
-        `if`(
-            collapse_vaccine,
-            mutate(., Residents.Initiated = ifelse(
-                is.na(.$Residents.Initiated), .$Residents.Completed, .$Residents.Initiated)),
-            .) %>%
-        `if`(
-            collapse_vaccine,
-            mutate(., Staff.Initiated = ifelse(
-                is.na(.$Staff.Initiated), .$Staff.Vadmin, .$Staff.Initiated)),
-            .) %>%
-        `if`(
-            collapse_vaccine,
-            mutate(., Residents.Initiated = ifelse(
-                is.na(.$Residents.Initiated), .$Residents.Vadmin, .$Residents.Initiated)),
-            .)
+                Name, Date, State,
+                starts_with("Residents"), starts_with("Staff")) %>%
+            select(-Residents.Population) %>%
+            `if`(
+                collapse_vaccine,
+                mutate(., Staff.Initiated = ifelse(
+                    is.na(.$Staff.Initiated), .$Staff.Completed, .$Staff.Initiated)),
+                .) %>%
+            `if`(
+                collapse_vaccine,
+                mutate(., Residents.Initiated = ifelse(
+                    is.na(.$Residents.Initiated), .$Residents.Completed, .$Residents.Initiated)),
+                .) %>%
+            `if`(
+                collapse_vaccine,
+                mutate(., Staff.Initiated = ifelse(
+                    is.na(.$Staff.Initiated), .$Staff.Vadmin, .$Staff.Initiated)),
+                .) %>%
+            `if`(
+                collapse_vaccine,
+                mutate(., Residents.Initiated = ifelse(
+                    is.na(.$Residents.Initiated), .$Residents.Vadmin, .$Residents.Initiated)),
+                .)
 
     if(all_dates){
         state_df <- state_wide_df %>%
