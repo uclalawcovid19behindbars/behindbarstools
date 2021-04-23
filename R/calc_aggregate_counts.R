@@ -22,6 +22,7 @@ max_na_rm <- function(x){
 #' intuitive comparisons
 #' @param all_dates logical, get time series data rather than just latest counts
 #' @param week_grouping logical, use weekly grouping for past data? else monthly
+#' @param adult_only logical, filter out youth facilities when calculating aggregates
 #'
 #' @return data frame with aggregated counts at state or national level
 #'
@@ -33,7 +34,7 @@ max_na_rm <- function(x){
 
 calc_aggregate_counts <- function(
     window = 31, ucla_only = FALSE, state = FALSE, collapse_vaccine = TRUE,
-    all_dates = FALSE, week_grouping = TRUE){
+    all_dates = FALSE, week_grouping = TRUE, adult_only = FALSE){
 
     round_ <- ifelse(week_grouping, "week", "month")
 
@@ -63,13 +64,17 @@ calc_aggregate_counts <- function(
 
     ucla_df <- read_scrape_data(window = window, all_dates = all_dates)
 
+    if(adult_only){
+        ucla_df <- ucla_df %>%
+            filter(Age != "Juvenile" | is.na(Age))
+    }
+
     state_wide_df <- ucla_df %>%
         mutate(State = ifelse(Jurisdiction == "federal", "Federal", State)) %>%
         mutate(State = ifelse(Jurisdiction == "immigration", "ICE", State)) %>%
         filter(
             Jurisdiction %in% c("state", "federal", "immigration") |
                 (State == "District of Columbia" & Jurisdiction == "county")) %>%
-        filter(Age != "Juvenile" | is.na(Age)) %>%
         select(
                 Name, Date, State,
                 starts_with("Residents"), starts_with("Staff")) %>%

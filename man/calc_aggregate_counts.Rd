@@ -10,7 +10,8 @@ calc_aggregate_counts(
   state = FALSE,
   collapse_vaccine = TRUE,
   all_dates = FALSE,
-  week_grouping = TRUE
+  week_grouping = TRUE,
+  adult_only = FALSE
 )
 }
 \arguments{
@@ -27,6 +28,8 @@ intuitive comparisons}
 \item{all_dates}{logical, get time series data rather than just latest counts}
 
 \item{week_grouping}{logical, use weekly grouping for past data? else monthly}
+
+\item{adult_only}{logical, filter out youth facilities when calculating aggregates}
 }
 \value{
 data frame with aggregated counts at state or national level
