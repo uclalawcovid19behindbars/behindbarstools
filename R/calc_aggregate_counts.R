@@ -61,73 +61,113 @@ calc_aggregate_counts <- function(
         mp_data$MP <- NA_real_
     }
 
-    ucla_df <- read_scrape_data(window = window, all_dates = all_dates)
+    ucla_df <- read_scrape_data(
+        window = window, all_dates = all_dates, wide_data = FALSE)
 
-    state_wide_df <- ucla_df %>%
+    fac_long_df <- ucla_df %>%
         mutate(State = ifelse(Jurisdiction == "federal", "Federal", State)) %>%
         mutate(State = ifelse(Jurisdiction == "immigration", "ICE", State)) %>%
         filter(
             Jurisdiction %in% c("state", "federal", "immigration") |
                 (State == "District of Columbia" & Jurisdiction == "county")) %>%
-        select(
-            Name, Date, State,
-            starts_with("Residents"), starts_with("Staff")) %>%
-        select(-Residents.Population) %>%
-        `if`(
-            collapse_vaccine,
-            mutate(., Staff.Initiated = ifelse(
-                is.na(.$Staff.Initiated), .$Staff.Completed, .$Staff.Initiated)),
-            .) %>%
-        `if`(
-            collapse_vaccine,
-            mutate(., Residents.Initiated = ifelse(
-                is.na(.$Residents.Initiated), .$Residents.Completed, .$Residents.Initiated)),
-            .) %>%
-        `if`(
-            collapse_vaccine,
-            mutate(., Staff.Initiated = ifelse(
-                is.na(.$Staff.Initiated), .$Staff.Vadmin, .$Staff.Initiated)),
-            .) %>%
-        `if`(
-            collapse_vaccine,
-            mutate(., Residents.Initiated = ifelse(
-                is.na(.$Residents.Initiated), .$Residents.Vadmin, .$Residents.Initiated)),
-            .)
+        select(Name, Date, State, Measure, value)
 
     if(all_dates){
-        state_df <- state_wide_df %>%
+        state_df <- fac_long_df %>%
             mutate(Date = lubridate::floor_date(Date, round_)) %>%
-            tidyr::pivot_longer(
-                -(Name:State), names_to = "Measure", values_to = "UCLA") %>%
+            rename(UCLA = value) %>%
             filter(!is.na(UCLA)) %>%
             group_by(State, Date, Measure, Name) %>%
             summarize(UCLA = max_na_rm(UCLA), .groups = "drop_last") %>%
             mutate(has_statewide = "STATEWIDE" %in% Name) %>%
-            # if state wide and other counts exist for a measure only use statewide
+            # if state wide and other counts exist for a measure only take max date
+            filter(!(has_statewide) | Date == max(Date)) %>%
+            mutate(has_statewide = "STATEWIDE" %in% Name) %>%
+            # if state wide and other counts still exist for a measure only use statewide
             filter(!(has_statewide & Name != "STATEWIDE")) %>%
             group_by(State, Date, Measure) %>%
             summarise(UCLA = sum_na_rm(UCLA), .groups = "drop")
 
+        if(collapse_vaccine){
+            sub_vac_res <- state_df %>%
+                group_by(State, Date) %>%
+                mutate(No.Initiated = !("Residents.Initiated" %in% Measure)) %>%
+                filter(No.Initiated) %>%
+                # remove vadmin in the vector if you dont want to sub for that val
+                filter(Measure %in% c("Residents.Completed", "Residents.Vadmin")) %>%
+                arrange(State, Date, Measure) %>%
+                filter(1:n() == 1) %>%
+                mutate(Measure = "Residents.Initiated") %>%
+                ungroup()
+
+            sub_vac_staff <- state_df %>%
+                group_by(State, Date) %>%
+                mutate(No.Initiated = !("Staff.Initiated" %in% Measure)) %>%
+                filter(No.Initiated) %>%
+                # add vadmin in the vector if you dont to sub for that val
+                filter(Measure %in% c("Staff.Completed", "Staff.Vadmin")) %>%
+                arrange(State, Date, Measure) %>%
+                filter(1:n() == 1) %>%
+                mutate(Measure = "Staff.Initiated") %>%
+                ungroup()
+
+            state_df <- bind_rows(state_df, sub_vac_res, sub_vac_staff) %>%
+                select(-No.Initiated)
+        }
+
         comb_df <- state_df %>%
-            full_join(mp_data, by = c("State", "Measure", "Date"))
+            full_join(mp_data, by = c("State", "Measure", "Date")) %>%
+            arrange(State, Date, Measure)
     }
     else{
-        state_df <- state_wide_df %>%
-            tidyr::pivot_longer(
-                -(Name:State), names_to = "Measure", values_to = "UCLA") %>%
+        state_df <- fac_long_df %>%
+            rename(UCLA = value) %>%
             filter(!is.na(UCLA)) %>%
             group_by(State, Measure) %>%
             mutate(has_statewide = "STATEWIDE" %in% Name) %>%
-            # if state wide and other counts exist for a measure only use statewide
+            # if state wide and other counts exist for a measure only take more
+            # recently scraped data
+            filter(!(has_statewide) | Date == max(Date)) %>%
+            mutate(has_statewide = "STATEWIDE" %in% Name) %>%
+            # if state wide and other counts still exist for a measure only
+            # use statewide measures
             filter(!(has_statewide & Name != "STATEWIDE")) %>%
             group_by(State, Measure) %>%
             summarise(
                 UCLA = sum_na_rm(UCLA), Date = max(Date), .groups = "drop")
 
+        if(collapse_vaccine){
+            sub_vac_res <- state_df %>%
+                group_by(State) %>%
+                mutate(No.Initiated = !("Residents.Initiated" %in% Measure)) %>%
+                filter(No.Initiated) %>%
+                # add vadmin in the vector if you also want to sub for that val
+                filter(Measure %in% c("Residents.Completed", "Residents.Vadmin")) %>%
+                arrange(State, Measure) %>%
+                filter(1:n() == 1) %>%
+                mutate(Measure = "Residents.Initiated") %>%
+                ungroup()
+
+            sub_vac_staff <- state_df %>%
+                group_by(State) %>%
+                mutate(No.Initiated = !("Staff.Initiated" %in% Measure)) %>%
+                filter(No.Initiated) %>%
+                # add vadmin in the vector if you also want to sub for that val
+                filter(Measure %in% c("Staff.Completed", "Staff.Vadmin")) %>%
+                arrange(State, Measure) %>%
+                filter(1:n() == 1) %>%
+                mutate(Measure = "Staff.Initiated") %>%
+                ungroup()
+
+            state_df <- bind_rows(state_df, sub_vac_res, sub_vac_staff) %>%
+                select(-No.Initiated)
+        }
+
         comb_df <- state_df %>%
             rename(Date.UCLA = Date) %>%
             full_join(
-                rename(mp_data, Date.MP = Date), by = c("State", "Measure"))
+                rename(mp_data, Date.MP = Date), by = c("State", "Measure")) %>%
+            arrange(State, Measure)
     }
 
     harm_df <- comb_df %>%
