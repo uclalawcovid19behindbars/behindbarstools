@@ -142,7 +142,7 @@ calc_aggregate_counts <- function(
                 mutate(No.Initiated = !("Residents.Initiated" %in% Measure)) %>%
                 filter(No.Initiated) %>%
                 # add vadmin in the vector if you also want to sub for that val
-                filter(Measure %in% c("Residents.Completed")) %>%
+                filter(Measure %in% c("Residents.Completed", "Residents.Vadmin")) %>%
                 arrange(State, Measure) %>%
                 filter(1:n() == 1) %>%
                 mutate(Measure = "Residents.Initiated") %>%
@@ -153,7 +153,7 @@ calc_aggregate_counts <- function(
                 mutate(No.Initiated = !("Staff.Initiated" %in% Measure)) %>%
                 filter(No.Initiated) %>%
                 # add vadmin in the vector if you also want to sub for that val
-                filter(Measure %in% c("Staff.Completed")) %>%
+                filter(Measure %in% c("Staff.Completed", "Staff.Vadmin")) %>%
                 arrange(State, Measure) %>%
                 filter(1:n() == 1) %>%
                 mutate(Measure = "Staff.Initiated") %>%
