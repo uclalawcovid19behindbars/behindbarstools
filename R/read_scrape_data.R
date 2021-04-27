@@ -68,7 +68,7 @@ read_scrape_data <- function(
     if(!is.null(state)){
         filt_df <- dat_df %>%
             filter(State %in% state & !is.na(value)) %>%
-            as.data.table()
+            data.table::as.data.table()
 
         if(debug){
             message(stringr::str_c(
@@ -76,7 +76,7 @@ read_scrape_data <- function(
         }
     }
     else {
-        filt_df <- as.data.table(dat_df)[!is.na(value), ]
+        filt_df <- data.table::as.data.table(dat_df)[!is.na(value), ]
     }
 
     # resolve population issues, prioritize dedicated pop scrapers
@@ -131,7 +131,7 @@ read_scrape_data <- function(
                     "Date", "Name", "State", "jurisdiction_scraper",
                     "Facility.ID", "name")
                 ) %>%
-            as.data.table() %>%
+            data.table::as.data.table() %>%
             mutate(CDate = ifelse(is.na(value), NA_integer_, Date))
 
         full_date_df[,
