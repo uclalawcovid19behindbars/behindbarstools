@@ -193,9 +193,6 @@ read_scrape_data <- function(
             arrange(Facility.ID, jurisdiction_scraper, State, Name, Measure, Date) %>%
             # keep only last observed value
             filter(1:n() == n()) %>%
-            # make all the sources the same
-            group_by(Facility.ID, jurisdiction_scraper, State, Name) %>%
-            mutate(source = first(source)) %>%
             ungroup()
     }
 
@@ -204,6 +201,9 @@ read_scrape_data <- function(
             out_df <- out_df %>%
                 group_by(
                     Facility.ID, jurisdiction_scraper, State, Name) %>%
+                # make all the sources the same for wide data only
+                mutate(source = first(source)) %>%
+                # make all the dates the same for wide data not all dates only
                 mutate(Date = max(Date)) %>%
                 ungroup() %>%
                 group_by(State, Date, Measure, jurisdiction_scraper) %>%
@@ -217,6 +217,14 @@ read_scrape_data <- function(
                 filter(!(has_other & has_statewide & Name == "STATEWIDE")) %>%
                 ungroup() %>%
                 select(-has_statewide, -has_other)
+        }else{
+            out_df <- out_df %>%
+                group_by(Facility.ID, jurisdiction_scraper, State, Name, Measure) %>%
+                arrange(Facility.ID, jurisdiction_scraper, State, Name, Measure, Date) %>%
+                # make all the sources the same for wide data only
+                group_by(Facility.ID, jurisdiction_scraper, State, Name, Date) %>%
+                mutate(source = first(source)) %>%
+                ungroup()
         }
 
         out_df <- out_df %>%
