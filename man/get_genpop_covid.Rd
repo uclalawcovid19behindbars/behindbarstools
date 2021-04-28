@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_genpop_covid.R
 \name{get_genpop_covid}
 \alias{get_genpop_covid}
-\title{Get general population COVID data from NYT and ACS 2018}
+\title{Get general population COVID data from NYT and Census 2019}
 \usage{
 get_genpop_covid(county, state = NULL)
 }
@@ -13,12 +13,12 @@ get_genpop_covid(county, state = NULL)
 }
 \value{
 a data frame with the following columns: Date, County, State, FIPS,
-General.Confirmed, General.Deaths, General.Population2018
+General.Confirmed, General.Deaths, General.Population
 }
 \description{
 Pulls data from the NYT github page on COVID cases and deaths
-for a county and then merges alongside a population number from the 2018
-ACS for that county to use for rate calculation.
+for a county and then merges alongside a population number from the 2019
+Census population estimates for that county to use for rate calculation.
 }
 \examples{
 \dontrun{
@@ -44,7 +44,7 @@ county_df \%>\%
     right_join(satf_df) \%>\%
     mutate(`Prisoner\nPopulation` = Residents.Confirmed / Population.Feb20) \%>\%
     mutate(`King County\nPopulation` =
-               General.Confirmed / General.Population2018) \%>\%
+               General.Confirmed / General.Population2019) \%>\%
     select(Date, `Prisoner\nPopulation`, `King County\nPopulation`) \%>\%
     tidyr::pivot_longer(-Date) \%>\%
     mutate(name = forcats::fct_rev(name)) \%>\%
