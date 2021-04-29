@@ -1,13 +1,13 @@
-#' Get general population COVID data from NYT and ACS 2018
+#' Get general population COVID data from NYT and Census 2019
 #'
 #' @description Pulls data from the NYT github page on COVID cases and deaths
-#' for a county and then merges alongside a population number from the 2018
-#' ACS for that county to use for rate calculation.
+#' for a county and then merges alongside a population number from the 2019
+#' Census population estimates for that county to use for rate calculation.
 #'
 #' @param county either a 5 digit fips code (safer) or a county name
 #' @param state a state name or abbreviation if a county name was provided
 #' @return a data frame with the following columns: Date, County, State, FIPS,
-#' General.Confirmed, General.Deaths, General.Population2018
+#' General.Confirmed, General.Deaths, General.Population
 #'
 #' @examples
 #' \dontrun{
@@ -33,7 +33,7 @@
 #'     right_join(satf_df) %>%
 #'     mutate(`Prisoner\nPopulation` = Residents.Confirmed / Population.Feb20) %>%
 #'     mutate(`King County\nPopulation` =
-#'                General.Confirmed / General.Population2018) %>%
+#'                General.Confirmed / General.Population2019) %>%
 #'     select(Date, `Prisoner\nPopulation`, `King County\nPopulation`) %>%
 #'     tidyr::pivot_longer(-Date) %>%
 #'     mutate(name = forcats::fct_rev(name)) %>%
@@ -91,15 +91,16 @@ get_genpop_covid <- function(county, state = NULL){
         return(tibble())
     }
 
-    # read 2018 acs county pop totals
-    pop_list <- "https://datausa.io/api/data?drilldowns=County&" %>%
-        paste0("measures=Population&year=2018") %>%
-        jsonlite::read_json(simplifyVector = TRUE)
+    # read updated 2019 population estimates
+    pop_list <- "https://www2.census.gov/programs-surveys/popest/datasets/" %>%
+        stringr::str_c("2010-2019/counties/totals/co-est2019-alldata.csv") %>%
+        readr::read_csv(col_types = readr::cols())
 
-    out_df <- pop_list$data %>%
-        filter(stringr::str_ends(`ID County`, first(covid_df$FIPS))) %>%
-        pull(Population) %>%
-        {mutate(covid_df, General.Population2018 = .)}
+    out_df <- pop_list %>%
+        mutate(FIPS = stringr::str_c(STATE, COUNTY)) %>%
+        filter(`FIPS` == first(covid_df$FIPS)) %>%
+        pull(POPESTIMATE2019) %>%
+        {mutate(covid_df, General.Population = .)}
 
     return(out_df)
 }
