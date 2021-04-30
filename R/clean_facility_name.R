@@ -80,7 +80,7 @@ clean_facility_name <- function(dat, alt_name_xwalk = FALSE, debug = FALSE){
       ))
 
     nonfederal_xwalk <- name_xwalk %>%
-        filter(Jurisdiction %in% c("state", "county"))
+        filter(Jurisdiction %in% c("state", "county", "psychiatric"))
 
     nonfederal <- dat %>%
         filter(!federal_bool) %>%
