@@ -85,6 +85,12 @@ ExtractTable <- function(img,  api_key = NULL) {
     }
 
     server_response <- process_file(api_key, img)
+
+    # Delete tempfile if exists
+    if(file.exists(f_)){
+        file.remove(f_)
+    }
+
     parsed_resp <- parse_response(server_response)
     # Wait for a maximum of 5 minutes to finish the trigger job
     # Retries every 20 seconds
