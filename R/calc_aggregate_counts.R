@@ -94,7 +94,7 @@ calc_aggregate_counts <- function(
                 mutate(No.Initiated = !("Residents.Initiated" %in% Measure)) %>%
                 filter(No.Initiated) %>%
                 # remove vadmin in the vector if you dont want to sub for that val
-                filter(Measure %in% c("Residents.Completed", "Residents.Vadmin")) %>%
+                filter(Measure %in% c("Residents.Completed")) %>%
                 arrange(State, Date, Measure) %>%
                 filter(1:n() == 1) %>%
                 mutate(Measure = "Residents.Initiated") %>%
@@ -105,7 +105,7 @@ calc_aggregate_counts <- function(
                 mutate(No.Initiated = !("Staff.Initiated" %in% Measure)) %>%
                 filter(No.Initiated) %>%
                 # add vadmin in the vector if you dont to sub for that val
-                filter(Measure %in% c("Staff.Completed", "Staff.Vadmin")) %>%
+                filter(Measure %in% c("Staff.Completed")) %>%
                 arrange(State, Date, Measure) %>%
                 filter(1:n() == 1) %>%
                 mutate(Measure = "Staff.Initiated") %>%
@@ -142,7 +142,7 @@ calc_aggregate_counts <- function(
                 mutate(No.Initiated = !("Residents.Initiated" %in% Measure)) %>%
                 filter(No.Initiated) %>%
                 # add vadmin in the vector if you also want to sub for that val
-                filter(Measure %in% c("Residents.Completed", "Residents.Vadmin")) %>%
+                filter(Measure %in% c("Residents.Completed")) %>%
                 arrange(State, Measure) %>%
                 filter(1:n() == 1) %>%
                 mutate(Measure = "Residents.Initiated") %>%
@@ -153,7 +153,7 @@ calc_aggregate_counts <- function(
                 mutate(No.Initiated = !("Staff.Initiated" %in% Measure)) %>%
                 filter(No.Initiated) %>%
                 # add vadmin in the vector if you also want to sub for that val
-                filter(Measure %in% c("Staff.Completed", "Staff.Vadmin")) %>%
+                filter(Measure %in% c("Staff.Completed")) %>%
                 arrange(State, Measure) %>%
                 filter(1:n() == 1) %>%
                 mutate(Measure = "Staff.Initiated") %>%
