@@ -87,7 +87,7 @@ calc_aggregate_counts <- function(
                 mutate(No.Initiated = !("Residents.Initiated" %in% Measure)) %>%
                 filter(No.Initiated) %>%
                 # remove vadmin in the vector if you dont want to sub for that val
-                filter(Measure %in% c("Residents.Completed", "Residents.Vadmin")) %>%
+                filter(Measure %in% c("Residents.Completed")) %>%
                 arrange(State, Date, Measure) %>%
                 filter(1:n() == 1) %>%
                 mutate(Measure = "Residents.Initiated") %>%
@@ -98,7 +98,7 @@ calc_aggregate_counts <- function(
                 mutate(No.Initiated = !("Staff.Initiated" %in% Measure)) %>%
                 filter(No.Initiated) %>%
                 # add vadmin in the vector if you dont to sub for that val
-                filter(Measure %in% c("Staff.Completed", "Staff.Vadmin")) %>%
+                filter(Measure %in% c("Staff.Completed")) %>%
                 arrange(State, Date, Measure) %>%
                 filter(1:n() == 1) %>%
                 mutate(Measure = "Staff.Initiated") %>%
@@ -135,7 +135,7 @@ calc_aggregate_counts <- function(
                 mutate(No.Initiated = !("Residents.Initiated" %in% Measure)) %>%
                 filter(No.Initiated) %>%
                 # add vadmin in the vector if you also want to sub for that val
-                filter(Measure %in% c("Residents.Completed", "Residents.Vadmin")) %>%
+                filter(Measure %in% c("Residents.Completed")) %>%
                 arrange(State, Measure) %>%
                 filter(1:n() == 1) %>%
                 mutate(Measure = "Residents.Initiated") %>%
@@ -146,7 +146,7 @@ calc_aggregate_counts <- function(
                 mutate(No.Initiated = !("Staff.Initiated" %in% Measure)) %>%
                 filter(No.Initiated) %>%
                 # add vadmin in the vector if you also want to sub for that val
-                filter(Measure %in% c("Staff.Completed", "Staff.Vadmin")) %>%
+                filter(Measure %in% c("Staff.Completed")) %>%
                 arrange(State, Measure) %>%
                 filter(1:n() == 1) %>%
                 mutate(Measure = "Staff.Initiated") %>%
@@ -172,8 +172,25 @@ calc_aggregate_counts <- function(
             TRUE ~ MP
         ))
 
+    # Join with anchored population data
     if(state){
-        return(harm_df)
+        aggregate_pop_df <- read_aggregate_pop_data()
+
+        out_state_df <- harm_df %>%
+            left_join(aggregate_pop_df, by = "State") %>%
+            mutate(Pop.Anchor = case_when(
+                # Jan21 for residents,  vaccine measures
+                str_detect(Measure, "Residents.") &
+                    str_detect(Measure, ".Initiated|.Completed|Vadmin") ~
+                    Residents.Population.Jan21,
+                # Staff for all staff measures
+                str_detect(Measure, "Staff.") ~ Staff.Population,
+                # Feb20 for residents, non-vaccine measures
+                TRUE ~ Residents.Population.Feb20
+            )) %>%
+            select(-Residents.Population.Feb20, -Residents.Population.Jan21, -Staff.Population)
+
+        return(out_state_df)
     }
 
     agg_df <- harm_df %>%
