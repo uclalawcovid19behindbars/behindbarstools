@@ -4,12 +4,7 @@
 \alias{alt_aggregate_counts}
 \title{Alternate Aggregate UCLA data for website groupings}
 \usage{
-alt_aggregate_counts(
-  window = 31,
-  all_dates = FALSE,
-  week_grouping = TRUE,
-  collapse_vaccine = TRUE
-)
+alt_aggregate_counts(window = 31, all_dates = FALSE, week_grouping = TRUE)
 }
 \arguments{
 \item{window}{integer, the day range of acceptable data to pull from, ignored
@@ -18,18 +13,16 @@ if all dates is true}
 \item{all_dates}{logical, get time series data rather than just latest counts}
 
 \item{week_grouping}{logical, use weekly grouping for past data? else monthly}
-
-\item{collapse_vaccine}{logical, combine vaccine variables for more
-intuitive comparisons}
 }
 \value{
-data frame with aggregated counts at state or national level
+data frame with aggregated counts at the state level by web groups
 }
 \description{
 Reads the UCLA aggregates counts for states for most recent
 data within a given window and reports either state level data or national
 data. States include values for the 50 states broken down by carceral type,
-prison, ICE, Federal, Juvenile, Psychiatric, and county.
+prison, ICE, Federal, Juvenile, Psychiatric, and county. For prisons, data
+from the Marshall project is also incorporated.
 }
 \examples{
 \dontrun{

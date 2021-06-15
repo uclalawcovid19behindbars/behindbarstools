@@ -3,16 +3,15 @@
 #' Reads the UCLA aggregates counts for states for most recent
 #' data within a given window and reports either state level data or national
 #' data. States include values for the 50 states broken down by carceral type,
-#' prison, ICE, Federal, Juvenile, Psychiatric, and county.
+#' prison, ICE, Federal, Juvenile, Psychiatric, and county. For prisons, data
+#' from the Marshall project is also incorporated.
 #'
 #' @param window integer, the day range of acceptable data to pull from, ignored
 #' if all dates is true
 #' @param all_dates logical, get time series data rather than just latest counts
 #' @param week_grouping logical, use weekly grouping for past data? else monthly
-#' @param collapse_vaccine logical, combine vaccine variables for more
-#' intuitive comparisons
 #'
-#' @return data frame with aggregated counts at state or national level
+#' @return data frame with aggregated counts at the state level by web groups
 #'
 #' @examples
 #' \dontrun{
@@ -21,12 +20,13 @@
 #' @export
 
 alt_aggregate_counts <- function(
-    window = 31, all_dates = FALSE, week_grouping = TRUE,
-    collapse_vaccine = TRUE){
+    window = 31, all_dates = FALSE, week_grouping = TRUE){
 
+    # How to round data when doing all dates
     round_ <- ifelse(week_grouping, "week", "month")
 
-    ucla_df <- read_scrape_data(
+    # read in ucla data and do the appropriate grouping
+    fac_long_df <- read_scrape_data(
         window = window, all_dates = all_dates, wide_data = FALSE) %>%
         mutate(Web.Group = case_when(
             Jurisdiction == "immigration" ~ "ICE",
@@ -34,58 +34,69 @@ alt_aggregate_counts <- function(
             Age == "Juvenile" ~ "Juvenile",
             Jurisdiction == "state" ~ "Prison",
             Jurisdiction == "psychiatric" ~ "Psychiatric",
-            Jurisdiction == "county" ~ "County",
+            Jurisdiction == "cou nty" ~ "County",
             TRUE ~ NA_character_
-        ))
-
-    fac_long_df <- ucla_df %>%
+        ))  %>%
         filter(State != "Not Available") %>%
-        select(Name, Date, State, Measure, Web.Group, value)
+        select(
+            Name, Date, State, Measure, Web.Group, value, Population.Feb20) %>%
+        mutate(Rate = value/Population.Feb20)
 
+    # pull in the comparable MP data
+    mp_df <- read_mpap_data(
+        all_dates = all_dates, window = window) %>%
+        filter(State != "Federal")%>%
+        tidyr::pivot_longer(
+            -(State:Date), names_to = "Measure", values_to = "MP")
+
+    mp_pop_df <- read_mpap_pop_data() %>%
+        tidyr::pivot_longer(
+            -State, names_to = "Group", values_to = "Population.Feb20") %>%
+        mutate(Group = ifelse(
+            str_starts(Group, "Staff"), "Staff", "Residents"))
+
+    if(all_dates){
+        mp_df <- mp_df %>%
+            filter(!is.na(Date)) %>%
+            mutate(Date = lubridate::floor_date(Date, round_)) %>%
+            group_by(State, Date, Measure) %>%
+            filter(MP == max_na_rm(MP)) %>%
+            filter(1:n() == 1) %>%
+            ungroup()
+    }
+
+    # aggregate the data together
     if(all_dates){
         state_df <- fac_long_df %>%
             mutate(Date = lubridate::floor_date(Date, round_)) %>%
             rename(UCLA = value) %>%
             filter(!is.na(UCLA)) %>%
-            group_by(State, Date, Measure, Web.Group, Name) %>%
+            group_by(
+                State, Date, Measure, Web.Group, Name, Population.Feb20) %>%
             summarize(UCLA = max_na_rm(UCLA), .groups = "drop_last") %>%
             mutate(has_statewide = "STATEWIDE" %in% Name) %>%
-            # if state wide and other counts exist for a measure only take max date
+            # if state wide and other counts exist for a measure
+            # only take max date
             filter(!(has_statewide) | Date == max(Date)) %>%
             mutate(has_statewide = "STATEWIDE" %in% Name) %>%
-            # if state wide and other counts still exist for a measure only use statewide
+            # if state wide and other counts still exist for a measure
+            # only use statewide
             filter(!(has_statewide & Name != "STATEWIDE")) %>%
             group_by(State, Date, Web.Group, Measure) %>%
-            summarise(UCLA = sum_na_rm(UCLA), .groups = "drop")
+            mutate(Rate = UCLA/Population.Feb20) %>%
+            summarise(
+                UCLA = sum_na_rm(UCLA),
+                Rate = sum_na_rm(Rate*Population.Feb20)/
+                    sum_na_rm(Population.Feb20),
+                Date = max(Date), .groups = "drop") %>%
+            mutate(Rate = ifelse(str_starts(Measure, "Staff"), NA, Rate)) %>%
+            filter(!str_ends(Measure, "Population"))
 
-        if(collapse_vaccine){
-            sub_vac_res <- state_df %>%
-                group_by(State, Date, Web.Group) %>%
-                mutate(No.Initiated = !("Residents.Initiated" %in% Measure)) %>%
-                filter(No.Initiated) %>%
-                # remove vadmin in the vector if you dont want to sub for that val
-                filter(Measure %in% c("Residents.Completed", "Residents.Vadmin")) %>%
-                arrange(State, Web.Group, Date, Measure) %>%
-                filter(1:n() == 1) %>%
-                mutate(Measure = "Residents.Initiated") %>%
-                ungroup()
+        pri_df <- state_df %>%
+            filter(Web.Group == "Prison") %>%
+            full_join(mp_df, by = c("State", "Date", "Measure"))
 
-            sub_vac_staff <- state_df %>%
-                group_by(State, Date) %>%
-                mutate(No.Initiated = !("Staff.Initiated" %in% Measure)) %>%
-                filter(No.Initiated) %>%
-                # add vadmin in the vector if you dont to sub for that val
-                filter(Measure %in% c("Staff.Completed", "Staff.Vadmin")) %>%
-                arrange(State, Web.Group, Date, Measure) %>%
-                filter(1:n() == 1) %>%
-                mutate(Measure = "Staff.Initiated") %>%
-                ungroup()
-
-            state_df <- bind_rows(state_df, sub_vac_res, sub_vac_staff) %>%
-                select(-No.Initiated)
-        }
-    }
-    else{
+    }else{
         state_df <- fac_long_df %>%
             rename(UCLA = value) %>%
             filter(!is.na(UCLA)) %>%
@@ -100,38 +111,47 @@ alt_aggregate_counts <- function(
             filter(!(has_statewide & Name != "STATEWIDE")) %>%
             group_by(State, Measure, Web.Group) %>%
             summarise(
-                UCLA = sum_na_rm(UCLA), Date = max(Date), .groups = "drop")
+                UCLA = sum_na_rm(UCLA),
+                Rate = sum_na_rm(Rate*Population.Feb20)/
+                    sum_na_rm(Population.Feb20),
+                Date = max(Date), .groups = "drop") %>%
+            mutate(Rate = ifelse(str_starts(Measure, "Staff"), NA, Rate)) %>%
+            filter(!str_ends(Measure, "Population"))
 
-        if(collapse_vaccine){
-            sub_vac_res <- state_df %>%
-                group_by(State, Web.Group) %>%
-                mutate(No.Initiated = !("Residents.Initiated" %in% Measure)) %>%
-                filter(No.Initiated) %>%
-                # add vadmin in the vector if you also want to sub for that val
-                filter(Measure %in% c("Residents.Completed", "Residents.Vadmin")) %>%
-                arrange(State, Measure) %>%
-                filter(1:n() == 1) %>%
-                mutate(Measure = "Residents.Initiated") %>%
-                ungroup()
-
-            sub_vac_staff <- state_df %>%
-                group_by(State, Web.Group) %>%
-                mutate(No.Initiated = !("Staff.Initiated" %in% Measure)) %>%
-                filter(No.Initiated) %>%
-                # add vadmin in the vector if you also want to sub for that val
-                filter(Measure %in% c("Staff.Completed", "Staff.Vadmin")) %>%
-                arrange(State, Measure) %>%
-                filter(1:n() == 1) %>%
-                mutate(Measure = "Staff.Initiated") %>%
-                ungroup()
-
-            state_df <- bind_rows(state_df, sub_vac_res, sub_vac_staff) %>%
-                select(-No.Initiated)
-        }
+        pri_df <- state_df %>%
+            filter(Web.Group == "Prison") %>%
+            full_join(select(mp_df, -Date), by = c("State", "Measure"))
     }
 
-    out_agg_df <- state_df %>%
-        rename(Value = UCLA)
+    # combine MP and UCLA data
+    out_agg_df <- pri_df %>%
+        mutate(Group = ifelse(
+            str_starts(Measure, "Staff"), "Staff", "Residents")) %>%
+        left_join(mp_pop_df, by = c("State", "Group")) %>%
+        select(-Group) %>%
+        mutate(Val = case_when(
+            is.na(UCLA) & is.na(MP) ~ NA_real_,
+            is.na(UCLA) ~ MP,
+            is.na(MP) ~ UCLA,
+            UCLA >= MP ~ UCLA,
+            TRUE ~ MP
+        )) %>%
+        mutate(Rate = ifelse(is.na(Rate), UCLA/Population.Feb20, Rate)) %>%
+        mutate(
+            Rate = case_when(
+                is.na(UCLA) & is.na(MP) ~ NA_real_,
+                is.na(UCLA) ~ MP/Population.Feb20,
+                is.na(MP) ~ Rate,
+                UCLA >= MP ~ Rate,
+                TRUE ~ MP/Population.Feb20
+            )
+        ) %>%
+        select(-MP, -UCLA, -Population.Feb20) %>%
+        bind_rows(
+            state_df %>%
+                filter(Web.Group != "Prison") %>%
+                rename(Val = UCLA)
+        )
 
     return(out_agg_df)
 }

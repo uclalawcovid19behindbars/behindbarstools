@@ -23,6 +23,7 @@ read_mpap_data <- function(all_dates = FALSE, window = 14){
 
     rename_df <- mp_raw_df %>%
         mutate(Date = lubridate::mdy(as_of_date)) %>%
+        filter(!is.na(Date)) %>%
         select(
             State = name,
             Date,
