@@ -186,16 +186,9 @@ calc_aggregate_counts <- function(
         out_state_df <- harm_df %>%
             left_join(aggregate_pop_df, by = "State") %>%
             mutate(Pop.Anchor = case_when(
-                # Jan21 for residents,  vaccine measures
-                str_detect(Measure, "Residents.") &
-                    str_detect(Measure, ".Initiated|.Completed|Vadmin") ~
-                    Residents.Population.Jan21,
-                # Staff for all staff measures
-                str_detect(Measure, "Staff.") ~ Staff.Population,
-                # Feb20 for residents, non-vaccine measures
-                TRUE ~ Residents.Population.Feb20
-            )) %>%
-            select(-Residents.Population.Feb20, -Residents.Population.Jan21, -Staff.Population)
+                str_detect(Measure, "Residents.") ~ Residents.Population,
+                str_detect(Measure, "Staff.") ~ Staff.Population)) %>%
+            select(-Residents.Population, -Staff.Population, -Date)
 
         return(out_state_df)
     }
