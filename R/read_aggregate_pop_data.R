@@ -18,8 +18,7 @@ read_aggregate_pop_data <- function(){
     POP_ANCHOR_LOC %>%
         read_csv(col_types = cols(
             State = "c",
-            Residents.Population.Feb20 = "d",
-            Residents.Population.Jan21 = "d",
+            Residents.Population = "d",
             Staff.Population = "d"
         )
     )
