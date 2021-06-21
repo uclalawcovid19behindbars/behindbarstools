@@ -65,6 +65,8 @@ alt_aggregate_counts <- function(
             ungroup()
     }
 
+    pop_threshold <- .8
+
     # aggregate the data together
     if(all_dates){
         state_df <- fac_long_df %>%
@@ -83,6 +85,11 @@ alt_aggregate_counts <- function(
             # only use statewide
             filter(!(has_statewide & Name != "STATEWIDE")) %>%
             group_by(State, Date, Web.Group, Measure) %>%
+            mutate(rem_thresh =
+                       mean(!is.na(Population.Feb20)) < pop_threshold) %>%
+            mutate(Population.Feb20 = ifelse(
+                rem_thresh, NA, Population.Feb20)) %>%
+            select(-rem_thresh) %>%
             mutate(Rate = UCLA/Population.Feb20) %>%
             summarise(
                 UCLA = sum_na_rm(UCLA),
@@ -110,6 +117,11 @@ alt_aggregate_counts <- function(
             # use statewide measures
             filter(!(has_statewide & Name != "STATEWIDE")) %>%
             group_by(State, Measure, Web.Group) %>%
+            mutate(rem_thresh =
+                       mean(!is.na(Population.Feb20)) < pop_threshold) %>%
+            mutate(Population.Feb20 = ifelse(
+                rem_thresh, NA, Population.Feb20)) %>%
+            select(-rem_thresh) %>%
             summarise(
                 UCLA = sum_na_rm(UCLA),
                 Rate = sum_na_rm(Rate*Population.Feb20)/
