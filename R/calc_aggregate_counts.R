@@ -29,6 +29,7 @@ max_na_rm <- function(x){
 #' \dontrun{
 #' calc_aggregate_counts()
 #' }
+#' calc_aggregate_counts(state = TRUE, all_dates = TRUE)
 #' @export
 
 calc_aggregate_counts <- function(
