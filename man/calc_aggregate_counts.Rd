@@ -43,4 +43,5 @@ value for a state the larger value for is taken.
 \dontrun{
 calc_aggregate_counts()
 }
+calc_aggregate_counts(state = TRUE, all_dates = TRUE)
 }

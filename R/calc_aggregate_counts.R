@@ -29,6 +29,7 @@ max_na_rm <- function(x){
 #' \dontrun{
 #' calc_aggregate_counts()
 #' }
+#' calc_aggregate_counts(state = TRUE, all_dates = TRUE)
 #' @export
 
 calc_aggregate_counts <- function(
@@ -184,11 +185,11 @@ calc_aggregate_counts <- function(
         aggregate_pop_df <- read_aggregate_pop_data()
 
         out_state_df <- harm_df %>%
-            left_join(aggregate_pop_df, by = "State") %>%
+            left_join(select(aggregate_pop_df, -Date) , by = "State") %>%
             mutate(Pop.Anchor = case_when(
                 str_detect(Measure, "Residents.") ~ Residents.Population,
                 str_detect(Measure, "Staff.") ~ Staff.Population)) %>%
-            select(-Residents.Population, -Staff.Population, -Date)
+            select(-Residents.Population, -Staff.Population)
 
         return(out_state_df)
     }
