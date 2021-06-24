@@ -74,7 +74,7 @@ clean_facility_name <- function(dat, alt_name_xwalk = FALSE, debug = FALSE){
                # include Jurisdiction, jurisdiction_scraper in federal_bool = TRUE
                str_detect(jurisdiction_scraper, "(?i)immigration") ~ TRUE,
                str_detect(Jurisdiction, "(?i)immigration") ~ TRUE,
-               # include youth facilities
+               # include manually collected youth facilities
                str_detect(jurisdiction_scraper, "(?i)youth") ~ TRUE,
                # when Jurisdiction is NA, and neither State nor Facility
                # contains "federal", federal_bool = FALSE
@@ -100,7 +100,8 @@ clean_facility_name <- function(dat, alt_name_xwalk = FALSE, debug = FALSE){
 
     federal_xwalk <- name_xwalk %>%
         filter(Jurisdiction %in% c("federal", "immigration") |
-              str_detect(xwalk_name_raw, ("(?i)youth facility"))) ## include youth
+              ## include manually collected youth facilities
+              str_detect(xwalk_name_raw, ("YOUTH FACILITY")))
 
     federal <- dat %>%
         filter(federal_bool) %>%
