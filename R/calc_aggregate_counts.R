@@ -1,10 +1,3 @@
-max_na_rm <- function(x){
-    if(all(is.na(x))){
-        return(NA)
-    }
-    max(x, na.rm = TRUE)
-}
-
 #' Aggregate UCLA and MP data to get a more recent accurate count of COVID variables
 #'
 #' Reads the UCLA and MP/AP dataset aggregates counts for states for most recent
