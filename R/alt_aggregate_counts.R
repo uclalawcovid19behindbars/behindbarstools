@@ -27,17 +27,19 @@ alt_aggregate_counts <- function(
 
     # read in ucla data and do the appropriate grouping
     fac_long_df <- read_scrape_data(
-        window = window, all_dates = all_dates, wide_data = FALSE) %>%
+        window = window, all_dates = all_dates, wide_data = TRUE) %>%
         mutate(Web.Group = case_when(
             Jurisdiction == "immigration" ~ "ICE",
             Jurisdiction == "federal" ~ "Federal",
             Age == "Juvenile" ~ "Juvenile",
             Jurisdiction == "state" ~ "Prison",
             Jurisdiction == "psychiatric" ~ "Psychiatric",
-            Jurisdiction == "cou nty" ~ "County",
+            Jurisdiction == "county" ~ "County",
             TRUE ~ NA_character_
         ))  %>%
-        filter(State != "Not Available") %>%
+        # filter(State != "Not Available") %>%
+        tidyr::pivot_longer(
+            starts_with(c("Residents", "Staff")), names_to = "Measure") %>%
         select(
             Name, Date, State, Measure, Web.Group, value, Population.Feb20) %>%
         mutate(Rate = value/Population.Feb20)
@@ -72,7 +74,7 @@ alt_aggregate_counts <- function(
         state_df <- fac_long_df %>%
             mutate(Date = lubridate::floor_date(Date, round_)) %>%
             rename(UCLA = value) %>%
-            filter(!is.na(UCLA)) %>%
+            # filter(!is.na(UCLA)) %>%
             group_by(
                 State, Date, Measure, Web.Group, Name, Population.Feb20) %>%
             summarize(UCLA = max_na_rm(UCLA), .groups = "drop_last") %>%
@@ -93,8 +95,9 @@ alt_aggregate_counts <- function(
             mutate(Rate = UCLA/Population.Feb20) %>%
             summarise(
                 UCLA = sum_na_rm(UCLA),
-                Rate = sum_na_rm(Rate*Population.Feb20)/
-                    sum_na_rm(Population.Feb20),
+                # Rate = sum_na_rm(Rate*Population.Feb20)/
+                #     sum_na_rm(Population.Feb20),
+                Rate = sum_na_rm(UCLA)/sum_na_rm(Population.Feb20),
                 Date = max(Date), .groups = "drop") %>%
             mutate(Rate = ifelse(str_starts(Measure, "Staff"), NA, Rate)) %>%
             filter(!str_ends(Measure, "Population"))
@@ -106,7 +109,7 @@ alt_aggregate_counts <- function(
     }else{
         state_df <- fac_long_df %>%
             rename(UCLA = value) %>%
-            filter(!is.na(UCLA)) %>%
+            # filter(!is.na(UCLA)) %>%
             group_by(State, Measure, Web.Group) %>%
             mutate(has_statewide = "STATEWIDE" %in% Name) %>%
             # if state wide and other counts exist for a measure only take more
@@ -124,8 +127,9 @@ alt_aggregate_counts <- function(
             select(-rem_thresh) %>%
             summarise(
                 UCLA = sum_na_rm(UCLA),
-                Rate = sum_na_rm(Rate*Population.Feb20)/
-                    sum_na_rm(Population.Feb20),
+                # Rate = sum_na_rm(Rate*Population.Feb20)/
+                #     sum_na_rm(Population.Feb20),
+                Rate = sum_na_rm(UCLA)/sum_na_rm(Population.Feb20),
                 Date = max(Date), .groups = "drop") %>%
             mutate(Rate = ifelse(str_starts(Measure, "Staff"), NA, Rate)) %>%
             filter(!str_ends(Measure, "Population"))
