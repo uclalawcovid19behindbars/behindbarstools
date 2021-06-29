@@ -7,7 +7,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' read_staff_popfeb20()
+#' read_mpap_pop_data()
 #' }
 #' @export
 
