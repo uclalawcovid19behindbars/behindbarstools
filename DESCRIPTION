@@ -1,6 +1,6 @@
 Package: behindbarstools
 Type: Package
-Title: Tools for the UCLA Behind Bars Data team
+Title: Tools for the UCLA Behind Bars Data Team
 Version: 0.1.0
 Authors@R: c(person("Michael","Everett",role=c("aut"),email="everett@law.ucla.edu"),person("Hope","Johnson",role=c("aut"),email="johnsonh@law.ucla.edu"),person("Neal","Marquez",role=c("aut","cre"),email="marquezn@law.ucla.edu"),person("Erika","Tyagi",role=c("aut"),email="tyagi@law.ucla.edu"))
 Maintainer: Neal Marquez <marquezn@law.ucla.edu>
@@ -33,7 +33,7 @@ Imports:
     stats, 
     ggrepel, 
     sf,
-    geojsonsf , 
+    geojsonsf, 
     broom,
     geojsonio, 
     rgeos  

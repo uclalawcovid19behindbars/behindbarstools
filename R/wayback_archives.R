@@ -8,7 +8,9 @@
 #' statuscode and url
 #'
 #' @examples
+#' \dontrun{
 #' wayback_archives("https://doccs.ny.gov/doccs-covid-19-report")
+#' }
 #'
 #' @export
 
