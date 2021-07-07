@@ -48,15 +48,16 @@ plot_recent_fac_increases <- function(
         plot_start_date <- plot_end_date - lubridate::days(plot_days)
     }
     
-    fac_delta_df <- scrape_df %>%
+    keep_facs <- scrape_df %>%
         filter(!(stringr::str_detect(Name, "(?i)state") & stringr::str_detect(Name, "(?i)wide"))) %>%
         filter(Date >= delta_start_date) %>%
         group_by(Name, State) %>%
         mutate(delta = last(!!sym(metric)) - first(!!sym(metric))) %>%
-        ungroup() %>%
-        filter(delta %in% head(sort(unique(delta), decreasing = T), n = num_fac)) %>%
-        select(State, Name) %>%
-        unique() %>%
+        distinct(Name, State, delta) %>% 
+        arrange(desc(delta), Name) %>% # Use name as a tie-breaker 
+        head(num_fac) 
+        
+    fac_delta_df <- keep_facs %>% 
         left_join(scrape_df, by = c("State", "Name")) %>% 
         mutate(Title = stringr::str_c(Name, "\n", State, "\n")) %>%
         mutate(last_value = if_else(Date == max(Date), as.character(!!sym(metric)), NA_character_))
