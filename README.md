@@ -3,8 +3,7 @@
 
 # behindbarstools
 
-[![Travis build
-status](https://travis-ci.com/uclalawcovid19behindbars/behindbarstools.svg?branch=master)](https://travis-ci.com/uclalawcovid19behindbars/behindbarstools)
+[![R build status](https://github.com/uclalawcovid19behindbars/behindbarstools/workflows/R-CMD-check/badge.svg)](https://github.com/uclalawcovid19behindbars/behindbarstools/actions)
 
 ## Overview
 
