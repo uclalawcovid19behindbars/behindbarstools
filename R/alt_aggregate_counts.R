@@ -1,13 +1,13 @@
 #' Alternate Aggregate UCLA data for website groupings
 #'
 #' Reads the UCLA aggregates counts for states for most recent
-#' data within a given window and reports either state level data or national
+#' data after a given date cutoff and reports either state level data or national
 #' data. States include values for the 50 states broken down by carceral type,
 #' prison, ICE, Federal, Juvenile, Psychiatric, and county. For prisons, data
 #' from the Marshall project is also incorporated.
 #'
-#' @param window integer, the day range of acceptable data to pull from, ignored
-#' if all dates is true
+#' @param date_cutoff date, the earliest date of acceptable data to pull from, 
+#' ignored if all dates is true
 #' @param all_dates logical, get time series data rather than just latest counts
 #' @param week_grouping logical, use weekly grouping for past data? else monthly
 #'
@@ -20,14 +20,14 @@
 #' @export
 
 alt_aggregate_counts <- function(
-    window = 31, all_dates = FALSE, week_grouping = TRUE){
+    date_cutoff = DATE_CUTOFF, all_dates = FALSE, week_grouping = TRUE){
 
     # How to round data when doing all dates
     round_ <- ifelse(week_grouping, "week", "month")
 
     # read in ucla data and do the appropriate grouping
     fac_long_df <- read_scrape_data(
-        window = window, all_dates = all_dates, wide_data = TRUE) %>%
+        date_cutoff = date_cutoff, all_dates = all_dates, wide_data = TRUE) %>%
         mutate(Web.Group = case_when(
             Jurisdiction == "immigration" ~ "ICE",
             Jurisdiction == "federal" ~ "Federal",
@@ -46,7 +46,7 @@ alt_aggregate_counts <- function(
 
     # pull in the comparable MP data
     mp_df <- read_mpap_data(
-        all_dates = all_dates, window = window) %>%
+        all_dates = all_dates, date_cutoff = date_cutoff) %>%
         filter(State != "Federal")%>%
         tidyr::pivot_longer(
             -(State:Date), names_to = "Measure", values_to = "MP")

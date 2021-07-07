@@ -4,13 +4,13 @@
 \alias{read_mpap_data}
 \title{Read the latest Marshall Project State Data}
 \usage{
-read_mpap_data(all_dates = FALSE, window = 14)
+read_mpap_data(all_dates = FALSE, date_cutoff = DATE_CUTOFF)
 }
 \arguments{
 \item{all_dates}{return all historical data from MP/AP}
 
-\item{window}{integer, the day range of acceptable data to pull from if
-all_dates is false}
+\item{date_cutoff}{date, the earliest date of acceptable data to pull from 
+if all_dates is false}
 }
 \value{
 data frame with MP/AP results

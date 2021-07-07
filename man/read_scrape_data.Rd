@@ -6,8 +6,8 @@
 \usage{
 read_scrape_data(
   all_dates = FALSE,
-  window = 31,
-  window_pop = 31,
+  date_cutoff = DATE_CUTOFF,
+  window_pop = 90,
   coalesce_func = sum_na_rm,
   drop_noncovid_obs = TRUE,
   debug = FALSE,
@@ -18,11 +18,11 @@ read_scrape_data(
 \arguments{
 \item{all_dates}{logical, get all data from all dates recorded by webscraper}
 
-\item{window}{int, how far to go back (in days) to look for values from a given
-facility to populate NAs for ALL scraped variables. Used when all_dates is FALSE}
+\item{date_cutoff}{date, the earliest date of acceptable data to pull from 
+if all_dates is FALSE}
 
 \item{window_pop}{int, how far to go back (in days) to look for values from a given
-facility to populate NAs in Residents.Population. Used when coalesce_pop is TRUE}
+facility to populate NAs in Residents.Population}
 
 \item{coalesce_func}{function, how to combine redundant rows}
 

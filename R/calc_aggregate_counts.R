@@ -1,14 +1,14 @@
 #' Aggregate UCLA and MP data to get a more recent accurate count of COVID variables
 #'
 #' Reads the UCLA and MP/AP dataset aggregates counts for states for most recent
-#' data within a given window and reports either state level data or national
+#' data after a given date cutoff and reports either state level data or national
 #' data. States include values for the 50 state DOCs, Federal for BOP prisons,
 #' ICE detention centers, and incarcerated individuals under the administration
 #' of the District of Columbia DOC. If both UCLA and MP report a
 #' value for a state the larger value for is taken.
 #'
-#' @param window integer, the day range of acceptable data to pull from, ignored
-#' if all dates is true
+#' @param date_cutoff date, the earliest date of acceptable data to pull from, 
+#' ignored if all dates is true
 #' @param ucla_only logical, only consider data from UCLA
 #' @param state logical, return state level data
 #' @param collapse_vaccine logical, combine vaccine variables for more
@@ -26,15 +26,15 @@
 #' @export
 
 calc_aggregate_counts <- function(
-    window = 31, ucla_only = FALSE, state = FALSE, collapse_vaccine = TRUE,
-    all_dates = FALSE, week_grouping = TRUE){
+    date_cutoff = DATE_CUTOFF, ucla_only = FALSE, state = FALSE, 
+    collapse_vaccine = TRUE, all_dates = FALSE, week_grouping = TRUE){
 
     round_ <- ifelse(week_grouping, "week", "month")
 
     to_report <- c(
         datasets::state.name, "Federal", "ICE", "District of Columbia")
 
-    mp_data_wide <- read_mpap_data(window = window, all_dates = all_dates)
+    mp_data_wide <- read_mpap_data(date_cutoff = date_cutoff, all_dates = all_dates)
 
     if(all_dates){
         mp_data <- mp_data_wide %>%
@@ -56,7 +56,7 @@ calc_aggregate_counts <- function(
     }
 
     ucla_df <- read_scrape_data(
-        window = window, all_dates = all_dates, wide_data = FALSE)
+        date_cutoff = date_cutoff, all_dates = all_dates, wide_data = FALSE)
 
     fac_long_df <- ucla_df %>%
         mutate(State = ifelse(Jurisdiction == "federal", "Federal", State)) %>%

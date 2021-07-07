@@ -15,6 +15,6 @@ resident population data closest to Feb 20, 2020.
 }
 \examples{
 \dontrun{
-read_staff_popfeb20()
+read_mpap_pop_data()
 }
 }

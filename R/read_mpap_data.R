@@ -4,8 +4,8 @@
 #' UCLA dataset
 #'
 #' @param all_dates return all historical data from MP/AP
-#' @param window integer, the day range of acceptable data to pull from if
-#' all_dates is false
+#' @param date_cutoff date, the earliest date of acceptable data to pull from 
+#' if all_dates is false
 #'
 #' @return data frame with MP/AP results
 #'
@@ -15,7 +15,7 @@
 #' }
 #' @export
 
-read_mpap_data <- function(all_dates = FALSE, window = 14){
+read_mpap_data <- function(all_dates = FALSE, date_cutoff = DATE_CUTOFF){
     mp_raw_df <- "https://raw.githubusercontent.com/themarshallproject/" %>%
         stringr::str_c(
             "COVID_prison_data/master/data/covid_prison_cases.csv") %>%
@@ -42,7 +42,7 @@ read_mpap_data <- function(all_dates = FALSE, window = 14){
 
     if(!all_dates){
         rename_df <- rename_df %>%
-            filter(Date >= (Sys.Date() - window)) %>%
+            filter(Date >= date_cutoff) %>% 
             arrange(State, Date) %>%
             group_by(State) %>%
             mutate(across(where(is.numeric), last_not_na)) %>%

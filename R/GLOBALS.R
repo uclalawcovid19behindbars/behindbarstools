@@ -9,3 +9,5 @@ FAC_DATA_LOC <- "https://raw.githubusercontent.com/uclalawcovid19behindbars/faci
 FAC_SPELLINGS_LOC <-"https://raw.githubusercontent.com/uclalawcovid19behindbars/facility_data/master/data/fac_spellings.csv"
 
 POP_ANCHOR_LOC <- "https://raw.githubusercontent.com/uclalawcovid19behindbars/data/master/anchored-data/state_aggregate_denominators.csv"
+
+DATE_CUTOFF <- as.Date("2021-06-01")
