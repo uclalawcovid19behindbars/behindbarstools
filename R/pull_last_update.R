@@ -23,6 +23,8 @@
 #'     filter(jurisdiction %in% c("state", "federal", "immigration")) %>%
 #'     # remove population scrapers here
 #'     filter(!stringr::str_detect(id, "(?i)population")) %>%
+#'     # remove youth scrapers here
+#'     filter(!stringr::str_detect(id, "(?i)youth")) %>%
 #'     # Do some renaming
 #'     mutate(State = ifelse(jurisdiction == "immigration", "ICE", State)) %>%
 #'     mutate(State = ifelse(jurisdiction == "federal", "BOP", State)) %>%
