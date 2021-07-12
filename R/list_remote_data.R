@@ -23,7 +23,7 @@
 
 list_remote_data <- function(folder, scraper_name = NULL, dates_only = FALSE){
 
-    folders <- c("raw_files", "log_files", "extracted_data")
+    folders <- c("raw_files", "log_files", "extracted_data", "last_update")
 
     if(!(folder %in% folders) | (length(folder) != 1)){
         stop(
