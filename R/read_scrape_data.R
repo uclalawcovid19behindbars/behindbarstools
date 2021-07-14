@@ -3,10 +3,10 @@
 #' Reads either time series or latest data from the web scraper runs.
 #'
 #' @param all_dates logical, get all data from all dates recorded by webscraper
-#' @param window int, how far to go back (in days) to look for values from a given
-#' facility to populate NAs for ALL scraped variables. Used when all_dates is FALSE
+#' @param date_cutoff date, the earliest date of acceptable data to pull from 
+#' if all_dates is FALSE
 #' @param window_pop int, how far to go back (in days) to look for values from a given
-#' facility to populate NAs in Residents.Population. Used when coalesce_pop is TRUE
+#' facility to populate NAs in Residents.Population 
 #' @param coalesce_func function, how to combine redundant rows
 #' @param drop_noncovid_obs logical, drop rows missing all COVID variables
 #' @param debug logical, print debug statements on number of rows maintained in
@@ -24,8 +24,9 @@
 #' @export
 
 read_scrape_data <- function(
-    all_dates = FALSE, window = 31, window_pop = 31, coalesce_func = sum_na_rm,
-    drop_noncovid_obs = TRUE, debug = FALSE, state = NULL, wide_data = TRUE){
+    all_dates = FALSE, date_cutoff = DATE_CUTOFF, window_pop = 90, 
+    coalesce_func = sum_na_rm, drop_noncovid_obs = TRUE, debug = FALSE, 
+    state = NULL, wide_data = TRUE){
 
     remote_loc <- stringr::str_c(
         SRVR_SCRAPE_LOC, "summary_data/aggregated_data.csv")
@@ -187,8 +188,8 @@ read_scrape_data <- function(
 
     if(!all_dates){
         out_df <- out_df %>%
-            # only keep values in the last window of days
-            filter(Date >= (Sys.Date() - window)) %>%
+            # only keep values newer than date cutoff 
+            filter(Date >= date_cutoff) %>% 
             group_by(Facility.ID, jurisdiction_scraper, State, Name, Measure) %>%
             arrange(Facility.ID, jurisdiction_scraper, State, Name, Measure, Date) %>%
             # keep only last observed value

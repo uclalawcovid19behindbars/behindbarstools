@@ -4,11 +4,15 @@
 \alias{alt_aggregate_counts}
 \title{Alternate Aggregate UCLA data for website groupings}
 \usage{
-alt_aggregate_counts(window = 31, all_dates = FALSE, week_grouping = TRUE)
+alt_aggregate_counts(
+  date_cutoff = DATE_CUTOFF,
+  all_dates = FALSE,
+  week_grouping = TRUE
+)
 }
 \arguments{
-\item{window}{integer, the day range of acceptable data to pull from, ignored
-if all dates is true}
+\item{date_cutoff}{date, the earliest date of acceptable data to pull from, 
+ignored if all dates is true}
 
 \item{all_dates}{logical, get time series data rather than just latest counts}
 
@@ -19,7 +23,7 @@ data frame with aggregated counts at the state level by web groups
 }
 \description{
 Reads the UCLA aggregates counts for states for most recent
-data within a given window and reports either state level data or national
+data after a given date cutoff and reports either state level data or national
 data. States include values for the 50 states broken down by carceral type,
 prison, ICE, Federal, Juvenile, Psychiatric, and county. For prisons, data
 from the Marshall project is also incorporated.
