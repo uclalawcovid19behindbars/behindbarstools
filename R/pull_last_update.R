@@ -53,6 +53,7 @@
 #'         stringr::str_c("As of ", as.character(first(last_df$Date))))
 #' }
 #'
+#' @importFrom purrr map_dfr
 #' @export
 
 pull_last_update <- function(all_dates = FALSE, scraper_name = NULL){
@@ -78,12 +79,11 @@ pull_last_update <- function(all_dates = FALSE, scraper_name = NULL){
     }
 
     if(nrow(rem_df) == 1){
-        return(readr::read_csv(rem_df$loc, col_types = readr::cols()))
+        out_df = readr::read_csv(rem_df$loc, col_types = readr::cols())
+    } else {
+        out_df = rem_df$loc %>%
+            purrr::map_dfr(~ readr::read_csv(.), col_types = readr::cols())
     }
-
-    out_df <- bind_rows(sapply(rem_df$loc, function(l){
-        readr::read_csv(l, col_types = readr::cols())
-    }))
 
     return(out_df)
 }
