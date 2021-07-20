@@ -18,6 +18,8 @@ given a URL returns the time stamped url, timestamp, and statuscodes
 for wayback machine archived versions of the website.
 }
 \examples{
+\dontrun{
 wayback_archives("https://doccs.ny.gov/doccs-covid-19-report")
+}
 
 }
