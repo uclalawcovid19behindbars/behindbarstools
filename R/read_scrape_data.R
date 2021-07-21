@@ -251,6 +251,8 @@ read_scrape_data <- function(
         message(stringr::str_c(
             "Named data frame contains ", nrow(out_df), " rows."))
     }
+    
+    out_df <- assign_web_group(out_df)
 
     return(out_df)
 }
