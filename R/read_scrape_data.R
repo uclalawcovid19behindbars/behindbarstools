@@ -26,7 +26,7 @@
 read_scrape_data <- function(
     all_dates = FALSE, date_cutoff = DATE_CUTOFF, window_pop = 90, 
     coalesce_func = sum_na_rm, drop_noncovid_obs = TRUE, debug = FALSE, 
-    state = NULL, wide_data = TRUE){
+    state = NULL, wide_data = TRUE, web_group = FALSE){
 
     remote_loc <- stringr::str_c(
         SRVR_SCRAPE_LOC, "summary_data/aggregated_data.csv")
@@ -251,6 +251,8 @@ read_scrape_data <- function(
         message(stringr::str_c(
             "Named data frame contains ", nrow(out_df), " rows."))
     }
+    
+    out_df <- assign_web_group(out_df)
 
     return(out_df)
 }

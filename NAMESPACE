@@ -2,6 +2,7 @@
 
 export(ExtractTable)
 export(alt_aggregate_counts)
+export(assign_web_group)
 export(calc_aggregate_counts)
 export(clean_fac_col_txt)
 export(clean_facility_name)

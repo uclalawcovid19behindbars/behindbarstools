@@ -12,7 +12,8 @@ read_scrape_data(
   drop_noncovid_obs = TRUE,
   debug = FALSE,
   state = NULL,
-  wide_data = TRUE
+  wide_data = TRUE,
+  web_group = FALSE
 )
 }
 \arguments{

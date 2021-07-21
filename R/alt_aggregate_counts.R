@@ -28,15 +28,7 @@ alt_aggregate_counts <- function(
     # read in ucla data and do the appropriate grouping
     fac_long_df <- read_scrape_data(
         date_cutoff = date_cutoff, all_dates = all_dates, wide_data = TRUE) %>%
-        mutate(Web.Group = case_when(
-            Jurisdiction == "immigration" ~ "ICE",
-            Jurisdiction == "federal" ~ "Federal",
-            Age == "Juvenile" ~ "Juvenile",
-            Jurisdiction == "state" ~ "Prison",
-            Jurisdiction == "psychiatric" ~ "Psychiatric",
-            Jurisdiction == "county" ~ "County",
-            TRUE ~ NA_character_
-        ))  %>%
+        assign_web_group() %>%
         # filter(State != "Not Available") %>%
         tidyr::pivot_longer(
             starts_with(c("Residents", "Staff")), names_to = "Measure") %>%
