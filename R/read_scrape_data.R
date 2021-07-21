@@ -26,7 +26,7 @@
 read_scrape_data <- function(
     all_dates = FALSE, date_cutoff = DATE_CUTOFF, window_pop = 90, 
     coalesce_func = sum_na_rm, drop_noncovid_obs = TRUE, debug = FALSE, 
-    state = NULL, wide_data = TRUE, web_group = FALSE){
+    state = NULL, wide_data = TRUE){
 
     remote_loc <- stringr::str_c(
         SRVR_SCRAPE_LOC, "summary_data/aggregated_data.csv")

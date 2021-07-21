@@ -16,7 +16,7 @@ original data frame with new Web.Group column added
 Assigns UCLA website groupings based on a combination of a Jurisdiction and 
 Age field. Web groupings include ICE, Federal, Juvenile, Prison, Psychiatric, 
 and County. ICE and Federal facilities will never be assigned Juvenile (i.e., 
-jurisdiction takes precedence for ICE and Federal facilities, and Age takes
+Jurisdiction takes precedence for ICE and Federal facilities, and Age takes
 precedence for State, County, and Psychiatric facilities).
 }
 \examples{
