@@ -7,7 +7,7 @@
 #' of the District of Columbia DOC. If both UCLA and MP report a
 #' value for a state the larger value for is taken.
 #'
-#' @param date_cutoff date, the earliest date of acceptable data to pull from, 
+#' @param date_cutoff date, the earliest date of acceptable data to pull from,
 #' ignored if all dates is true
 #' @param ucla_only logical, only consider data from UCLA
 #' @param state logical, return state level data
@@ -26,8 +26,9 @@
 #' @export
 
 calc_aggregate_counts <- function(
-    date_cutoff = DATE_CUTOFF, ucla_only = FALSE, state = FALSE, 
-    collapse_vaccine = TRUE, all_dates = FALSE, week_grouping = TRUE){
+    date_cutoff = DATE_CUTOFF, ucla_only = FALSE, state = FALSE,
+    collapse_vaccine = TRUE, all_dates = FALSE, week_grouping = TRUE,
+    only_prison = TRUE){
 
     round_ <- ifelse(week_grouping, "week", "month")
 
@@ -61,8 +62,9 @@ calc_aggregate_counts <- function(
     fac_long_df <- ucla_df %>%
         mutate(State = ifelse(Jurisdiction == "federal", "Federal", State)) %>%
         mutate(State = ifelse(Jurisdiction == "immigration", "ICE", State)) %>%
+        ## filter out juvenile, psychiatric, and most county facilities
         filter(
-            Jurisdiction %in% c("state", "federal", "immigration") |
+            Web.Group %in% c("Prison", "Federal", "ICE") |
                 (State == "District of Columbia" & Jurisdiction == "county")) %>%
         select(Name, Date, State, Measure, value)
 
