@@ -10,11 +10,12 @@ calc_aggregate_counts(
   state = FALSE,
   collapse_vaccine = TRUE,
   all_dates = FALSE,
-  week_grouping = TRUE
+  week_grouping = TRUE,
+  only_prison = TRUE
 )
 }
 \arguments{
-\item{date_cutoff}{date, the earliest date of acceptable data to pull from, 
+\item{date_cutoff}{date, the earliest date of acceptable data to pull from,
 ignored if all dates is true}
 
 \item{ucla_only}{logical, only consider data from UCLA}
