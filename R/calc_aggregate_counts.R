@@ -15,6 +15,8 @@
 #' intuitive comparisons
 #' @param all_dates logical, get time series data rather than just latest counts
 #' @param week_grouping logical, use weekly grouping for past data? else monthly
+#' @param only_prison logical, whether to only include Prison, Federal, and ICE 
+#' web groups (state prisons, federal prisons, and ICE detention)
 #'
 #' @return data frame with aggregated counts at state or national level
 #'
