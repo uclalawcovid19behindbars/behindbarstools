@@ -7,7 +7,7 @@
 #' of the District of Columbia DOC. If both UCLA and MP report a
 #' value for a state the larger value for is taken.
 #'
-#' @param date_cutoff date, the earliest date of acceptable data to pull from, 
+#' @param date_cutoff date, the earliest date of acceptable data to pull from,
 #' ignored if all dates is true
 #' @param ucla_only logical, only consider data from UCLA
 #' @param state logical, return state level data
@@ -15,6 +15,8 @@
 #' intuitive comparisons
 #' @param all_dates logical, get time series data rather than just latest counts
 #' @param week_grouping logical, use weekly grouping for past data? else monthly
+#' @param only_prison logical, whether to only include Prison, Federal, and ICE 
+#' web groups (state prisons, federal prisons, and ICE detention)
 #'
 #' @return data frame with aggregated counts at state or national level
 #'
@@ -26,8 +28,9 @@
 #' @export
 
 calc_aggregate_counts <- function(
-    date_cutoff = DATE_CUTOFF, ucla_only = FALSE, state = FALSE, 
-    collapse_vaccine = TRUE, all_dates = FALSE, week_grouping = TRUE){
+    date_cutoff = DATE_CUTOFF, ucla_only = FALSE, state = FALSE,
+    collapse_vaccine = TRUE, all_dates = FALSE, week_grouping = TRUE,
+    only_prison = TRUE){
 
     round_ <- ifelse(week_grouping, "week", "month")
 
@@ -61,8 +64,9 @@ calc_aggregate_counts <- function(
     fac_long_df <- ucla_df %>%
         mutate(State = ifelse(Jurisdiction == "federal", "Federal", State)) %>%
         mutate(State = ifelse(Jurisdiction == "immigration", "ICE", State)) %>%
+        ## filter out juvenile, psychiatric, and most county facilities
         filter(
-            Jurisdiction %in% c("state", "federal", "immigration") |
+            Web.Group %in% c("Prison", "Federal", "ICE") |
                 (State == "District of Columbia" & Jurisdiction == "county")) %>%
         select(Name, Date, State, Measure, value)
 

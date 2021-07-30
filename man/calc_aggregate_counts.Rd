@@ -10,11 +10,12 @@ calc_aggregate_counts(
   state = FALSE,
   collapse_vaccine = TRUE,
   all_dates = FALSE,
-  week_grouping = TRUE
+  week_grouping = TRUE,
+  only_prison = TRUE
 )
 }
 \arguments{
-\item{date_cutoff}{date, the earliest date of acceptable data to pull from, 
+\item{date_cutoff}{date, the earliest date of acceptable data to pull from,
 ignored if all dates is true}
 
 \item{ucla_only}{logical, only consider data from UCLA}
@@ -27,6 +28,9 @@ intuitive comparisons}
 \item{all_dates}{logical, get time series data rather than just latest counts}
 
 \item{week_grouping}{logical, use weekly grouping for past data? else monthly}
+
+\item{only_prison}{logical, whether to only include Prison, Federal, and ICE 
+web groups (state prisons, federal prisons, and ICE detention)}
 }
 \value{
 data frame with aggregated counts at state or national level
