@@ -4,7 +4,6 @@
 #' for a state and then merges alongside a population number from the 2020
 #' Census population estimates for that state to use for rate calculation.
 #'
-#' @param state a state name or abbreviation not a fips code!
 #' @return a data frame with the following columns: State, Date,
 #' General.Confirmed, General.Deaths, General.Population
 #'
@@ -13,7 +12,8 @@
 #' state_ <- "Georgia"
 #'
 #'# get state level covid data
-#' st_gen_df <- get_genstate_covid(state_)
+#' st_gen_df <- get_genstate_covid() %>%
+#'     filter(State == state_)
 #'
 #' # get our prison data
 #' hist_df <- alt_aggregate_counts(all_dates = T)
@@ -58,26 +58,12 @@
 #'
 #' @export
 
-get_genstate_covid <- function(state){
-
-    if(!is.character(state)){
-        stop("'state' argument should be of class ch")
-    }
-
-    if(stringr::str_count(state) == 2){
-        state <- translate_state(stringr::str_to_upper(state))
-    }
+get_genstate_covid <- function(){
 
     genpop_df <- "https://www2.census.gov/programs-surveys/popest/datasets/" %>%
         stringr::str_c("2010-2020/state/totals/nst-est2020.csv") %>%
         readr::read_csv(col_types = readr::cols()) %>%
         select(State = NAME, General.Population = POPESTIMATE2020)
-
-    if(!(state %in% genpop_df$State)){
-        stop(
-            "The state name or abbreviation provided does not appear to be ",
-            "valid")
-    }
 
     state_infections <- "https://data.cdc.gov/api/views/9mfq-cb36/rows.csv" %>%
         stringr::str_c("?accessType=DOWNLOAD") %>%
@@ -86,7 +72,8 @@ get_genstate_covid <- function(state){
     gen_covid_df <- state_infections %>%
         rename(state_abv = state) %>%
         mutate(State = translate_state(state_abv)) %>%
-        filter(State == state) %>%
+        mutate(State = ifelse(state_abv == "PR", "Puerto Rico", State)) %>%
+        filter(!is.na(State)) %>%
         mutate(Date = lubridate::mdy(submission_date)) %>%
         arrange(Date) %>%
         select(

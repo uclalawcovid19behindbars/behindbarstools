@@ -4,10 +4,7 @@
 \alias{get_genstate_covid}
 \title{Get general population state COVID data from CDC and Census 2020 pop estimates}
 \usage{
-get_genstate_covid(state)
-}
-\arguments{
-\item{state}{a state name or abbreviation not a fips code!}
+get_genstate_covid()
 }
 \value{
 a data frame with the following columns: State, Date,
@@ -23,7 +20,8 @@ Census population estimates for that state to use for rate calculation.
 state_ <- "Georgia"
 
 # get state level covid data
-st_gen_df <- get_genstate_covid(state_)
+st_gen_df <- get_genstate_covid() \%>\%
+    filter(State == state_)
 
 # get our prison data
 hist_df <- alt_aggregate_counts(all_dates = T)
