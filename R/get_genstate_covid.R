@@ -8,6 +8,8 @@
 #' General.Confirmed, General.Deaths, General.Population
 #'
 #' @examples
+#' get_genstate_covid()
+#'
 #' \dontrun{
 #' state_ <- "Georgia"
 #'
@@ -78,7 +80,7 @@ get_genstate_covid <- function(){
         arrange(Date) %>%
         select(
             State, Date, General.Confirmed = tot_cases,
-            General.Death = tot_death) %>%
+            General.Deaths = tot_death) %>%
         left_join(genpop_df, by = "State")
 
     return(gen_covid_df)

@@ -16,6 +16,8 @@ for a state and then merges alongside a population number from the 2020
 Census population estimates for that state to use for rate calculation.
 }
 \examples{
+get_genstate_covid()
+
 \dontrun{
 state_ <- "Georgia"
 
