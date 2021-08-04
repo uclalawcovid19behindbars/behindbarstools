@@ -16,11 +16,7 @@ for adults in a state and then merges alongside a population number from the 18+
 Census population estimates for that state to use for rate calculation.
 }
 \examples{
-\dontrun{
-
 # get state-level vax data
 st_gen_df <- get_genstate_vax()
 
-
-}
 }

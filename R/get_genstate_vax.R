@@ -8,13 +8,9 @@
 #' General.Initiated, General.Adult.Population
 #'
 #' @examples
-#' \dontrun{
-#'
 #'# get state-level vax data
 #' st_gen_df <- get_genstate_vax()
 #'
-#'
-#' }
 #' @importFrom jsonlite read_json
 #' @export
 
@@ -33,14 +29,16 @@ get_genstate_vax <- function(){
         jsonlite::read_json(simplifyVector = TRUE)
 
     gen_vax_df <- as_tibble(raw_cdc_vax$vaccination_data) %>%
-        mutate(General.Initiated = Administered_Dose1_Recip_18Plus)  %>%
+        mutate(General.Initiated = Administered_Dose1_Recip_18Plus,
+               General.Completed = Series_Complete_18Plus)  %>%
         mutate(State = translate_state(Location)) %>%
         mutate(State = ifelse(Location == "PR", "Puerto Rico", State),
                State = ifelse(Location == "US", "National", State)) %>%
         mutate(Date = lubridate::ymd(Date)) %>%
         left_join(adultpop_df, by = "State") %>%
         filter(!is.na(State)) %>%
-        select(State, General.Initiated, General.Adult.Population, Date)
+        select(State, General.Initiated, General.Completed,
+               General.Adult.Population, Date)
 
     return(gen_vax_df)
 }
