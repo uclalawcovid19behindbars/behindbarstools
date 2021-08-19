@@ -6,9 +6,8 @@
 #' @return data frame with COVID Prison Project results
 #'
 #' @examples
-#' \dontrun{
 #' read_cpp_data()
-#' }
+#' 
 #' @export
 
 read_cpp_data <- function(){

@@ -14,7 +14,6 @@ Reads the COVID Prison Project dataset and converts variable names to be
 comparable to the UCLA dataset
 }
 \examples{
-\dontrun{
 read_cpp_data()
-}
+
 }
