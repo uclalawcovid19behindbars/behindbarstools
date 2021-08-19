@@ -18,7 +18,7 @@ read_cpp_data <- function(){
         .[[2]] %>% 
         rvest::html_table()
     
-    rename_df <- raw_cpp_df %>% 
+    rename_df <- cpp_raw_df %>% 
         mutate(
             State = case_when(`Prison System` == "Federal BOP" ~ "Federal", 
                               `Prison System` == "ICE" ~ "ICE", 
