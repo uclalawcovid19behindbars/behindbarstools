@@ -10,6 +10,7 @@ coalesce_join(
   by = NULL,
   suffix = c(".x", ".y"),
   join = dplyr::full_join,
+  debug = FALSE,
   ...
 )
 }
@@ -41,6 +42,8 @@ Should be a character vector of length 2.}
 
 \item{join}{Type of join to perform (e.g. dplyr::left_join).}
 
+\item{debug}{logical, use coalesce_with_warnings and print debug statements}
+
 \item{...}{Other parameters passed onto methods.}
 }
 \value{
@@ -53,14 +56,14 @@ Syntax borrowed directly from here:
 https://alistaire.rbind.io/blog/coalescing-joins/.
 }
 \examples{
-df1 <- data_frame(
+df1 <- data.frame(
     key  = c('a', 'b', 'c', 'd', 'e', 'f'),
     var1 = c(  1,   2,   3,   4,  NA,  NA),
     var2 = c( NA,  NA,  NA,  NA,   5,   6),
     var3 = c(  1,   2,   3,   4,   5,   6)
 )
 
-df2 <- data_frame(
+df2 <- data.frame(
     key  = c('c', 'd', 'e', 'f'),
     var1 = c( NA,  NA,   5,   6),
     var2 = c( NA,   4,   5,  NA),

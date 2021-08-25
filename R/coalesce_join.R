@@ -28,19 +28,20 @@
 #'   `y`, these suffixes will be added to the output to disambiguate them.
 #'   Should be a character vector of length 2.
 #' @param join Type of join to perform (e.g. dplyr::left_join). 
+#' @param debug logical, use coalesce_with_warnings and print debug statements
 #' @param ... Other parameters passed onto methods.
 #'
 #' @return An object of the same type as `x`.
 #'
 #' @examples
-#' df1 <- data_frame(
+#' df1 <- data.frame(
 #'     key  = c('a', 'b', 'c', 'd', 'e', 'f'),
 #'     var1 = c(  1,   2,   3,   4,  NA,  NA),
 #'     var2 = c( NA,  NA,  NA,  NA,   5,   6),
 #'     var3 = c(  1,   2,   3,   4,   5,   6)
 #' )
 #' 
-#' df2 <- data_frame(
+#' df2 <- data.frame(
 #'     key  = c('c', 'd', 'e', 'f'),
 #'     var1 = c( NA,  NA,   5,   6),
 #'     var2 = c( NA,   4,   5,  NA),
@@ -54,7 +55,8 @@
 coalesce_join <- function(x, y, 
                           by = NULL, 
                           suffix = c(".x", ".y"), 
-                          join = dplyr::full_join, ...) {
+                          join = dplyr::full_join, 
+                          debug = FALSE, ...) {
     
     joined <- join(x, y, by = by, suffix = suffix, ...)
     # names of desired output
@@ -69,10 +71,20 @@ coalesce_join <- function(x, y,
         nchar(to_coalesce) - nchar(suffix_used)
     ))
     
-    coalesced <- purrr::map_dfc(to_coalesce, ~dplyr::coalesce(
-        joined[[paste0(.x, suffix[1])]], 
-        joined[[paste0(.x, suffix[2])]]
-    ))
+    if (debug) {
+        coalesced <- purrr::map_dfc(
+            to_coalesce, ~behindbarstools::coalesce_with_warnings(
+            joined[[paste0(.x, suffix[1])]], 
+            joined[[paste0(.x, suffix[2])]]
+        ))
+    } else {
+        coalesced <- purrr::map_dfc(
+            to_coalesce, ~dplyr::coalesce(
+            joined[[paste0(.x, suffix[1])]], 
+            joined[[paste0(.x, suffix[2])]]
+        ))
+    }
+    
     names(coalesced) <- to_coalesce
     
     dplyr::bind_cols(joined, coalesced)[cols]
