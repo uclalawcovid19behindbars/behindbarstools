@@ -82,7 +82,7 @@ pull_last_update <- function(all_dates = FALSE, scraper_name = NULL){
         out_df = readr::read_csv(rem_df$loc, col_types = readr::cols())
     } else {
         out_df = rem_df$loc %>%
-            purrr::map_dfr(~ readr::read_csv(., col_types = readr::cols()))
+            purrr::map_dfr(~ readr::read_csv(., col_types = "cDccc"))
     }
 
     return(out_df)
