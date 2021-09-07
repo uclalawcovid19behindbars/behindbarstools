@@ -26,14 +26,13 @@ alt_aggregate_counts <- function(
     round_ <- ifelse(week_grouping, "week", "month")
 
     # read in ucla data and do the appropriate grouping
-    fac_long_df <- read_scrape_data(
-        date_cutoff = date_cutoff, all_dates = all_dates, wide_data = TRUE) %>%
-        assign_web_group() %>%
-        # filter(State != "Not Available") %>%
-        tidyr::pivot_longer(
-            starts_with(c("Residents", "Staff")), names_to = "Measure") %>%
+    ucla_df <- read_scrape_data(
+        date_cutoff = date_cutoff, all_dates = all_dates, wide_data = FALSE)
+    
+    fac_long_df <- ucla_df %>%
+        assign_web_group() %>% 
         select(
-            Name, Date, State, Measure, Web.Group, value, Population.Feb20) %>%
+            Name, Date, State, Measure, Web.Group, value, Population.Feb20) %>% 
         mutate(Rate = value/Population.Feb20)
 
     # pull in the comparable MP data
@@ -66,7 +65,7 @@ alt_aggregate_counts <- function(
         state_df <- fac_long_df %>%
             mutate(Date = lubridate::floor_date(Date, round_)) %>%
             rename(UCLA = value) %>%
-            # filter(!is.na(UCLA)) %>%
+            filter(!is.na(UCLA)) %>%
             group_by(
                 State, Date, Measure, Web.Group, Name, Population.Feb20) %>%
             summarize(UCLA = max_na_rm(UCLA), .groups = "drop_last") %>%
@@ -96,12 +95,13 @@ alt_aggregate_counts <- function(
 
         pri_df <- state_df %>%
             filter(Web.Group == "Prison") %>%
-            full_join(mp_df, by = c("State", "Date", "Measure"))
+            full_join(mp_df, by = c("State", "Date", "Measure")) %>% 
+            mutate(Web.Group = "Prison")
 
     }else{
         state_df <- fac_long_df %>%
             rename(UCLA = value) %>%
-            # filter(!is.na(UCLA)) %>%
+            filter(!is.na(UCLA)) %>%
             group_by(State, Measure, Web.Group) %>%
             mutate(has_statewide = "STATEWIDE" %in% Name) %>%
             # if state wide and other counts exist for a measure only take more
@@ -128,7 +128,8 @@ alt_aggregate_counts <- function(
 
         pri_df <- state_df %>%
             filter(Web.Group == "Prison") %>%
-            full_join(select(mp_df, -Date), by = c("State", "Measure"))
+            full_join(select(mp_df, -Date), by = c("State", "Measure")) %>% 
+            mutate(Web.Group = "Prison")
     }
 
     # combine MP and UCLA data
