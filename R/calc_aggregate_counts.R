@@ -7,8 +7,10 @@
 #' of the District of Columbia DOC. If both UCLA and MP report a
 #' value for a state the larger value for is taken.
 #'
-#' @param date_cutoff date, the earliest date of acceptable data to pull from,
-#' ignored if all dates is true
+#' @param date_cutoff date, the earliest date of acceptable data to pull from 
+#' if all_dates is FALSE for .Confirmed and .Deaths variables 
+#' @param window integer, the day range of acceptable UCLA data to pull from 
+#' if all_dates is FALSE for all variables EXCEPT .Confirmed and .Deaths 
 #' @param ucla_only logical, only consider data from UCLA
 #' @param state logical, return state level data
 #' @param collapse_vaccine logical, combine vaccine variables for more
@@ -28,7 +30,7 @@
 #' @export
 
 calc_aggregate_counts <- function(
-    date_cutoff = DATE_CUTOFF, ucla_only = FALSE, state = FALSE,
+    date_cutoff = DATE_CUTOFF, window = 31, ucla_only = FALSE, state = FALSE,
     collapse_vaccine = TRUE, all_dates = FALSE, week_grouping = TRUE,
     only_prison = TRUE){
 
@@ -59,7 +61,7 @@ calc_aggregate_counts <- function(
     }
 
     ucla_df <- read_scrape_data(
-        date_cutoff = date_cutoff, all_dates = all_dates, wide_data = FALSE)
+        date_cutoff = date_cutoff, window = window, all_dates = all_dates, wide_data = FALSE)
 
     fac_long_df <- ucla_df %>%
         mutate(State = ifelse(Jurisdiction == "federal", "Federal", State)) %>%

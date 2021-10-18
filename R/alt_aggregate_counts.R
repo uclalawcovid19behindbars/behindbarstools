@@ -6,8 +6,10 @@
 #' prison, ICE, Federal, Juvenile, Psychiatric, and county. For prisons, data
 #' from the Marshall project is also incorporated.
 #'
-#' @param date_cutoff date, the earliest date of acceptable data to pull from, 
-#' ignored if all dates is true
+#' @param date_cutoff date, the earliest date of acceptable data to pull from 
+#' if all_dates is FALSE for .Confirmed and .Deaths variables 
+#' @param window integer, the day range of acceptable UCLA data to pull from 
+#' if all_dates is FALSE for all variables EXCEPT .Confirmed and .Deaths 
 #' @param all_dates logical, get time series data rather than just latest counts
 #' @param week_grouping logical, use weekly grouping for past data? else monthly
 #'
@@ -20,14 +22,14 @@
 #' @export
 
 alt_aggregate_counts <- function(
-    date_cutoff = DATE_CUTOFF, all_dates = FALSE, week_grouping = TRUE){
+    date_cutoff = DATE_CUTOFF, window = 31, all_dates = FALSE, week_grouping = TRUE){
 
     # How to round data when doing all dates
     round_ <- ifelse(week_grouping, "week", "month")
 
     # read in ucla data and do the appropriate grouping
     ucla_df <- read_scrape_data(
-        date_cutoff = date_cutoff, all_dates = all_dates, wide_data = FALSE)
+        date_cutoff = date_cutoff, window = window, all_dates = all_dates, wide_data = FALSE)
     
     fac_long_df <- ucla_df %>%
         assign_web_group() %>% 
