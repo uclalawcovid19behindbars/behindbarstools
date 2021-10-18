@@ -6,6 +6,7 @@
 \usage{
 calc_aggregate_counts(
   date_cutoff = DATE_CUTOFF,
+  window = 31,
   ucla_only = FALSE,
   state = FALSE,
   collapse_vaccine = TRUE,
@@ -15,8 +16,11 @@ calc_aggregate_counts(
 )
 }
 \arguments{
-\item{date_cutoff}{date, the earliest date of acceptable data to pull from,
-ignored if all dates is true}
+\item{date_cutoff}{date, the earliest date of acceptable data to pull from 
+if all_dates is FALSE for .Confirmed and .Deaths variables}
+
+\item{window}{integer, the day range of acceptable UCLA data to pull from 
+if all_dates is FALSE for all variables EXCEPT .Confirmed and .Deaths}
 
 \item{ucla_only}{logical, only consider data from UCLA}
 

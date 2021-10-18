@@ -4,7 +4,9 @@
 #'
 #' @param all_dates logical, get all data from all dates recorded by webscraper
 #' @param date_cutoff date, the earliest date of acceptable data to pull from 
-#' if all_dates is FALSE
+#' if all_dates is FALSE for .Confirmed and .Deaths variables 
+#' @param window integer, the day range of acceptable data to pull from 
+#' if all_dates is FALSE for all variables EXCEPT .Confirmed and .Deaths 
 #' @param window_pop int, how far to go back (in days) to look for values from a given
 #' facility to populate NAs in Residents.Population 
 #' @param coalesce_func function, how to combine redundant rows
@@ -24,7 +26,7 @@
 #' @export
 
 read_scrape_data <- function(
-    all_dates = FALSE, date_cutoff = DATE_CUTOFF, window_pop = 90, 
+    all_dates = FALSE, date_cutoff = DATE_CUTOFF, window = 31, window_pop = 90, 
     coalesce_func = sum_na_rm, drop_noncovid_obs = TRUE, debug = FALSE, 
     state = NULL, wide_data = TRUE){
 
@@ -188,8 +190,12 @@ read_scrape_data <- function(
 
     if(!all_dates){
         out_df <- out_df %>%
-            # only keep values newer than date cutoff 
-            filter(Date >= date_cutoff) %>% 
+            # only keep values newer than date cutoff for confirmed, deaths 
+            # only keep values within window for other variables 
+            filter(
+                (Date >= date_cutoff & stringr::str_ends(Measure, "Confirmed|Deaths")) |
+                    (Date >= (Sys.Date() - window))
+            ) %>% 
             group_by(Facility.ID, jurisdiction_scraper, State, Name, Measure) %>%
             arrange(Facility.ID, jurisdiction_scraper, State, Name, Measure, Date) %>%
             # keep only last observed value

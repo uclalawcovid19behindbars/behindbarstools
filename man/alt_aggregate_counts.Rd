@@ -6,13 +6,17 @@
 \usage{
 alt_aggregate_counts(
   date_cutoff = DATE_CUTOFF,
+  window = 31,
   all_dates = FALSE,
   week_grouping = TRUE
 )
 }
 \arguments{
-\item{date_cutoff}{date, the earliest date of acceptable data to pull from, 
-ignored if all dates is true}
+\item{date_cutoff}{date, the earliest date of acceptable data to pull from 
+if all_dates is FALSE for .Confirmed and .Deaths variables}
+
+\item{window}{integer, the day range of acceptable UCLA data to pull from 
+if all_dates is FALSE for all variables EXCEPT .Confirmed and .Deaths}
 
 \item{all_dates}{logical, get time series data rather than just latest counts}
 
