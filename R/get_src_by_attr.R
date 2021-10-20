@@ -19,9 +19,8 @@
 #' @importFrom dplyr mutate
 #' @importFrom xml2 url_absolute
 #'
-#' @export
-#' \dontrun{
 #' @examples
+#' \dontrun{
 #' get_src_by_attr(
 #'     base = "https://doc.arkansas.gov/covid-19-updates/",
 #'     css = "a",
@@ -29,6 +28,8 @@
 #'     attr_regex = "(?i)stats.?update",
 #'     date_regex = "\\d+-\\d+-\\d+")
 #' }
+#'
+#' @export
 
 get_src_by_attr <- function(
     base, css, xpath, attr, attr_regex, date_regex = NULL, date_format = "mdy"){

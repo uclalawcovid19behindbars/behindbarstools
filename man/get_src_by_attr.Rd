@@ -35,3 +35,14 @@ character of the url specified by the search
 \description{
 Gets a web element based on a specific attribute that matches regex
 }
+\examples{
+\dontrun{
+get_src_by_attr(
+    base = "https://doc.arkansas.gov/covid-19-updates/",
+    css = "a",
+    attr = "href",
+    attr_regex = "(?i)stats.?update",
+    date_regex = "\\\\d+-\\\\d+-\\\\d+")
+}
+
+}
