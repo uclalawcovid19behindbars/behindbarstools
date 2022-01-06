@@ -7,17 +7,17 @@
 #' of the District of Columbia DOC. If both UCLA and MP report a
 #' value for a state the larger value for is taken.
 #'
-#' @param date_cutoff date, the earliest date of acceptable data to pull from 
-#' if all_dates is FALSE for .Confirmed and .Deaths variables 
-#' @param window integer, the day range of acceptable UCLA data to pull from 
-#' if all_dates is FALSE for all variables EXCEPT .Confirmed and .Deaths 
+#' @param date_cutoff date, the earliest date of acceptable data to pull from
+#' if all_dates is FALSE for .Confirmed and .Deaths variables
+#' @param window integer, the day range of acceptable UCLA data to pull from
+#' if all_dates is FALSE for all variables EXCEPT .Confirmed and .Deaths
 #' @param ucla_only logical, only consider data from UCLA
 #' @param state logical, return state level data
 #' @param collapse_vaccine logical, combine vaccine variables for more
 #' intuitive comparisons
 #' @param all_dates logical, get time series data rather than just latest counts
 #' @param week_grouping logical, use weekly grouping for past data? else monthly
-#' @param only_prison logical, whether to only include Prison, Federal, and ICE 
+#' @param only_prison logical, whether to only include Prison, Federal, and ICE
 #' web groups (state prisons, federal prisons, and ICE detention)
 #'
 #' @return data frame with aggregated counts at state or national level
@@ -132,6 +132,10 @@ calc_aggregate_counts <- function(
             # if state wide and other counts still exist for a measure only
             # use statewide measures
             filter(!(has_statewide & Name != "STATEWIDE")) %>%
+            # # if vaccine pct exists and vaccine pct is NOT statewide, don't sum it
+            mutate(UCLA = ifelse(str_detect(Measure, ".Pct") & !(has_statewide),
+                                 NA, UCLA)) %>%
+            filter(!is.na(UCLA)) %>%
             group_by(State, Measure) %>%
             summarise(
                 UCLA = sum_na_rm(UCLA), Date = max(Date), .groups = "drop")
