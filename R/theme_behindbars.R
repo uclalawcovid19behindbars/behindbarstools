@@ -35,7 +35,7 @@
 #'     }
 
 theme_behindbars <- function(
-    base_size = 24, base_family = "Helvetica", base_color = "#555526") {
+    base_size = 24, base_family = "Helvetica", base_color = "black") {
 
     ggplot2::theme_classic(
         base_family = base_family,
