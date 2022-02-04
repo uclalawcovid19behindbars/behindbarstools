@@ -23,7 +23,7 @@
 #' }
 #' read_scrape_data(all_dates = TRUE, state = "Wyoming")
 #'
-#' @export
+#' @export 
 
 read_scrape_data <- function(
     all_dates = FALSE, date_cutoff = DATE_CUTOFF, window = 31, window_pop = 90, 
@@ -33,71 +33,52 @@ read_scrape_data <- function(
     remote_loc <- stringr::str_c(
         SRVR_SCRAPE_LOC, "summary_data/aggregated_data.csv")
 
-    jnk <- read.csv(remote_loc, nrows=1, check.names=FALSE)
-    # all columns are character columns unless otherwise denoted
-    ctypes <- rep("c", ncol(jnk))
-    names(ctypes) <- names(jnk)
-    # columns that start with residents or staff or data
-    ctypes[stringr::str_starts(names(ctypes), "Residents|Staff")] <- "d"
-    # date is date type
-    ctypes[names(ctypes) == "Date"] <- "D"
+    # fix facility names, state names, add logical columns for population and
+    # historical scrapers, assign default jurisdiction if none exists
+    cleaned_df <- .clean_csv(remote_loc, debug)
 
-    dat_df <- remote_loc %>%
-        readr::read_csv(col_types = paste0(ctypes, collapse = "")) %>%
-        mutate(State = translate_state(State)) %>%
-        # rename this variable for clarity
-        rename(jurisdiction_scraper = jurisdiction) %>%
-        # the following steps are time intensive so its better to do them
-        # while the data is wide
-        mutate(Name = clean_fac_col_txt(Name, to_upper = TRUE)) %>%
-        mutate(
-            pop_scraper = ifelse(stringr::str_detect(id, "pop"), T, F),
-            historical_covid = ifelse(stringr::str_detect(id, "pre-nov"), T, F)
-            ) %>%
-        clean_facility_name(debug = debug) %>%
-        # if Jurisdiction is NA (no match in facility_spellings),
-        # make it scraper jurisdiction
-        mutate(Jurisdiction = ifelse(
-            (is.na(Jurisdiction) & !is.na(jurisdiction_scraper)),
-            jurisdiction_scraper, Jurisdiction)) %>%
-        # now we can pivot the data long
+    # now we can pivot the data long
+    base_df <- cleaned_df %>%
         tidyr::pivot_longer(starts_with(c("Residents", "Staff")))
 
     if(debug){
         message(stringr::str_c(
-            "Base data frame contains ", nrow(dat_df), " rows."))
+            "Base data frame contains ", nrow(base_df), " rows."))
     }
 
+    filtered_dt <- filter(base_df, !is.na(value)) %>%
+        data.table::as.data.table()
+
     if(!is.null(state)){
-        filt_df <- dat_df %>%
-            filter(State %in% state & !is.na(value)) %>%
-            data.table::as.data.table()
+        filtered_dt <- filtered_dt %>%
+            filter(State %in% state)
 
         if(debug){
             message(stringr::str_c(
-                "State specific data frame contains ", nrow(filt_df), " rows."))
+                "State specific data table contains ", nrow(filtered_dt), " rows."))
         }
-    }
-    else {
-        filt_df <- data.table::as.data.table(dat_df)[!is.na(value), ]
     }
 
     # resolve population issues, prioritize dedicated pop scrapers
-    pop_full_df <- filt_df[name == "Residents.Population",]
-    pop_full_df[,
+    pop_full_dt <- filtered_dt[name == "Residents.Population",]
+    ## TODO pop_full and pop_sub are the same -- do we care?
+    pop_full_dt[,
                 singlepop := length(unique(pop_scraper)) == 1,
                 by = list(
                     Date, Name, State, jurisdiction_scraper, Facility.ID, name)]
-    pop_sub <- pop_full_df[pop_scraper | singlepop,]
+    pop_sub <- pop_full_dt[pop_scraper | singlepop,]
     pop_sub[,singlepop := NULL]
 
     # resolve duplicate scrapers issues, prioritize old scrapers
-    cov_full_df <- filt_df[name != "Residents.Population",]
-    cov_full_df[,
-                singlescrape := length(unique(historical_covid)) == 1,
-                by = list(
-                    Date, Name, State, jurisdiction_scraper, Facility.ID, name)]
-    cov_sub <- cov_full_df[singlescrape | historical_covid,]
+    cov_full_dt <- filtered_dt[name != "Residents.Population",]
+    test <- cov_full_dt[,
+                        singlescrape := length(unique(historical_covid)) == 1,
+                        by = list(
+                            Date, Name, State, jurisdiction_scraper, Facility.ID, name)]
+    # In practice, what this is doing is removing Residents.Confirmed,
+    # Residents.Pending, Residents.Negative between pre and post Nov, is that right?
+    cov_sub <- cov_full_dt[singlescrape | historical_covid,]
+
 
     # combine scrapers together
     var_sub_df <- bind_rows(pop_sub,cov_sub) %>%
@@ -257,8 +238,66 @@ read_scrape_data <- function(
         message(stringr::str_c(
             "Named data frame contains ", nrow(out_df), " rows."))
     }
-    
+
     out_df <- assign_web_group(out_df)
 
     return(out_df)
+}
+
+#' Looks at the first row of csv and creates a string representing column type
+#'
+#' 'c' represents character columns, 'd' represents data columns, and
+#'    'D' represents date columns
+#'
+#' @return string with character representations of column type
+#'
+.set_col_data_types <- function(){
+    remote_loc <- stringr::str_c(
+        SRVR_SCRAPE_LOC, "summary_data/aggregated_data.csv")
+
+    raw <- read.csv(remote_loc, nrows=1, check.names=FALSE)
+    # all columns are character columns unless otherwise denoted
+    ctypes <- rep("c", ncol(raw))
+    names(ctypes) <- names(raw)
+    # columns that start with residents or staff or data
+    ctypes[stringr::str_starts(names(ctypes), "Residents|Staff")] <- "d"
+    # date is date type
+    ctypes[names(ctypes) == "Date"] <- "D"
+
+
+    return(paste0(ctypes, collapse = ""))
+}
+
+#' Cleans an aggregated data which includes historical and current scraped records
+#'
+#' Normalizes COVID-19 references, state categorizations
+#' Removes special characters (except spaces and dashes), new line indicators,
+#'  excess white space, changes "state-wide" to "statewide" (case-insensitive).
+#'
+#' @param file_location character vector for remote csv file
+#'
+#' @return cleaned, wide dataframe
+#'
+.clean_csv <- function(file_location, debug){
+    cleaned_df <- file_location %>%
+        # read in csv
+        readr::read_csv(col_types = .set_col_data_types()) %>%
+        mutate(State = translate_state(State)) %>%
+        # rename this variable for clarity
+        rename(jurisdiction_scraper = jurisdiction) %>%
+        # the following steps are time intensive so its better to do them
+        # while the data is wide
+        mutate(Name = clean_fac_col_txt(Name, to_upper = TRUE)) %>%
+        mutate(
+            pop_scraper = ifelse(stringr::str_detect(id, "pop"), T, F),
+            historical_covid = ifelse(stringr::str_detect(id, "pre-nov"), T, F)
+        ) %>%
+        clean_facility_name(debug = debug) %>%
+        # if Jurisdiction is NA (no match in facility_spellings),
+        # make it scraper jurisdiction
+        mutate(
+            Jurisdiction = ifelse(
+                (is.na(Jurisdiction) & !is.na(jurisdiction_scraper)),
+                jurisdiction_scraper, Jurisdiction)
+        )
 }
