@@ -29,7 +29,7 @@
 #' calc_aggregate_counts(state = TRUE, all_dates = TRUE)
 #' @export
 
-sub_vax_data <- function(df, ad = all_dates){
+sub_vax_data <- function(df, ad){
   grp_vars <- if(ad) c('State', 'Date') else c('State')
   arrange_vars <- if(ad) c('State', 'Date', 'Measure') else c('State', 'Measure')
   res <- df %>%
@@ -110,7 +110,7 @@ calc_aggregate_counts <- function(
             group_by(State, Date, Measure) %>%
             summarise(UCLA = sum_na_rm(UCLA), .groups = "drop")
         
-        if(collapse_vaccine) state_df <- sub_vax_data(state_df)
+        if(collapse_vaccine) state_df <- sub_vax_data(state_df, ad = all_dates)
 
         comb_df <- state_df %>%
             full_join(mp_data, by = c("State", "Measure", "Date")) %>%
@@ -137,7 +137,7 @@ calc_aggregate_counts <- function(
             summarise(
                 UCLA = sum_na_rm(UCLA), Date = max(Date), .groups = "drop")
 
-        if(collapse_vaccine) state_df <- sub_vax_data(state_df)
+        if(collapse_vaccine) state_df <- sub_vax_data(state_df, ad = all_dates)
         
         comb_df <- state_df %>%
             rename(Date.UCLA = Date) %>%
