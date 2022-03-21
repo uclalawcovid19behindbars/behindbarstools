@@ -205,12 +205,19 @@ calc_aggregate_counts <- function(
         agg_df <- group_by(agg_df, Date, Measure)
     }
 
-    out_agg_df <- agg_df %>%
+    UCLA_reporting_and_missing <- agg_df %>%
+        select(-Date.MP, -MP, -Val) %>%
+        filter(!is.na(UCLA)) %>%
         summarize(
-            Count = sum_na_rm(Val), Reporting = sum(!is.na(Val)),
+            Reporting = sum(!is.na(UCLA)),
             Missing = paste0(
-                to_report[!(to_report %in% State)], collapse = ", "),
-            .groups = "drop")
+                to_report[!(to_report %in% State)], collapse = ", "))
+
+    # Aggregate by Val, including MP, then add the reporting and missing
+    out_agg_df <- agg_df %>%
+        summarize(Count = sum_na_rm(Val)) %>%
+        left_join(UCLA_reporting_and_missing)
+
 
     return(out_agg_df)
 }
