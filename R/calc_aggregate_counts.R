@@ -216,7 +216,7 @@ calc_aggregate_counts <- function(
     # Aggregate by Val, including MP, then add the reporting and missing
     out_agg_df <- agg_df %>%
         summarize(Count = sum_na_rm(Val)) %>%
-        merge(UCLA_reporting_and_missing)
+        left_join(UCLA_reporting_and_missing)
 
 
     return(out_agg_df)
