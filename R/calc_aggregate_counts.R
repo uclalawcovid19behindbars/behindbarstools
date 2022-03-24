@@ -88,7 +88,7 @@ calc_aggregate_counts <- function(
             group_by(State, Date, Measure) %>%
             summarise(UCLA = sum_na_rm(UCLA), .groups = "drop")
         
-        if(sub_vax) state_df <- .sub_vax_data(state_df, ad = all_dates)
+        if(sub_vax) state_df <- .sub_vax_data(state_df, all_dates)
 
         comb_df <- state_df %>%
             full_join(mp_data, by = c("State", "Measure", "Date")) %>%
@@ -115,7 +115,7 @@ calc_aggregate_counts <- function(
             summarise(
                 UCLA = sum_na_rm(UCLA), Date = max(Date), .groups = "drop")
 
-        if(sub_vax) state_df <- .sub_vax_data(state_df, ad = all_dates)
+        if(sub_vax) state_df <- .sub_vax_data(state_df, all_dates)
         
         comb_df <- state_df %>%
             rename(Date.UCLA = Date) %>%
