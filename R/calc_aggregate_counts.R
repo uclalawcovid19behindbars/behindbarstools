@@ -29,55 +29,12 @@
 #' calc_aggregate_counts(state = TRUE, all_dates = TRUE)
 #' @export
 
-create_statewide_counts <- function(dat, all_dates) {
-    ## for state-wide historical data, we create weekly or monthly aggregate data
-    if (all_dates) {
-        dat <- dat %>%
-            mutate(Date = lubridate::floor_date(Date, round_))
-    }
-    fac_vars <- c('Facility.ID', 'Name')
-    base_vars <- c('State', 'Measure')
-    grp_vars_nofac <- if(all_dates) c(base_vars, 'Date') else base_vars
-    grp_vars_fac <- if(all_dates) c(base_vars, 'Date', fac_vars) else c(base_vars, fac_vars)
-
-    ## filter out NA values and group data as necessary
-    grped_dat <- dat %>%
-        rename(UCLA = value) %>%
-        filter(!is.na(UCLA)) %>%
-        group_by_at(grp_vars_fac)
-    ## take the max value from each facility/measure -- doesn't change latest data
-    maxed_dat <- grped_dat %>%
-        summarize(UCLA = max_na_rm(UCLA), .groups = "drop_last") %>%
-        ungroup()
-    ## if state-wide AND other obs exist for a measure/measure-date, only use statewide
-    statewided_dat <- maxed_dat %>%
-        mutate(statewide_exact = (Name == "STATEWIDE")) %>%
-        group_by_at(grp_vars_fac) %>%
-        mutate(statewide_in_grp = sum(statewide_exact) > 0) %>%
-        ungroup() %>%
-        filter(!(statewide_in_grp & !statewide_exact))
-    ## if vaccine pct exists and vaccine pct is NOT statewide, don't sum it
-    if (!all_dates) {
-        statewided_dat <- statewided_dat %>%
-            mutate(UCLA = ifelse((str_detect(Measure, ".Pct") & !statewide_exact),
-                                 NA, UCLA)) %>%
-            filter(!is.na(UCLA))
-    }
-    ## sum data to state-level
-    state_df <- statewided_dat %>%
-        group_by_at(grp_vars_nofac) %>%
-        summarise(UCLA = sum_na_rm(UCLA), .groups = "drop") %>%
-        ungroup()
-
-    return(state_df)
-}
-
 calc_aggregate_counts <- function(
     date_cutoff = DATE_CUTOFF, window = 31, ucla_only = FALSE, state = FALSE,
     collapse_vaccine = TRUE, all_dates = FALSE, week_grouping = TRUE,
     only_prison = TRUE){
 
-    round_ <- ifelse(week_grouping, "week", "month")
+    round_to <- ifelse(week_grouping, "week", "month")
 
     to_report <- c(
         datasets::state.name, "Federal", "ICE", "District of Columbia")
@@ -87,7 +44,7 @@ calc_aggregate_counts <- function(
     if(all_dates){
         mp_data <- mp_data_wide %>%
             filter(!is.na(Date)) %>%
-            mutate(Date = lubridate::floor_date(Date, round_)) %>%
+            mutate(Date = lubridate::floor_date(Date, round_to)) %>%
             tidyr::pivot_longer(
                 -(State:Date), names_to = "Measure", values_to = "MP") %>%
             group_by(State, Date, Measure) %>%
@@ -116,7 +73,8 @@ calc_aggregate_counts <- function(
         select(Facility.ID, Name, Date, State, Measure, value)
 
     if(all_dates){
-        state_df <- create_statewide_counts(fac_long_df, all_dates)
+        state_df <- .create_statewide_counts(fac_long_df, all_dates,
+                                            week_grouping = week_grouping)
 
         if(collapse_vaccine){
             sub_vac_res <- state_df %>%
@@ -150,7 +108,8 @@ calc_aggregate_counts <- function(
             arrange(State, Date, Measure)
     }
     else{
-        state_df <- create_statewide_counts(fac_long_df, all_dates)
+        state_df <- .create_statewide_counts(fac_long_df, all_dates,
+                                            week_grouping = week_grouping)
 
         if(collapse_vaccine){
             sub_vac_res <- state_df %>%
@@ -226,3 +185,47 @@ calc_aggregate_counts <- function(
 
     return(out_agg_df)
 }
+
+.create_statewide_counts <- function(dat, all_dates, week_grouping) {
+    round_to <- ifelse(week_grouping, "week", "month")
+
+    ## for state-wide historical data, we create weekly or monthly aggregate data
+    if (all_dates) {
+        dat <- dat %>%
+            mutate(Date = lubridate::floor_date(Date, round_to))
+    }
+    fac_vars <- c('Facility.ID', 'Name')
+    base_vars <- c('State', 'Measure')
+    grp_vars_nofac <- if(all_dates) c(base_vars, 'Date') else base_vars
+    grp_vars_fac <- if(all_dates) c(base_vars, 'Date', fac_vars) else c(base_vars, fac_vars)
+
+    ## filter out NA values and group data as necessary
+    grped_dat <- dat %>%
+        rename(UCLA = value) %>%
+        filter(!is.na(UCLA)) %>%
+        group_by_at(grp_vars_fac)
+    ## take the max value from each facility/measure -- doesn't change latest data
+    maxed_dat <- grped_dat %>%
+        summarize(UCLA = max_na_rm(UCLA), .groups = "drop_last")
+    ## if state-wide AND other obs exist for a measure/measure-date, only use statewide
+    statewided_dat <- maxed_dat %>%
+        mutate(statewide_exact = (Name == "STATEWIDE")) %>%
+        group_by_at(grp_vars_fac) %>%
+        mutate(statewide_in_grp = sum(statewide_exact) > 0) %>%
+        ungroup() %>%
+        filter(!(statewide_in_grp & !statewide_exact))
+    ## if vaccine pct exists and vaccine pct is NOT statewide, don't sum it
+    if (!all_dates) {
+        statewided_dat <- statewided_dat %>%
+            mutate(UCLA = ifelse((str_detect(Measure, ".Pct") & !statewide_exact),
+                                 NA, UCLA)) %>%
+            filter(!is.na(UCLA))
+    }
+    ## sum data to state-level
+    state_df <- statewided_dat %>%
+        group_by_at(grp_vars_nofac) %>%
+        summarise(UCLA = sum_na_rm(UCLA), .groups = "drop")
+
+    return(state_df)
+}
+

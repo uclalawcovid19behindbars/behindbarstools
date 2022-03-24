@@ -16,10 +16,10 @@ calc_aggregate_counts(
 )
 }
 \arguments{
-\item{date_cutoff}{date, the earliest date of acceptable data to pull from 
+\item{date_cutoff}{date, the earliest date of acceptable data to pull from
 if all_dates is FALSE for .Confirmed and .Deaths variables}
 
-\item{window}{integer, the day range of acceptable UCLA data to pull from 
+\item{window}{integer, the day range of acceptable UCLA data to pull from
 if all_dates is FALSE for all variables EXCEPT .Confirmed and .Deaths}
 
 \item{ucla_only}{logical, only consider data from UCLA}
@@ -33,7 +33,7 @@ intuitive comparisons}
 
 \item{week_grouping}{logical, use weekly grouping for past data? else monthly}
 
-\item{only_prison}{logical, whether to only include Prison, Federal, and ICE 
+\item{only_prison}{logical, whether to only include Prison, Federal, and ICE
 web groups (state prisons, federal prisons, and ICE detention)}
 }
 \value{
