@@ -13,7 +13,7 @@
 #' if all_dates is FALSE for all variables EXCEPT .Confirmed and .Deaths
 #' @param ucla_only logical, only consider data from UCLA
 #' @param state logical, return state level data
-#' @param collapse_vaccine logical, add variable for Residents.Initiated, equal to Residents.Completed, 
+#' @param sub_vax logical, add variable for Residents.Initiated, equal to Residents.Completed, 
 #' where Resident.Initiated is missing, by state, measure, and date when all_dates == T
 #' @param all_dates logical, get time series data rather than just latest counts
 #' @param week_grouping logical, use weekly grouping for past data? else monthly
@@ -29,31 +29,9 @@
 #' calc_aggregate_counts(state = TRUE, all_dates = TRUE)
 #' @export
 
-sub_vax_data <- function(df, ad){
-  grp_vars <- if(ad) c('State', 'Date') else c('State')
-  arrange_vars <- if(ad) c('State', 'Date', 'Measure') else c('State', 'Measure')
-  res <- df %>%
-    group_by_at(grp_vars) %>%
-    mutate(No.Initiated = !("Residents.Initiated" %in% Measure)) %>%
-    filter(No.Initiated ) %>%
-    filter(Measure %in% c("Residents.Completed")) %>%
-    arrange_at(arrange_vars) %>%
-    filter(1:n() == 1) %>% #if there are duplicates, take the highest one
-    mutate(Measure = "Residents.Initiated")
-  staff <- df %>%
-    group_by_at(grp_vars) %>%
-    mutate(No.Initiated = !("Staff.Initiated" %in% Measure)) %>%
-    filter(No.Initiated ) %>%
-    filter(Measure %in% c("Staff.Completed")) %>%
-    arrange_at(arrange_vars) %>%
-    filter(1:n() == 1) %>% #if there are duplicates, take the highest one
-    mutate(Measure = "Staff.Initiated") 
-  return(bind_rows(df, res, staff) %>% select(-No.Initiated))
-}
-
 calc_aggregate_counts <- function(
     date_cutoff = DATE_CUTOFF, window = 31, ucla_only = FALSE, state = FALSE,
-    collapse_vaccine = TRUE, all_dates = FALSE, week_grouping = TRUE,
+    sub_vax = TRUE, all_dates = FALSE, week_grouping = TRUE,
     only_prison = TRUE){
 
     round_ <- ifelse(week_grouping, "week", "month")
@@ -110,7 +88,7 @@ calc_aggregate_counts <- function(
             group_by(State, Date, Measure) %>%
             summarise(UCLA = sum_na_rm(UCLA), .groups = "drop")
         
-        if(collapse_vaccine) state_df <- sub_vax_data(state_df, ad = all_dates)
+        if(sub_vax) state_df <- .sub_vax_data(state_df, ad = all_dates)
 
         comb_df <- state_df %>%
             full_join(mp_data, by = c("State", "Measure", "Date")) %>%
@@ -137,7 +115,7 @@ calc_aggregate_counts <- function(
             summarise(
                 UCLA = sum_na_rm(UCLA), Date = max(Date), .groups = "drop")
 
-        if(collapse_vaccine) state_df <- sub_vax_data(state_df, ad = all_dates)
+        if(sub_vax) state_df <- .sub_vax_data(state_df, ad = all_dates)
         
         comb_df <- state_df %>%
             rename(Date.UCLA = Date) %>%
@@ -185,4 +163,26 @@ calc_aggregate_counts <- function(
             .groups = "drop")
 
     return(out_agg_df)
+}
+
+.sub_vax_data <- function(df, all_dates){
+  grp_vars <- if(all_dates) c('State', 'Date') else c('State')
+  arrange_vars <- if(all_dates) c('State', 'Date', 'Measure') else c('State', 'Measure')
+  res <- df %>%
+    group_by_at(grp_vars) %>%
+    mutate(No.Initiated = !("Residents.Initiated" %in% Measure)) %>%
+    filter(No.Initiated ) %>%
+    filter(Measure %in% c("Residents.Completed")) %>%
+    arrange_at(arrange_vars) %>%
+    filter(1:n() == 1) %>% #if there are duplicates, take the highest one
+    mutate(Measure = "Residents.Initiated")
+  staff <- df %>%
+    group_by_at(grp_vars) %>%
+    mutate(No.Initiated = !("Staff.Initiated" %in% Measure)) %>%
+    filter(No.Initiated ) %>%
+    filter(Measure %in% c("Staff.Completed")) %>%
+    arrange_at(arrange_vars) %>%
+    filter(1:n() == 1) %>% #if there are duplicates, take the highest one
+    mutate(Measure = "Staff.Initiated") 
+  return(bind_rows(df, res, staff) %>% select(-No.Initiated))
 }
