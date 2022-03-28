@@ -12,7 +12,7 @@
 theme_behindbars(
   base_size = 24,
   base_family = "Helvetica",
-  base_color = "#555526"
+  base_color = "black"
 )
 
 theme_map_behindbars(base_size = 24, base_family = "Helvetica")

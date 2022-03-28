@@ -9,31 +9,31 @@ calc_aggregate_counts(
   window = 31,
   ucla_only = FALSE,
   state = FALSE,
-  collapse_vaccine = TRUE,
+  sub_vax = TRUE,
   all_dates = FALSE,
   week_grouping = TRUE,
   only_prison = TRUE
 )
 }
 \arguments{
-\item{date_cutoff}{date, the earliest date of acceptable data to pull from 
+\item{date_cutoff}{date, the earliest date of acceptable data to pull from
 if all_dates is FALSE for .Confirmed and .Deaths variables}
 
-\item{window}{integer, the day range of acceptable UCLA data to pull from 
+\item{window}{integer, the day range of acceptable UCLA data to pull from
 if all_dates is FALSE for all variables EXCEPT .Confirmed and .Deaths}
 
 \item{ucla_only}{logical, only consider data from UCLA}
 
 \item{state}{logical, return state level data}
 
-\item{collapse_vaccine}{logical, combine vaccine variables for more
-intuitive comparisons}
+\item{sub_vax}{logical, add variable for Residents.Initiated, equal to Residents.Completed, 
+where Resident.Initiated is missing, by state, measure, and date when all_dates == T}
 
 \item{all_dates}{logical, get time series data rather than just latest counts}
 
 \item{week_grouping}{logical, use weekly grouping for past data? else monthly}
 
-\item{only_prison}{logical, whether to only include Prison, Federal, and ICE 
+\item{only_prison}{logical, whether to only include Prison, Federal, and ICE
 web groups (state prisons, federal prisons, and ICE detention)}
 }
 \value{
