@@ -13,8 +13,8 @@
 #' if all_dates is FALSE for all variables EXCEPT .Confirmed and .Deaths
 #' @param ucla_only logical, only consider data from UCLA
 #' @param state logical, return state level data
-#' @param collapse_vaccine logical, combine vaccine variables for more
-#' intuitive comparisons
+#' @param sub_vax logical, add variable for Residents.Initiated, equal to Residents.Completed, 
+#' where Resident.Initiated is missing, by state, measure, and date when all_dates == T
 #' @param all_dates logical, get time series data rather than just latest counts
 #' @param week_grouping logical, use weekly grouping for past data? else monthly
 #' @param only_prison logical, whether to only include Prison, Federal, and ICE
@@ -31,7 +31,7 @@
 
 calc_aggregate_counts <- function(
     date_cutoff = DATE_CUTOFF, window = 31, ucla_only = FALSE, state = FALSE,
-    collapse_vaccine = TRUE, all_dates = FALSE, week_grouping = TRUE,
+    sub_vax = TRUE, all_dates = FALSE, week_grouping = TRUE,
     only_prison = TRUE){
 
     round_ <- ifelse(week_grouping, "week", "month")
@@ -87,33 +87,8 @@ calc_aggregate_counts <- function(
             filter(!(has_statewide & Name != "STATEWIDE")) %>%
             group_by(State, Date, Measure) %>%
             summarise(UCLA = sum_na_rm(UCLA), .groups = "drop")
-
-        if(collapse_vaccine){
-            sub_vac_res <- state_df %>%
-                group_by(State, Date) %>%
-                mutate(No.Initiated = !("Residents.Initiated" %in% Measure)) %>%
-                filter(No.Initiated) %>%
-                # remove vadmin in the vector if you dont want to sub for that val
-                filter(Measure %in% c("Residents.Completed")) %>%
-                arrange(State, Date, Measure) %>%
-                filter(1:n() == 1) %>%
-                mutate(Measure = "Residents.Initiated") %>%
-                ungroup()
-
-            sub_vac_staff <- state_df %>%
-                group_by(State, Date) %>%
-                mutate(No.Initiated = !("Staff.Initiated" %in% Measure)) %>%
-                filter(No.Initiated) %>%
-                # add vadmin in the vector if you dont to sub for that val
-                filter(Measure %in% c("Staff.Completed")) %>%
-                arrange(State, Date, Measure) %>%
-                filter(1:n() == 1) %>%
-                mutate(Measure = "Staff.Initiated") %>%
-                ungroup()
-
-            state_df <- bind_rows(state_df, sub_vac_res, sub_vac_staff) %>%
-                select(-No.Initiated)
-        }
+        
+        if(sub_vax) state_df <- .sub_vax_data(state_df, all_dates)
 
         comb_df <- state_df %>%
             full_join(mp_data, by = c("State", "Measure", "Date")) %>%
@@ -140,33 +115,8 @@ calc_aggregate_counts <- function(
             summarise(
                 UCLA = sum_na_rm(UCLA), Date = max(Date), .groups = "drop")
 
-        if(collapse_vaccine){
-            sub_vac_res <- state_df %>%
-                group_by(State) %>%
-                mutate(No.Initiated = !("Residents.Initiated" %in% Measure)) %>%
-                filter(No.Initiated) %>%
-                # add vadmin in the vector if you also want to sub for that val
-                filter(Measure %in% c("Residents.Completed")) %>%
-                arrange(State, Measure) %>%
-                filter(1:n() == 1) %>%
-                mutate(Measure = "Residents.Initiated") %>%
-                ungroup()
-
-            sub_vac_staff <- state_df %>%
-                group_by(State) %>%
-                mutate(No.Initiated = !("Staff.Initiated" %in% Measure)) %>%
-                filter(No.Initiated) %>%
-                # add vadmin in the vector if you also want to sub for that val
-                filter(Measure %in% c("Staff.Completed")) %>%
-                arrange(State, Measure) %>%
-                filter(1:n() == 1) %>%
-                mutate(Measure = "Staff.Initiated") %>%
-                ungroup()
-
-            state_df <- bind_rows(state_df, sub_vac_res, sub_vac_staff) %>%
-                select(-No.Initiated)
-        }
-
+        if(sub_vax) state_df <- .sub_vax_data(state_df, all_dates)
+        
         comb_df <- state_df %>%
             rename(Date.UCLA = Date) %>%
             full_join(
@@ -213,4 +163,26 @@ calc_aggregate_counts <- function(
             .groups = "drop")
 
     return(out_agg_df)
+}
+
+.sub_vax_data <- function(df, all_dates){
+  grp_vars <- if(all_dates) c('State', 'Date') else c('State')
+  arrange_vars <- if(all_dates) c('State', 'Date', 'Measure') else c('State', 'Measure')
+  res <- df %>%
+    group_by_at(grp_vars) %>%
+    mutate(No.Initiated = !("Residents.Initiated" %in% Measure)) %>%
+    filter(No.Initiated ) %>%
+    filter(Measure %in% c("Residents.Completed")) %>%
+    arrange_at(arrange_vars) %>%
+    filter(1:n() == 1) %>% #if there are duplicates, take the highest one
+    mutate(Measure = "Residents.Initiated")
+  staff <- df %>%
+    group_by_at(grp_vars) %>%
+    mutate(No.Initiated = !("Staff.Initiated" %in% Measure)) %>%
+    filter(No.Initiated ) %>%
+    filter(Measure %in% c("Staff.Completed")) %>%
+    arrange_at(arrange_vars) %>%
+    filter(1:n() == 1) %>% #if there are duplicates, take the highest one
+    mutate(Measure = "Staff.Initiated") 
+  return(bind_rows(df, res, staff) %>% select(-No.Initiated))
 }
