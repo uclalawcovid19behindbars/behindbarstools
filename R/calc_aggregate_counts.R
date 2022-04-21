@@ -13,7 +13,7 @@
 #' if all_dates is FALSE for all variables EXCEPT .Confirmed and .Deaths
 #' @param ucla_only logical, only consider data from UCLA
 #' @param state logical, return state level data
-#' @param sub_vax logical, add variable for Residents.Initiated, equal to Residents.Completed, 
+#' @param sub_vax logical, add variable for Residents.Initiated, equal to Residents.Completed,
 #' where Resident.Initiated is missing, by state, measure, and date when all_dates == T
 #' @param all_dates logical, get time series data rather than just latest counts
 #' @param week_grouping logical, use weekly grouping for past data? else monthly
@@ -87,7 +87,7 @@ calc_aggregate_counts <- function(
             filter(!(has_statewide & Name != "STATEWIDE")) %>%
             group_by(State, Date, Measure) %>%
             summarise(UCLA = sum_na_rm(UCLA), .groups = "drop")
-        
+
         if(sub_vax) state_df <- .sub_vax_data(state_df, all_dates)
 
         comb_df <- state_df %>%
@@ -116,7 +116,7 @@ calc_aggregate_counts <- function(
                 UCLA = sum_na_rm(UCLA), Date = max(Date), .groups = "drop")
 
         if(sub_vax) state_df <- .sub_vax_data(state_df, all_dates)
-        
+
         comb_df <- state_df %>%
             rename(Date.UCLA = Date) %>%
             full_join(
@@ -144,7 +144,7 @@ calc_aggregate_counts <- function(
                 str_detect(Measure, "Staff.") ~ Staff.Population)) %>%
             select(-Residents.Population, -Staff.Population)
 
-        return(out_state_df)
+        out_state_df
     }
 
     agg_df <- harm_df %>%
@@ -183,6 +183,6 @@ calc_aggregate_counts <- function(
     filter(Measure %in% c("Staff.Completed")) %>%
     arrange_at(arrange_vars) %>%
     filter(1:n() == 1) %>% #if there are duplicates, take the highest one
-    mutate(Measure = "Staff.Initiated") 
+    mutate(Measure = "Staff.Initiated")
   return(bind_rows(df, res, staff) %>% select(-No.Initiated))
 }
