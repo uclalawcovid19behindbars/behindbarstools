@@ -144,8 +144,8 @@ calc_aggregate_counts <- function(
                 str_detect(Measure, "Staff.") ~ Staff.Population)) %>%
             select(-Residents.Population, -Staff.Population)
 
-        out_state_df
-    }
+        return(out_state_df)
+    } else {
 
     agg_df <- harm_df %>%
         filter(!is.na(Val)) %>%
@@ -163,6 +163,7 @@ calc_aggregate_counts <- function(
             .groups = "drop")
 
     return(out_agg_df)
+    }
 }
 
 .sub_vax_data <- function(df, all_dates){
