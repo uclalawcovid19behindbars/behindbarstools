@@ -39,27 +39,6 @@ calc_aggregate_counts <- function(
     to_report <- c(
         datasets::state.name, "Federal", "ICE", "District of Columbia")
 
-    mp_data_wide <- read_mpap_data(date_cutoff = date_cutoff, all_dates = all_dates)
-
-    if(all_dates){
-        mp_data <- mp_data_wide %>%
-            filter(!is.na(Date)) %>%
-            mutate(Date = lubridate::floor_date(Date, round_)) %>%
-            tidyr::pivot_longer(
-                -(State:Date), names_to = "Measure", values_to = "MP") %>%
-            group_by(State, Date, Measure) %>%
-            summarize(MP = max_na_rm(MP), .groups = "drop")
-    }
-    else{
-        mp_data <- mp_data_wide %>%
-            tidyr::pivot_longer(
-            -(State:Date), names_to = "Measure", values_to = "MP")
-    }
-
-    if(ucla_only){
-        mp_data$MP <- NA_real_
-    }
-
     ucla_df <- read_scrape_data(
         date_cutoff = date_cutoff, window = window, all_dates = all_dates, wide_data = FALSE)
 
@@ -91,7 +70,6 @@ calc_aggregate_counts <- function(
         if(sub_vax) state_df <- .sub_vax_data(state_df, all_dates)
 
         comb_df <- state_df %>%
-            full_join(mp_data, by = c("State", "Measure", "Date")) %>%
             arrange(State, Date, Measure)
     }
     else{
@@ -119,19 +97,10 @@ calc_aggregate_counts <- function(
 
         comb_df <- state_df %>%
             rename(Date.UCLA = Date) %>%
-            full_join(
-                rename(mp_data, Date.MP = Date), by = c("State", "Measure")) %>%
             arrange(State, Measure)
     }
 
-    harm_df <- comb_df %>%
-        mutate(Val = case_when(
-            is.na(UCLA) & is.na(MP) ~ NA_real_,
-            is.na(UCLA) ~ MP,
-            is.na(MP) ~ UCLA,
-            UCLA >= MP ~ UCLA,
-            TRUE ~ MP
-        ))
+    harm_df <- comb_df
 
     # Join with anchored population data
     if(state){
@@ -148,7 +117,6 @@ calc_aggregate_counts <- function(
     } else {
 
     agg_df <- harm_df %>%
-        filter(!is.na(Val)) %>%
         group_by(Measure)
 
     if(all_dates){
@@ -157,7 +125,7 @@ calc_aggregate_counts <- function(
 
     out_agg_df <- agg_df %>%
         summarize(
-            Count = sum_na_rm(Val), Reporting = sum(!is.na(Val)),
+            Count = sum_na_rm(UCLA), Reporting = sum(!is.na(UCLA)),
             Missing = paste0(
                 to_report[!(to_report %in% State)], collapse = ", "),
             .groups = "drop")
